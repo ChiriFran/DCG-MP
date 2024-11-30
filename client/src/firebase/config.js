@@ -8,8 +8,10 @@ import {
 } from "firebase/auth";
 
 // Tu configuración de Firebase para la aplicación web
+const firebaseApiKey = process.env.FIREBASE_API_KEY;
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBBkoZEjzftavISNPRRsAJRPbumS8AYbo4",
+  apiKey: firebaseApiKey,
   authDomain: "ecommerce-ad14c.firebaseapp.com",
   projectId: "ecommerce-ad14c",
   storageBucket: "ecommerce-ad14c.appspot.com",

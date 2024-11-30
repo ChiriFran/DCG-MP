@@ -20,8 +20,9 @@ const Carrito = () => {
     phone: "",
   });
 
+  const mpPublicKey = process.env.MP_PUBLIC_KEY_PROD;
   // Inicializa Mercado Pago
-  initMercadoPago("APP_USR-f2eb5540-8843-4738-9b8a-2875853a6a4c");
+  initMercadoPago(mpPublicKey);
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;

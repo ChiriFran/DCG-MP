@@ -4,8 +4,11 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 const router = Router();
 
 // Configuración de Mercado Pago
+
+const mpAccessToken = process.env.MP_ACCESS_TOKEN_TEST;
+
 const client = new MercadoPagoConfig({
-  accessToken: "APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXX", // Reemplaza con tu token real
+  accessToken: mpAccessToken, // Reemplaza con tu token real
 });
 
 router.post("/", async (req, res) => {
@@ -24,9 +27,9 @@ router.post("/", async (req, res) => {
         currency_id: "ARS",
       })),
       back_urls: {
-        success: "https://tu-app.vercel.app/checkout-success",
-        failure: "https://tu-app.vercel.app/checkout-failure",
-        pending: "https://tu-app.vercel.app/checkout-pending",
+        success: "https://dcgstore.vercel.app/",
+        failure: "https://dcgstore.vercel.app/",
+        pending: "https://dcgstore.vercel.app/",
       },
       auto_return: "approved",
       payer: {
