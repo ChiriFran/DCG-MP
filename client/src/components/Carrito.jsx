@@ -40,7 +40,10 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      const response = await axios.post("http://localhost:3000/create_preference", {
+      // Usar una URL dinámica que cambia dependiendo del entorno
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
+      const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
       });
@@ -51,6 +54,7 @@ const Carrito = () => {
       console.error("Error al crear la preferencia en Mercado Pago", error);
     }
   };
+
 
   const saveOrderToFirebase = async () => {
     const pedido = {
