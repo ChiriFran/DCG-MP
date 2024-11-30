@@ -5,7 +5,7 @@ const router = Router();
 
 // Configuración de Mercado Pago
 
-const mpAccessToken = process.env.MP_ACCESS_TOKEN_TEST;
+const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
 
 const client = new MercadoPagoConfig({
   accessToken: mpAccessToken, // Reemplaza con tu token real
