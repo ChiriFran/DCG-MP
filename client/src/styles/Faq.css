@@ -1,0 +1,80 @@
+.faqContainer {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10%;
+    margin-top: 10vh;
+    color: white;
+}
+
+.faqTitle {
+    margin: 0 0 2rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.301);
+    width: 80%;
+    text-align: center;
+}
+
+.faqTexts {
+    width: 50%;
+    line-height: 1.8;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.faqSubtitles{
+    width: 50%;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.901);
+    margin: 1rem 0;
+    margin-top: 2rem;
+}
+
+.faqContainer ul{
+    display: flex;
+    flex-flow: column;
+    align-items: start;
+    justify-content: center;
+    width: 50%;
+}
+
+.faqContainer ul li{
+    list-style-type: square;
+    margin-left: 4rem;
+    color: rgba(255, 255, 255, 0.901);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    line-height: 2;
+}
+
+@media screen and (max-width: 700px) {
+    .faqContainer {
+        padding: 0 0 5% 0;
+        margin-top: 5vh;
+    }
+
+    .faqTitle {
+        width: 100%;
+    }
+
+    .faqTexts {
+        width: 90%;
+        line-height: 2;    
+    }
+
+    .faqSubtitles{
+        width: 90%;
+        font-size: 1rem;
+    }
+
+    .faqContainer ul{
+        width: 80%;
+    }
+
+    .faqContainer ul li{
+        margin-left: 0;
+    }
+
+}

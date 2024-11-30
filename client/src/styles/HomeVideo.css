@@ -1,0 +1,20 @@
+.homeVideoContainer {
+  width: 80%;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.homeVideoContainer video {
+  width: 100%;
+}
+
+@media screen and (max-width: 700px) {
+
+  .homeVideoContainer video {
+    width: auto;
+    height: 80vh;
+  }
+}

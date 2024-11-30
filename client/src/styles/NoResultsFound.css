@@ -1,0 +1,21 @@
+.no-results-container{
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50vh;
+}
+
+.no-results-title{
+    color: #f4f4f4;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.no-results-text{
+    color: #f4f4f4;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 1rem 0;
+}

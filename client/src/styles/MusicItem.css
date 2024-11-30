@@ -1,0 +1,89 @@
+.musicItemContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.musicItem {
+  width: 100%;
+  max-width: 260px;
+  /* Limita el ancho máximo del contenedor */
+  height: 260px;
+  background-color: transparent;
+  overflow: hidden;
+  /* Asegura que el contenido no se desborde */
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  margin: 1rem 1rem;
+}
+
+.musicIframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(40, 40, 40);
+}
+
+.BuyBtn {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: #f4f4f4;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  padding-top: 0.5rem;
+  text-decoration: none;
+}
+
+.bandcampBackground:nth-last-child(1) {
+  display: none;
+  position: absolute;
+  top: -120%;
+  transform: rotate(-20deg);
+  left: 0.5rem;
+  font-weight: 500;
+  color: #f4f4f41b;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.bandcampBackground:nth-last-child(2) {
+  display: none;
+  position: absolute;
+  top: -120%;
+  transform: rotate(-20deg);
+  right: 0.5rem;
+  font-weight: 500;
+  color: #f4f4f41b;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 700px) {
+
+  .musicItemContainer {
+    width: 100%;
+    height: 100%;
+  }
+
+    .musicItem {
+      width: 100%;
+      height: 185px;
+      margin: 1.5rem 0.25rem;
+    }
+
+    .bandcampBackground:nth-last-child(1),
+    .bandcampBackground:nth-last-child(2) {
+      display: none;
+    }
+  }

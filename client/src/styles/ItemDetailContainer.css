@@ -1,0 +1,14 @@
+.detailContainer{
+    display: flex;
+    width: 100%;
+    flex-flow: row;
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+@media screen and (max-width: 700px) {
+    .detailContainer{
+        flex-flow: column;
+        justify-content: flex-start;
+    }
+}

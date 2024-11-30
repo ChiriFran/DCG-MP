@@ -1,0 +1,121 @@
+.search-filters {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 0 15%;
+}
+
+.barraBusqueda {
+  height: 40px;
+  width: 180px;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  font-weight: 400;
+  letter-spacing: 3px;
+  padding: 0.5rem 0;
+  padding-left: 0.3rem;
+  border: none;
+  background-color: transparent;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.457);
+  color: #f4f4f4;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.barraBusqueda:focus {
+  border-color: #007bff;
+}
+
+.categorySelect {
+  height: 40px;
+  width: 180px;
+  margin: 0 0;
+  border: none;
+  padding: 0.5rem 0;
+  margin: 0 0.5rem;
+  padding-left: 0.3rem;
+  background-color: rgba(255, 255, 255, 0.064);
+  color: #f4f4f484;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  font-weight: 400;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.categorySelect:focus {
+  background-color: rgb(0, 0, 0);
+  color: #f4f4f4;
+  outline: none;
+}
+
+.btnBuscar {
+  height: 40px;
+  border: none;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  margin: 0 0;
+  padding: 0.6rem 1rem;
+  background-color: rgba(255, 255, 255, 0.064);
+  color: #f4f4f481;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btnBuscar:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.input-container {
+  position: relative;
+}
+
+.suggestions-list-products {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 3px solid rgb(225, 225, 225);
+  background: rgba(5, 5, 5, 0.998);
+  color: #f4f4f4;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  transition: .3s;
+}
+
+.suggestions-list-products li {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.457);
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #f4f4f4f8;
+  background-color: transparent;
+  transition: .3s;
+}
+
+.suggestions-list-products li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .6s;
+}
+
+@media screen and (max-width: 700px) {
+  .search-filters {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .categorySelect {
+    width: 70%;
+    display: flex;
+    margin: 1rem 1rem;
+  }
+
+  .btnBuscar {
+    display: block;
+  }
+}

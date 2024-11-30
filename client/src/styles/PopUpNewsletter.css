@@ -1,0 +1,188 @@
+.popupOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition: opacity 0.6s ease-in-out;
+  opacity: 0;
+}
+
+.popupOverlay.fadeIn {
+  opacity: 1;
+}
+
+.popupOverlay.fadeOut {
+  opacity: 0;
+}
+
+.popupNewsletter {
+  margin: 0 auto;
+  border: none;
+  padding: 2% 5%;
+  background-color: #0a0a0a;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: translateY(-50px);
+  opacity: 0;
+  transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+}
+
+.popupNewsletter.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #f4f4f4;
+}
+
+.modalNewsletterContainer {
+  display: flex;
+  width: 100%;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: transparent;
+  color: #f4f4f4;
+}
+
+.popupNewsletter.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modalNewsletterTitle {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+  letter-spacing: 3px;
+}
+
+.modalNewsletterText {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  font-weight: 400;
+  padding: 0 5% 1rem;
+  text-align: center;
+}
+
+.modalNewsletterForm {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+}
+
+.modalFormGroup {
+  position: relative;
+  width: 100%;
+}
+
+#emailPopUp {
+  width: 100%;
+  padding: 6px;
+  border: none;
+  border: 1px solid #ffffff31;
+  background-color: rgba(174, 174, 174, 0.046);
+  color: #f4f4f4;
+  letter-spacing: 3px;
+  padding-left: 1rem;
+  box-sizing: border-box;
+}
+
+.modalSubmitButton {
+  text-align: end;
+  padding: 6px;
+  border: none;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.946);
+  border-bottom: 2px solid #ffffff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  letter-spacing: 3px;
+  transition: background-color 0.4s, color 0.4s, border-color 0.4s;
+  margin-left: 1rem;
+}
+
+.modalSubmitButton:hover {
+  color: rgba(247, 247, 247, 0.946);
+}
+
+.modalSubmitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.modalSubmitting {
+  background-color: #17a2b8;
+}
+
+.modalSuccessMessage {
+  position: relative;
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+  background-color: rgba(8, 228, 8, 0.426);
+  color: #000;
+  font-size: 1.2rem;
+  padding: 0.2rem 1rem;
+  transition: 0.4s;
+}
+
+.modalErrorMessage {
+  position: absolute;
+  color: rgba(255, 0, 0, 0.523);
+  font-size: 0.6rem;
+  font-weight: bold;
+  background-color: #ffd1d1dc;
+  padding: 8px 2%;
+  border-radius: 4px;
+  border: 1px solid #ff5c5c;
+  text-align: center;
+  width: 200px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 20%;
+}
+
+@media screen and (max-width: 700px) {
+  .popupNewsletter {
+    padding: 10% 0;
+    margin: 0 1rem;
+  }
+
+  .modalNewsletterContainer {
+    margin: 3rem 0;
+  }
+
+  .modalNewsletterTitle {
+    text-align: center;
+  }
+
+  .modalNewsletterText {
+    font-size: 0.8rem;
+    font-weight: 200;
+    padding: 0 8% 2rem;
+  }
+
+
+
+}

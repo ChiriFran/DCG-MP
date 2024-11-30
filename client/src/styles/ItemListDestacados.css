@@ -1,0 +1,42 @@
+.productosDestacadosContainer {
+  display: flex;
+  width: 100%;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.productosDestacados {
+  display: flex;
+  width: 80%;
+  flex-flow: row;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 10%;
+}
+
+.homeText {
+  width: 50%;
+  text-align: center;
+  margin: 5% 0;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  font-weight: 500;
+  color: #f4f4f4;
+  text-transform: uppercase;
+}
+
+@media screen and (max-width: 700px) {
+
+  .productosDestacados {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 1rem;
+  }
+
+  .productosDestacados {
+    width: 90%;
+  }
+
+}

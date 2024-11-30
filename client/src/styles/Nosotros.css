@@ -1,0 +1,20 @@
+.nosotrosContainer{
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.nosotrosTitle{
+    font-size: clamp(1.2rem, 2vw, 2rem);
+    margin: 1rem 0;
+}
+
+.nosotrosText{
+    width: 50%;
+    text-align: center;
+    margin: 1rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+}

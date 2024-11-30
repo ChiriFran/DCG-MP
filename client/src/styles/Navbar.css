@@ -1,0 +1,258 @@
+.nav {
+  display: flex;
+  width: 100%;
+  flex-flow: row;
+  align-items: start;
+  padding: 0.5rem 1rem;
+  justify-content: space-between;
+  z-index: 10000;
+  background-color: #0a0a0a;
+  transition: height 0.5s ease;
+}
+
+.link {
+  position: relative;
+  text-decoration: none;
+  color: #e9e9e9;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  z-index: 1000;
+}
+
+.logoImg {
+  margin-top: 3rem;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  /* Ajusta la distancia bajo el texto */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  /* Grosor de la línea */
+  background-color: #f4f4f4;
+  /* Color del subrayado */
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  /* Suaviza la transición */
+}
+
+.link.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.link svg {
+  margin: 0 0.5rem;
+}
+
+.brand {
+  display: none;
+}
+
+.navBarDesktopContainer {
+  display: flex;
+  width: 100%;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0a0a;
+  z-index: 10000;
+  padding: 0.5rem 0;
+  margin-bottom: 3rem;
+}
+
+.userMenuDesktop {
+  display: flex;
+  flex-flow: row;
+}
+
+.userMenuDesktop li {
+  font-size: 0.8rem;
+}
+
+.usernameNav{
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.navMenuDesktop {
+  display: flex;
+  flex-flow: row;
+  list-style: none;
+}
+
+.carritoContainerDesktop li {
+  padding: 0 1rem;
+}
+
+.navMenuDesktop li {
+  padding: 0 1rem;
+}
+
+.navMenu,
+.userMenu {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  margin: 0;
+}
+
+.navMenu li,
+.userMenu li {
+  padding: 0 1rem;
+  list-style: none;
+}
+
+.menuIcon {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: #e9e9e9;
+  margin: 3px 0;
+  transition: 0.4s;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+.closeIcon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  color: #e9e9e9;
+  cursor: pointer;
+}
+
+.closeIcon:hover {
+  color: #ffffff;
+}
+
+.carritoContainer {
+  list-style: none;
+}
+
+.carritoContainerDesktop {
+  border: 2px solid #f4f4f4;
+}
+
+.userMenuDesktop li {
+  list-style: none;
+}
+
+@media screen and (max-width: 700px) {
+
+  .userMenuDesktop {
+    display: none;
+  }
+
+  .carritoContainerDesktop {
+    display: none;
+  }
+
+  .navBarDesktopContainer {
+    display: none;
+  }
+
+  .logoImg {
+    margin-top: 1rem;
+  }
+
+  .menuIcon {
+    display: flex;
+  }
+
+  .navMenu,
+  .userMenu {
+    display: none;
+  }
+
+  /* Estado cuando el menú está oculto */
+  .mobileMenu.inactive {
+    transform: translateX(-100%);
+    /* Desplazado fuera de la pantalla */
+    transition: transform 0.3s ease-in-out;
+    /* Animación suave */
+  }
+
+  /* Estado cuando el menú está visible */
+  .mobileMenu.active {
+    transform: translateX(0);
+    /* Vuelve a su posición original */
+    transition: transform 0.3s ease-in-out;
+    /* Animación suave */
+  }
+
+  .menuIcon.hidden {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: flex;
+    flex-flow: column;
+    width: 60%;
+    height: 100vh;
+    align-items: center;
+    justify-content: space-evenly;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    padding: 3rem 0;
+    box-shadow: 0px 30px 23px -3px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .mobileMenu.active ul li {
+    padding: 0.5rem 0;
+  }
+
+  .mobileMenu.active .link {
+    color: #e9e9e9;
+  }
+
+  .nav {
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .productosNav {
+    display: none;
+  }
+
+  .menuIcon.active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .menuIcon.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menuIcon.active .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .mobileMenu.active .navMenu,
+  .mobileMenu.active .userMenu {
+    display: flex;
+    flex-direction: column;
+  }
+
+}

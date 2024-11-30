@@ -1,0 +1,386 @@
+.itemDetailContainer {
+  display: flex;
+  flex-flow: row;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  padding: 0 20%;
+  color: #f4f4f4;
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.itemDetail {
+  width: 100%;
+  margin-top: 5rem;
+  padding: 1rem 1rem;
+  padding-left: 10%;
+}
+
+.itemDetailImgContainer {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.itemDetailImg {
+  width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 1rem;
+}
+
+.itemDetailTitle {
+  font-size: 4rem;
+  margin: 1rem 0;
+  font-family: 'Instrument-serif';
+  font-weight: 400;
+}
+
+.itemDetailPrice {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+  color: rgba(225, 225, 225, 0.97);
+  border-bottom: 1px solid rgba(96, 96, 96, 0.44);
+  letter-spacing: 4px;
+}
+
+.paymentButtons {
+  border-bottom: 1px solid rgba(136, 135, 135, 0.48);
+}
+
+.sizeSelectorContainer {
+  margin: 1rem 0;
+  border-bottom: 1px solid rgba(96, 96, 96, 0.44);
+  padding-bottom: 1rem;
+}
+
+.sizeSelectorContainer h3 {
+  font-size: 0.8rem;
+  font-size: 700;
+  font-weight: 600;
+  color: rgb(118, 118, 118);
+  margin: 1rem 0;
+}
+
+#size-selector {
+  width: 100%;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.size-button {
+  width: 100%;
+  border: none;
+  padding: 0.8rem 0.8rem;
+  background-color: transparent;
+  color: #f1f2f6;
+  border-bottom: 2px solid rgba(255, 255, 255, 0);
+}
+
+.size-button:hover{
+  background-color: rgba(225, 225, 225, 0.1);
+
+}
+
+.size-button.selected {
+  background-color: rgba(225, 225, 225, 0.1);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.445);
+}
+
+.botonesComprarEliminar {
+  display: flex;
+  flex-flow: row;
+  align-items: end;
+}
+
+.cantidadEnCarrito {
+  color: rgb(96, 96, 96);
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(136, 135, 135, 0.48);
+}
+
+.eliminarDelCarrito {
+  border: none;
+  margin: 0 1rem;
+  font-size: 0.8rem;
+  background-color: rgba(0, 0, 0, 0.88);
+  color: #ffffffa4;
+  border-radius: 0.5rem;
+  background-color: transparent;
+}
+
+.eliminarDelCarrito:hover {
+  background-color: rgba(1, 1, 1, 0.607);
+  color: #fff;
+}
+
+.sizeChartContainerDesktop,
+.sizeGridContainerDesktop {
+  display: block;
+}
+
+.itemDetailDescription {
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: #f4f4f476;
+  margin: 1rem 0;
+}
+
+.itemDetailDescriptionList ul {
+  margin: 1rem 2rem;
+}
+
+.itemDetailDescriptionList ul li {
+  font-size: 0.8rem;
+  color: rgb(136, 135, 135);
+  padding: 0.1rem 0;
+  line-height: 1.4;
+  list-style-type: decimal-leading-zero;
+}
+
+.sizeChartContainer,
+.sizeGridContainer {
+  display: none;
+}
+
+.sizeChartContainerDesktop {
+  margin: 1rem 0 1rem 0;
+  width: 100%;
+  border-top: 1px solid rgba(136, 135, 135, 0.48);
+}
+
+.sizeTitle {
+  font-size: 1rem;
+  color: rgb(136, 135, 135);
+  margin: 1rem;
+  font-weight: 600;
+}
+
+.sizeChartContainerDesktop>ul>li>p {
+  font-size: 0.8rem;
+  margin: 0.5rem 0;
+  color: rgb(136, 135, 135);
+  padding: 0 1rem;
+  letter-spacing: 0.5px;
+}
+
+.sizeChartContainerDesktop span {
+  font-size: 0.8rem;
+}
+
+.sizeChartContainerDesktop ul {
+  padding-left: 2rem;
+}
+
+.sizeChartContainerDesktop ul li {
+  color: rgb(136, 135, 135);
+  list-style-type: square;
+  font-size: 1rem;
+}
+
+.sizeGridContainerDesktop {
+  width: 100%;
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 2px;
+  margin-bottom: 1rem;
+}
+
+.sizeGrid>div {
+  color: rgb(136, 135, 135);
+  border: 1px solid rgba(136, 135, 135, 0.48);
+  padding: 0.5rem 1rem;
+  text-align: center;
+}
+
+.divVacio {
+  background-color: rgba(225, 225, 225, 0.1);
+
+}
+
+.talleS {
+  grid-column-start: 1;
+  grid-row-start: 2;
+}
+
+.talleM {
+  grid-column-start: 1;
+  grid-row-start: 3;
+}
+
+.talleL {
+  grid-column-start: 1;
+  grid-row-start: 4;
+}
+
+.talleXL {
+  grid-column-start: 1;
+  grid-row-start: 5;
+}
+
+.talleXXL {
+  grid-column-start: 1;
+  grid-row-start: 6;
+}
+
+.longitud {
+  background-color: rgba(225, 225, 225, 0.1);
+  grid-column-start: 2;
+  grid-row-start: 1;
+}
+
+.longitudS {
+  grid-column-start: 2;
+  grid-row-start: 2;
+}
+
+.longitudM {
+  grid-column-start: 2;
+  grid-row-start: 3;
+}
+
+.longitudL {
+  grid-column-start: 2;
+  grid-row-start: 4;
+}
+
+.longitudXL {
+  grid-column-start: 2;
+  grid-row-start: 5;
+}
+
+.longitudXXL {
+  grid-column-start: 2;
+  grid-row-start: 6;
+}
+
+.pecho {
+  background-color: rgba(225, 225, 225, 0.1);
+  grid-column-start: 3;
+  grid-row-start: 1;
+}
+
+.pechoS {
+  grid-column-start: 3;
+  grid-row-start: 2;
+}
+
+.pechoM {
+  grid-column-start: 3;
+  grid-row-start: 3;
+}
+
+.pechoL {
+  grid-column-start: 3;
+  grid-row-start: 4;
+}
+
+.pechoXL {
+  grid-column-start: 3;
+  grid-row-start: 5;
+}
+
+.pechoXXL {
+  grid-column-start: 3;
+  grid-row-start: 6;
+}
+
+.careInstructions p {
+  color: rgb(136, 135, 135);
+  font-weight: 600;
+}
+
+.careInstructions ul li {
+  list-style-type: square;
+}
+
+.itemDetailCategory {
+  margin: 1rem 0;
+}
+
+.itemDetailCategory p {
+  font-size: 1rem;
+  color: rgb(136, 135, 135);
+}
+
+
+@media screen and (max-width: 700px) {
+
+  .itemDetailContainer {
+    display: flex;
+    flex-flow: column;
+    align-items: start;
+    justify-content: center;
+    width: 100%;
+    padding: 0 0;
+    color: #f4f4f4;
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+
+  }
+
+  .itemDetail {
+    width: 100%;
+    padding: 1rem 1rem;
+    margin-top: 0;
+    order: 2;
+  }
+
+  .sizeChartContainer,
+  .sizeGridContainer {
+    display: block;
+  }
+
+  .itemDetailImgContainer {
+    display: flex;
+    width: 100%;
+    min-height: 500px;
+    align-items: center;
+    justify-content: center;
+    order: 1;
+  }
+
+  .itemDetailImg {
+    width: 100%;
+  }
+
+  .botonesComprarEliminar {
+    display: flex;
+    flex-flow: column;
+    align-items: baseline;
+    justify-content: center;
+  }
+
+  .eliminarDelCarrito {
+    margin: 0.5rem 1rem;
+  }
+
+  .sizeChartContainerDesktop,
+  .sizeGridContainerDesktop {
+    display: none;
+  }
+
+  .sizeChartContainer>ul>li>p {
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+    color: rgb(136, 135, 135);
+    padding: 0 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .sizeChartContainer ul li {
+    color: rgb(136, 135, 135);
+    list-style-type: square;
+    font-size: 0.8rem;
+  }
+}

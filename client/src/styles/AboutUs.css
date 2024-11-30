@@ -1,0 +1,45 @@
+.acercaContainer {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10%;
+    margin-top: 10vh;
+    color: white;
+}
+
+.acercaTitle {
+    margin: 0 0 2rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.301);
+    width: 80%;
+    text-align: center;
+
+}
+
+.acercaTexts {
+    width: 50%;
+    line-height: 1.8;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+
+}
+
+@media screen and (max-width: 700px) {
+    .acercaContainer {
+        padding: 0 0 5% 0;
+        margin-top: 5vh;
+    }
+
+    .acercaTitle {
+        width: 100%;
+    }
+
+    .acercaTexts {
+        width: 90%;
+        line-height: 2;
+
+    }
+
+}
