@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 
 // Tu configuración de Firebase para la aplicación web
-const firebaseApiKey = process.env.FIREBASE_API_KEY;
+const firebaseApiKey = import.meta.env.FIREBASE_API_KEY;
 
 const firebaseConfig = {
   apiKey: firebaseApiKey,
