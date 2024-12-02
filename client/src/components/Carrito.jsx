@@ -21,7 +21,7 @@ const Carrito = () => {
   });
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
-  const mpPublicKey = process.env.REACT_APP_MP_PUBLIC_KEY_PROD;
+  const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD; // Cambiado a VITE_ para acceso correcto
   initMercadoPago(mpPublicKey);
 
   // Maneja los cambios en los campos de envío
@@ -43,7 +43,7 @@ const Carrito = () => {
       }));
 
       // URL base del backend desde las variables de entorno
-      const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
       console.log("API URL:", apiUrl); // Depuración para verificar la URL
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
@@ -58,7 +58,6 @@ const Carrito = () => {
       alert("Hubo un problema al generar la preferencia. Intenta nuevamente.");
     }
   };
-
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
