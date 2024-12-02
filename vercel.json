@@ -1,27 +1,30 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "api/index.js",
-        "use": "@vercel/node"
-      },
-      {
-        "src": "client/package.json",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "client/dist"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/create_preference.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "client/dist"
       }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/client/$1"
-      }
-    ]
-  }
-  
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/create_preference",
+      "dest": "/api/create_preference.js"  
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"  
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"  
+    }
+  ]
+}

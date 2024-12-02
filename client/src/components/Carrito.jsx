@@ -3,7 +3,7 @@ import "../styles/Carrito.css";
 import { CartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import ItemListContainerDestacados from "./ItemListContainerDestacados";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
@@ -20,10 +20,11 @@ const Carrito = () => {
     phone: "",
   });
 
-  const mpPublicKey = process.env.MP_PUBLIC_KEY_PROD;
-  // Inicializa Mercado Pago
+  // Inicializa Mercado Pago con clave pública desde las variables de entorno
+  const mpPublicKey = process.env.REACT_APP_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
+  // Maneja los cambios en los campos de envío
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingData((prevData) => ({
@@ -32,6 +33,7 @@ const Carrito = () => {
     }));
   };
 
+  // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
@@ -40,8 +42,8 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      // Usar una URL dinámica que cambia dependiendo del entorno
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+      // URL base del backend desde las variables de entorno
+      const apiUrl = process.env.REACT_APP_API_URL;
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -51,11 +53,12 @@ const Carrito = () => {
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error al crear la preferencia en Mercado Pago", error);
+      console.error("Error al crear la preferencia en Mercado Pago:", error);
+      alert("Hubo un problema al generar la preferencia. Intenta nuevamente.");
     }
   };
 
-
+  // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
@@ -67,13 +70,15 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Pedido guardado con ID: ${doc.id}`);
-      return true; // Indica que la operación fue exitosa
+      return true;
     } catch (error) {
-      console.error("Error al guardar el pedido en Firebase", error);
+      console.error("Error al guardar el pedido en Firebase:", error);
+      alert("Hubo un problema al guardar el pedido. Intenta nuevamente.");
       return false;
     }
   };
 
+  // Maneja la compra
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -201,8 +206,6 @@ const Carrito = () => {
           </>
         ) : null}
       </div>
-
-      {/* {preferenceId && <Wallet initialization={{ preferenceId: preferenceId }} />} */}
 
       {carrito.length === 0 && <ItemListContainerDestacados />}
     </div>
