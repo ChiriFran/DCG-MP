@@ -1,6 +1,11 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
+  // Agrega las cabeceras CORS
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Permite solicitudes desde cualquier dominio
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS"); // Métodos permitidos
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Cabeceras permitidas
+
   if (req.method === "POST") {
     try {
       const { items, shipping } = req.body;
@@ -39,6 +44,7 @@ export default async function handler(req, res) {
       const preference = new Preference(client);
       const result = await preference.create({ body });
 
+      console.log(result); // Log de la respuesta de Mercado Pago
       res.status(200).json({ id: result.id });
     } catch (error) {
       console.error("Error al crear la preferencia:", error);

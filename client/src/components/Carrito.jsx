@@ -32,7 +32,7 @@ const Carrito = () => {
       [name]: value,
     }));
   };
-
+  
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
@@ -44,6 +44,7 @@ const Carrito = () => {
 
       // URL base del backend desde las variables de entorno
       const apiUrl = process.env.REACT_APP_API_URL;
+      console.log("API URL:", apiUrl); // Depuración para verificar la URL
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -57,6 +58,7 @@ const Carrito = () => {
       alert("Hubo un problema al generar la preferencia. Intenta nuevamente.");
     }
   };
+
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
