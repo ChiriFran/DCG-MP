@@ -13,6 +13,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "mercadopago": "^2.0.7",
+    "dotenv": "^10.0.0",
     "send": "^1.1.0",
     "serve-static": "^1.16.2",
     "whatwg-url": "^14.0.0"
