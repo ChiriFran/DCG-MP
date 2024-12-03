@@ -33,6 +33,7 @@
     width: 180px;
     margin: 0 0;
     border: none;
+    border-radius: none;
     padding: 0.5rem 0;
     margin: 0 0.5rem;
     padding-left: 0.3rem;
@@ -108,16 +109,26 @@
 
 @media screen and (max-width: 700px) {
     .music-filters {
+        flex-flow: column;
         padding: 0.5rem 0.5rem;
     }
 
+    .musicInputContainer{
+        width: 94%;
+    }
+
+    .authorSearch {
+        width: 100%;
+    }
+
     .orderSelect {
-        width: 70%;
+        width: 94%;
         display: flex;
-        margin: 1rem 1rem;
+        margin: 0.5rem 0.5rem;
     }
 
     .btnMusicBuscar {
+        width: 94%;
         display: block;
     }
 }
