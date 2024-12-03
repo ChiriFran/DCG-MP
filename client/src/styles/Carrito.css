@@ -122,13 +122,42 @@
   height: 100%;
 }
 
+.formEnvio {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.formEnvioGroup {
+  width: 50%;
+  position: relative;
+  padding: 0 0.5rem;
+}
+
+.formEnvioGroup input {
+  width: 100%;
+  padding: 6px;
+  border: none;
+  border: 1px solid #ffffff31;
+  background-color: rgba(174, 174, 174, 0.046);
+  color: #f4f4f4;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  padding-left: 1rem;
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
+}
+
+
 .carritoFaq {
   font-size: 0.8rem;
   text-decoration: underline;
   color: rgba(128, 128, 128, 0.8);
 }
 
-.mercadoPagoBtn{
+.mercadoPagoBtn {
   background-color: rgba(128, 128, 128, 0.274);
   border: none;
   color: rgba(255, 255, 255, 0.872);
@@ -210,8 +239,8 @@
   }
 
   .productImage {
-    width: 100%;
-    height: 100%;
+    width: 50%;
+    height: 50%;
     margin-bottom: 1rem;
     margin-right: 0;
   }
@@ -238,6 +267,10 @@
     padding: 0.8rem 0;
     font-size: 1rem;
     text-align: center;
+  }
+
+  .formEnvioGroup {
+    width: 100%;
   }
 
   .vaciarCarrito {

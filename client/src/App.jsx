@@ -14,6 +14,7 @@ import Carrito from "./components/Carrito.jsx";
 import Checkout from "./components/Checkout.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
+import CartPopup from "./components/CartPopup.jsx";
 import ContactFooter from "./components/ContactFooter.jsx";
 import Footer from "./components/Footer.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
@@ -29,15 +30,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/Productos" element={<ItemListContainer />} />
-              <Route
-                path="/Productos/:category"
-                element={<ItemListContainer />}
-              />
+              <Route path="/Productos/:category" element={<ItemListContainer />} />
               <Route path="/Music" element={<MusicList />} />
-              <Route
-                path="/ProductoDetalles/:id"
-                element={<ItemDetailContainer />}
-              />
+              <Route path="/ProductoDetalles/:id" element={<ItemDetailContainer />} />
               <Route path="/AboutUs" element={<AboutUs />} />
               <Route path="/Faq" element={<Faq />} />
               <Route path="/Eventos" element={<Eventos />} />
@@ -49,6 +44,7 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
             </Routes>
           </ScrollToTop>
+          <CartPopup />
           <ContactFooter />
           <Footer />
         </HashRouter>

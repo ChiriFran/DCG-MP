@@ -1,0 +1,88 @@
+.cart-popup {
+    position: fixed;
+    top: 20px;
+    right: -320px;
+    /* Empieza fuera de la pantalla */
+    width: 400px;
+    height: 200px;
+    background-color: black;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.cart-popup.show {
+    right: 20px;
+    /* El popup entra desde la derecha */
+    opacity: 1;
+    visibility: visible;
+}
+
+.cart-popup.hide {
+    right: -420px;
+    /* El popup vuelve a salir */
+    opacity: 0;
+    visibility: hidden;
+}
+
+.popup-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+}
+
+.popup-product-image {
+    width: 80px;
+    /* Ajusta el tamaño de la imagen */
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.popup-product-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 20px;
+}
+
+.popup-product-info h3 {
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.popup-product-info p {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    margin: 5px 0;
+}
+
+.popup-content button {
+    width: 100%;
+    background-color: #ffffff4b;
+    border: none;
+    border-bottom: 2px solid #ffffffbc;
+    padding: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    transition: .2s;
+}
+
+.popup-content button:hover {
+    background-color: #747474;
+    transition: .4s;
+}

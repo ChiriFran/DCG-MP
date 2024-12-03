@@ -32,7 +32,7 @@ const Carrito = () => {
       [name]: value,
     }));
   };
-  
+
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
@@ -133,7 +133,7 @@ const Carrito = () => {
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
-                <div className="formGroup">
+                <div className="formEnvioGroup">
                   <label>Full Name</label>
                   <input
                     type="text"
@@ -143,7 +143,7 @@ const Carrito = () => {
                     required
                   />
                 </div>
-                <div className="formGroup">
+                <div className="formEnvioGroup">
                   <label>Address</label>
                   <input
                     type="text"
@@ -153,17 +153,7 @@ const Carrito = () => {
                     required
                   />
                 </div>
-                <div className="formGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={shippingData.zipCode}
-                    onChange={handleShippingChange}
-                    required
-                  />
-                </div>
-                <div className="formGroup">
+                <div className="formEnvioGroup">
                   <label>City</label>
                   <input
                     type="text"
@@ -173,22 +163,32 @@ const Carrito = () => {
                     required
                   />
                 </div>
-                <div className="formGroup">
-                  <label>Province</label>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
                   <input
                     type="text"
-                    name="province"
-                    value={shippingData.province}
+                    name="zipCode"
+                    value={shippingData.zipCode}
                     onChange={handleShippingChange}
                     required
                   />
                 </div>
-                <div className="formGroup">
+                <div className="formEnvioGroup">
                   <label>Phone</label>
                   <input
                     type="text"
                     name="phone"
                     value={shippingData.phone}
+                    onChange={handleShippingChange}
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Province</label>
+                  <input
+                    type="text"
+                    name="province"
+                    value={shippingData.province}
                     onChange={handleShippingChange}
                     required
                   />
