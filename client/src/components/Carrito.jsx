@@ -19,6 +19,7 @@ const Carrito = () => {
     province: "",
     phone: "",
   });
+  const [isProcessing, setIsProcessing] = useState(false); // Estado para manejar el clic repetido en el botón
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD; // Cambiado a VITE_ para acceso correcto
@@ -83,8 +84,15 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
+    if (isProcessing) return; // Evita clics repetidos
+
+    setIsProcessing(true); // Activar el estado de procesamiento
+
     const saved = await saveOrderToFirebase();
-    if (!saved) return;
+    if (!saved) {
+      setIsProcessing(false); // Desactivar el estado de procesamiento si falla
+      return;
+    }
 
     const id = await createPreference();
     if (id) {
@@ -97,6 +105,8 @@ const Carrito = () => {
       // Vaciar el carrito después de guardar el pedido y abrir el checkout
       vaciarCarrito();
     }
+
+    setIsProcessing(false); // Desactivar el estado de procesamiento después de completar el flujo
   };
 
   return (
@@ -193,8 +203,15 @@ const Carrito = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="mercadoPagoBtn">
-                  Checkout MP
+                <button
+                  type="submit"
+                  className="mercadoPagoBtn"
+                  style={{
+                    cursor: isProcessing ? "not-allowed" : "pointer",
+                  }}
+                  disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
+                >
+                  {isProcessing ? "Processing..." : "Checkout MP"}
                 </button>
               </form>
               <button onClick={vaciarCarrito} className="vaciarCarrito">
