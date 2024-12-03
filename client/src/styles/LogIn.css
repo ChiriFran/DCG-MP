@@ -80,9 +80,10 @@
 
 /*Button*/
 .form-log-in button {
+  border: 0;
+  border-bottom: 2px solid #adadad62;
   background-color: #ffffff18;
   color: #f1f2f6;
-  border: 0;
   padding: 10px 2rem;
   font-size: 1rem;
   font-weight: 600;
@@ -123,7 +124,6 @@
   background-color: #000;
   color: rgb(238, 238, 238);
   margin: 1rem 0;
-  border-radius: 0.5rem;
   cursor: pointer;
 }
 

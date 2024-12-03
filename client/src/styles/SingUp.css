@@ -81,10 +81,10 @@
 
 /*Button*/
 .form-sing-up button {
-  background-color: #adadad31;
-  color: #f1f2f6;
   border: 0;
-  border-radius: 24px;
+  background-color: #adadad15;
+  border-bottom: 2px solid #adadad62;
+  color: #f1f2f6;
   padding: 10px 2rem;
   font-size: 1rem;
   font-weight: 600;
@@ -94,6 +94,7 @@
 
 .form-sing-up button:hover {
   background-color: #848484d5;
+  border-bottom: 2px solid #bcbcbc;
 }
 
 .error-message {
@@ -123,6 +124,29 @@
   background-color: #cccccc;
   cursor: not-allowed;
 }
+
+/* Mensaje de validación de contraseña */
+.password-hint {
+  margin: 10px;
+  font-size: 0.8rem;
+  text-align: left;
+  color: #adadad;
+}
+
+.password-hint.error-message {
+  color: red;
+  background-color: rgba(255, 0, 0, 0.1);
+  border-left: 4px solid red;
+  padding-left: 8px;
+}
+
+.password-hint.success-message {
+  color: #7ed957;
+  background-color: rgba(0, 128, 0, 0.1);
+  border-left: 4px solid #7ed957;
+  padding-left: 8px;
+}
+
 
 /* Indicador de carga */
 .loading-spinner {

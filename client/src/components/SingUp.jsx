@@ -15,12 +15,45 @@ function SignUp() {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!hasUppercase) {
+      return "Password must include at least one uppercase letter.";
+    }
+    if (!hasLowercase) {
+      return "Password must include at least one lowercase letter.";
+    }
+    if (!hasNumber) {
+      return "Password must include at least one number.";
+    }
+    if (!hasSpecialChar) {
+      return "Password must include at least one special character.";
+    }
+    return null;
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
     setLoading(true);
     setError(null);
     setSuccessMessage("");
@@ -41,7 +74,7 @@ function SignUp() {
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
-      setError(error.message);
+      setError("An error occurred while signing up. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +96,7 @@ function SignUp() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   disabled={loading}
-                ></input>
+                />
                 <input
                   type="text"
                   className="input-sing-up"
@@ -71,7 +104,7 @@ function SignUp() {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   disabled={loading}
-                ></input>
+                />
                 <input
                   type="email"
                   className="input-sing-up"
@@ -79,7 +112,7 @@ function SignUp() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                ></input>
+                />
                 <input
                   type="password"
                   className="input-sing-up"
@@ -87,7 +120,7 @@ function SignUp() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
-                ></input>
+                />
                 <input
                   type="password"
                   className="input-sing-up"
@@ -95,7 +128,15 @@ function SignUp() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
-                ></input>
+                />
+                {password.length > 0 && (
+                  <p
+                    className={`password-hint ${validatePassword(password) ? "error-message" : "success-message"
+                      }`}
+                  >
+                    {validatePassword(password) || "Password meets all security requirements!"}
+                  </p>
+                )}
                 <button type="submit" disabled={loading}>
                   {loading ? "Signing up..." : "Sign up"}
                 </button>
