@@ -1,16 +1,17 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "../styles/Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
-import { useUser } from "../context/UserContext"; // Usar el contexto de usuario
+import { useUser } from "../context/UserContext";
+import logoMobile from '../../media/logo/logoMobile.png';
 import logo from '../../media/logo/logo.svg';
 import cartIcon from '../../media/icons/cart.svg';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [currentLogo, setCurrentLogo] = useState(window.innerWidth <= 700 ? logoMobile : logo);
   const { carrito } = useContext(CartContext);
 
-  // Obtener el estado del usuario desde el contexto
   const { userEmail, loggedIn } = useUser();
   const navigate = useNavigate();
 
@@ -26,9 +27,19 @@ const Navbar = () => {
 
   const handleUserClick = () => {
     if (loggedIn) {
-      navigate("/LogIn"); // Redirigir al LogIn sin hacer logout
+      navigate("/LogIn");
     }
   };
+
+  // Cambiar logo según el ancho de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setCurrentLogo(window.innerWidth <= 700 ? logoMobile : logo);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,7 +58,7 @@ const Navbar = () => {
           {loggedIn ? (
             <li>
               <button className="link usernameNav" onClick={handleUserClick}>
-                {userEmail} {/* Hacer clic en el nombre para ir al LogIn */}
+                {userEmail}
               </button>
             </li>
           ) : (
@@ -58,8 +69,8 @@ const Navbar = () => {
         </ul>
 
         <Link to="/" className="link">
-          <img className="logoImg" src={logo} alt="Logo" />
-          <h1 className="brand">Detroit Classic Galery</h1>
+          <img className="logoImg" src={currentLogo} alt="Logo" />
+          <h1 className="brand">Detroit Classic Gallery</h1>
         </Link>
 
         <ul className="carritoContainerDesktop">
@@ -103,7 +114,7 @@ const Navbar = () => {
           <ul className="userMenu">
             {loggedIn ? (
               <li>
-                <button className="link usernameNav" onClick={handleUserClick}>{userEmail}</button> {/* Redirigir al LogIn */}
+                <button className="link usernameNav" onClick={handleUserClick}>{userEmail}</button>
               </li>
             ) : (
               <>

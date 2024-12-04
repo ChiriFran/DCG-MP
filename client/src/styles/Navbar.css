@@ -183,20 +183,11 @@
 
   .logoImg {
     margin-top: 1rem;
-    display: none;
+    width: 180px;
   }
 
   .link {
     align-items: stretch;
-  }
-
-  .brand {
-    display: block;
-    width: 50%;
-    font-size: 0.8rem;
-    letter-spacing: 3px;
-    font-weight: 400;
-    padding: 1rem 0;
   }
 
   .menuIcon {
@@ -279,6 +270,21 @@
   .mobileMenu.active .userMenu {
     display: flex;
     flex-direction: column;
+  }
+
+  .carritoContainer li a{
+    display: flex;
+    flex-flow: row;
+    align-items: end;
+    justify-content: center;
+  }
+
+  .carritoContainer li a img{
+    margin: 0 0.5rem;
+  }
+
+  .carritoContainer li a span{
+    margin: 0 0.5rem;
   }
 
 }
