@@ -1,5 +1,6 @@
 .footerContainer{
     display: flex;
+    flex-flow: column;
     width: 100%;
     height: 5vh;
     align-items: center;
@@ -10,7 +11,28 @@
     color: #ffffff42;
 }
 
+.footerPayTitle{
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    font-weight: 400;
+}
+
+.footerPaymentContainer{
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.footerPaymentContainer img{
+    width: 32px;
+    margin: 0 0.5rem;
+    opacity: 0.6;
+}
+
 .footerDate{
     letter-spacing: 4px;
     font-size: 0.6rem;
+    padding: 0.5rem 0 1rem;
 }
