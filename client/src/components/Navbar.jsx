@@ -58,7 +58,7 @@ const Navbar = () => {
 
         <Link to="/" className="link">
           <img className="logoImg" src={logo} alt="Logo" />
-          <h1 className="brand">D-troit Class'c Galery</h1>
+          <h1 className="brand">Detroit Classic Galery</h1>
         </Link>
 
         <ul className="carritoContainerDesktop">
