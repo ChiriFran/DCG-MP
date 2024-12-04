@@ -13,16 +13,23 @@ const CartPopup = () => {
 
     useEffect(() => {
         // Detectar cambios en el carrito
-        carrito.forEach((producto, index) => {
-            const prevProducto = prevCart[index];
+        if (carrito.length === 0 && prevCart.length > 0) {
+            // El carrito está vacío y antes tenía productos
+            setLastProduct(null);
+            setPopupMessage("Empty cart");
+            setIsVisible(true);
+        } else {
+            carrito.forEach((producto, index) => {
+                const prevProducto = prevCart[index];
 
-            // Si no existía antes o si su cantidad ha cambiado
-            if (!prevProducto || producto.cantidad !== prevProducto.cantidad) {
-                setLastProduct(producto);
-                setPopupMessage("Added to cart:");
-                setIsVisible(true);
-            }
-        });
+                // Si no existía antes o si su cantidad ha cambiado
+                if (!prevProducto || producto.cantidad !== prevProducto.cantidad) {
+                    setLastProduct(producto);
+                    setPopupMessage("Added to cart:");
+                    setIsVisible(true);
+                }
+            });
+        }
 
         // Actualizar el carrito anterior para la próxima comparación
         setPrevCart([...carrito]);
@@ -47,7 +54,7 @@ const CartPopup = () => {
     return (
         <div className={`cart-popup ${isVisible ? "show" : "hide"}`}>
             <div className="popup-content">
-                {lastProduct && (
+                {lastProduct ? (
                     <>
                         <img src={lastProduct.image} alt={lastProduct.title} className="popup-product-image" />
                         <div className="popup-product-info">
@@ -57,8 +64,7 @@ const CartPopup = () => {
                             <button onClick={goToCart}>Buy</button>
                         </div>
                     </>
-                )}
-                {!lastProduct && (
+                ) : (
                     <div className="popup-product-info">
                         <h3>{popupMessage}</h3>
                     </div>
