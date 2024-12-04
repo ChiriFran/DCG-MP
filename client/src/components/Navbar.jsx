@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { useUser } from "../context/UserContext"; // Usar el contexto de usuario
 import logo from '../../media/logo/logo.svg';
+import cartIcon from '../../media/icons/cart.svg';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -64,7 +65,8 @@ const Navbar = () => {
         <ul className="carritoContainerDesktop">
           <li>
             <Link to="/Carrito" className="link">
-              Cart {getTotalItems()}
+              <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
+              <span>{getTotalItems()}</span>
             </Link>
           </li>
         </ul>
@@ -92,7 +94,8 @@ const Navbar = () => {
           <ul className="carritoContainer">
             <li>
               <Link to="/Carrito" className="link" onClick={toggleMenu}>
-                Cart {getTotalItems()}
+                <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
+                <span>{getTotalItems()}</span>
               </Link>
             </li>
           </ul>
