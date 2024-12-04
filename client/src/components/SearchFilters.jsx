@@ -12,7 +12,11 @@ const SearchFilters = ({ onSearch }) => {
     onSearch({ title: searchTerm, category: category.toLowerCase() });
   };
 
-  // Detectar la tecla Enter en el campo de búsqueda
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Previene la recarga de la página
+    handleSearch(); // Llama a la función de búsqueda
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleSearch();
@@ -24,26 +28,24 @@ const SearchFilters = ({ onSearch }) => {
     setSearchTerm(value);
 
     if (value.length > 0) {
-      // Filtrar las sugerencias (puedes ajustar esto según la lógica de tu aplicación)
       const filteredSuggestions = ["T-shirt", "Hoodie", "Caps", "Bags"]
         .filter((item) => item.toLowerCase().includes(value.toLowerCase()));
       setSuggestions(filteredSuggestions);
     } else {
-      setSuggestions([]); // Vaciar las sugerencias si el input está vacío
+      setSuggestions([]);
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
     setSearchTerm(suggestion);
     setSuggestions([]);
-    setShowSuggestions(false); // Cerrar las sugerencias al seleccionar una opción
+    setShowSuggestions(false);
   };
 
   const handleInputClick = () => {
-    setShowSuggestions(true); // Mostrar las sugerencias al hacer clic en el input
+    setShowSuggestions(true);
 
     if (searchTerm.length === 0) {
-      // Si el input está vacío, mostrar todas las sugerencias
       setSuggestions(["T-shirt", "Hoodie", "Caps", "Bags"]);
     }
   };
@@ -51,7 +53,7 @@ const SearchFilters = ({ onSearch }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
-        setShowSuggestions(false); // Cerrar las sugerencias al hacer clic fuera
+        setShowSuggestions(false);
       }
     };
 
@@ -62,7 +64,7 @@ const SearchFilters = ({ onSearch }) => {
   }, []);
 
   return (
-    <div className="search-filters">
+    <form className="search-filters" onSubmit={handleSubmit}>
       <div className="input-container" ref={suggestionsRef}>
         <input
           className="barraBusqueda"
@@ -70,8 +72,8 @@ const SearchFilters = ({ onSearch }) => {
           placeholder="Search by name"
           value={searchTerm}
           onChange={handleChange}
-          onKeyDown={handleKeyDown}  // Detecta Enter en el input
-          onClick={handleInputClick} // Muestra las sugerencias al hacer clic
+          onKeyDown={handleKeyDown}
+          onClick={handleInputClick}
         />
         {showSuggestions && suggestions.length > 0 && (
           <ul className="suggestions-list-products">
@@ -95,8 +97,8 @@ const SearchFilters = ({ onSearch }) => {
         <option value="Gorras">Caps</option>
         <option value="Bolsas">Bags</option>
       </select>
-      <button className="btnBuscar" onClick={handleSearch}>Search</button>
-    </div>
+      <button className="btnBuscar" type="submit">Search</button>
+    </form>
   );
 };
 
