@@ -23,19 +23,19 @@ function SignUp() {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     if (password.length < minLength) {
-      return "Password must be at least 8 characters long.";
+      return "Password must be at least 8 CHARACTERS long.";
     }
     if (!hasUppercase) {
-      return "Password must include at least one uppercase letter.";
+      return "Password must include at least one UPPERCASE letter.";
     }
     if (!hasLowercase) {
-      return "Password must include at least one lowercase letter.";
+      return "Password must include at least one LOWERCASE letter.";
     }
     if (!hasNumber) {
-      return "Password must include at least one number.";
+      return "Password must include at least one NUMBER.";
     }
     if (!hasSpecialChar) {
-      return "Password must include at least one special character.";
+      return "Password must include at least one SPECIAL CHARACTER.";
     }
     return null;
   };
