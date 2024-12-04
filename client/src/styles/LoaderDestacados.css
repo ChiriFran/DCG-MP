@@ -2,7 +2,7 @@
     display: flex;
     flex-flow: column;
     width: 100%;
-    height: 40vh;
+    margin: 10% 0;
     align-items: center;
     justify-content: center;
 }
@@ -11,4 +11,11 @@
     margin: 1rem 0;
     color: #fff;
     
+}
+
+
+@media screen and (max-width: 700px) {
+    .clipLoaderContianerDestacados{
+        margin: 50% 0;
+    }
 }

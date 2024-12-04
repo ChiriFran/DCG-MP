@@ -1,16 +1,15 @@
-import { HashLoader } from "react-spinners";
+import { GridLoader } from "react-spinners";
 import '../styles/Loader.css'
 
 function Loader() {
   return (
     <div className="clipLoaderContianer">
-      <HashLoader
+      <GridLoader
         color="#fff"
-        size={50}
+        size={15}
         aria-label="Loading..."
         data-testid="loader"
       />
-      <span>Loading...</span>
     </div>
   );
 }
