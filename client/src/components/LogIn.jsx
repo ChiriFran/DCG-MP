@@ -79,7 +79,7 @@ function LogIn() {
             <div className="logedInContainer">
               <p className="logedInUser">Welcome {userEmail}</p>
               <Link className="logedInButtonTienda" to="/Productos">
-                ¡Visitar Tienda!
+              Visit Store!
               </Link>
               <button onClick={handleLogOut} className="logOutButton">Log out</button>
             </div>
