@@ -45,7 +45,6 @@ const Carrito = () => {
 
       // URL base del backend desde las variables de entorno
       const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
-      console.log("API URL:", apiUrl); // Depuración para verificar la URL
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
