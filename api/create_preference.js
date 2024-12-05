@@ -2,15 +2,15 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Permite solicitudes desde cualquier dominio
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS"); // Métodos permitidos
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Cabeceras permitidas
 
   if (req.method === "POST") {
     try {
-      const { items, shipping, storeZipCode } = req.body;
+      const { items, shipping } = req.body;
 
-      if (!shipping || !shipping.name || !shipping.address || !shipping.zipCode) {
+      if (!shipping || !shipping.name || !shipping.address) {
         return res.status(400).json({ error: "Missing shipping data" });
       }
 
@@ -20,7 +20,6 @@ export default async function handler(req, res) {
         accessToken: mpAccessToken,
       });
 
-      // Aquí configuramos los datos de envío, incluyendo la dirección de origen de la tienda (código postal)
       const body = {
         items: items.map((item) => ({
           title: item.title,
@@ -38,11 +37,7 @@ export default async function handler(req, res) {
           name: shipping.name,
           address: {
             street_name: shipping.address,
-            zip_code: shipping.zipCode, // Código postal del cliente
           },
-        },
-        shipping: {
-          zip_code: storeZipCode,  // Código postal de la tienda (1426)
         },
       };
 

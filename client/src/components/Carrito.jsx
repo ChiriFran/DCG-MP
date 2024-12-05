@@ -19,7 +19,7 @@ const Carrito = () => {
     province: "",
     phone: "",
   });
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // Estado para manejar el clic repetido en el botón
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD; // Cambiado a VITE_ para acceso correcto
@@ -44,12 +44,11 @@ const Carrito = () => {
       }));
 
       // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
-        storeZipCode: "1426", // Código postal de la tienda
       });
 
       const { id } = response.data;
@@ -209,7 +208,7 @@ const Carrito = () => {
                   style={{
                     cursor: isProcessing ? "not-allowed" : "pointer",
                   }}
-                  disabled={isProcessing}
+                  disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
                 >
                   {isProcessing ? "Processing..." : "Checkout MP"}
                 </button>
