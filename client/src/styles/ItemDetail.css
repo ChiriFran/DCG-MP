@@ -82,7 +82,7 @@
   border-bottom: 2px solid rgba(255, 255, 255, 0);
 }
 
-.size-button:hover{
+.size-button:hover {
   background-color: rgba(225, 225, 225, 0.1);
 
 }
@@ -185,7 +185,7 @@
 }
 
 .sizeGridContainerDesktop {
-  width: 100%;
+  width: 80%;
 }
 
 .sizeGrid {
@@ -199,7 +199,7 @@
 .sizeGrid>div {
   color: rgb(136, 135, 135);
   border: 1px solid rgba(136, 135, 135, 0.48);
-  padding: 0.5rem 1rem;
+  padding: 0.2rem 0.8rem;
   text-align: center;
 }
 
@@ -295,13 +295,24 @@
   grid-row-start: 6;
 }
 
+.careInstructions {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
+  height: 50%;
+}
+
 .careInstructions p {
   color: rgb(136, 135, 135);
   font-weight: 600;
 }
 
 .careInstructions ul li {
+  color: rgb(136, 135, 135);
   list-style-type: square;
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-left: 5%;
 }
 
 .itemDetailCategory {

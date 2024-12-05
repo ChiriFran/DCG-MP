@@ -137,17 +137,6 @@ const ItemDetail = ({ item }) => {
               </li>
             </ul>
           </div>
-
-          <div className="careInstructions">
-            <p>Care Instructions</p>
-            <ul>
-              <li>Wash before use for the perfect look</li>
-              <li>Desired vintage effect can be enhanced by washing</li>
-              <li>Gentle cycle 30°</li>
-              <li>Wash with similar colors</li>
-              <li>Wash and iron inside-out</li>
-            </ul>
-          </div>
         </div>
       </div>
 
@@ -155,6 +144,7 @@ const ItemDetail = ({ item }) => {
         <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
 
         <div className="sizeGridContainerDesktop">
+
           <div className="sizeGrid">
             {/* talles */}
             <div className="divVacio"></div>
@@ -178,6 +168,18 @@ const ItemDetail = ({ item }) => {
             <div className="pechoXL">68</div>
             <div className="pechoXXL">72</div>
           </div>
+
+          <div className="careInstructions">
+            <p>Care Instructions</p>
+            <ul>
+              <li>Wash before use for the perfect look</li>
+              <li>Desired vintage effect can be enhanced by washing</li>
+              <li>Gentle cycle 30°</li>
+              <li>Wash with similar colors</li>
+              <li>Wash and iron inside-out</li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>
