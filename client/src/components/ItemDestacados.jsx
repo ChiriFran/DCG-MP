@@ -26,7 +26,7 @@ const ItemDestacados = ({ producto }) => {
         </div>
         <div className="card-info">
           <h4 className="text-body">
-            {title.length > 6 ? title.substring(0, 15 ) + "..." : title}
+            {title.length > 6 ? title.substring(0, 15) + "..." : title}
           </h4>
         </div>
         <div className="card-footer">
