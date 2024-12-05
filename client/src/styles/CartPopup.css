@@ -16,7 +16,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.5s ease-in-out;
-    z-index: 1000;
+    z-index: 100000;
 }
 
 .cart-popup.show {

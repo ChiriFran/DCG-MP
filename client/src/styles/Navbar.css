@@ -1,13 +1,39 @@
 .nav {
   display: flex;
-  width: 100%;
-  flex-flow: row;
-  align-items: start;
-  padding: 0.5rem 1rem;
-  justify-content: space-between;
-  z-index: 10000;
+  align-items: center;
+  justify-content: center; /* Centrar logo */
+  position: relative; /* Para que los elementos absolutos se posicionen respecto al nav */
   background-color: #0a0a0a;
-  transition: height 0.5s ease;
+  z-index: 10000;
+}
+
+.userMenuDesktop {
+  position: absolute;
+  left: 1rem; /* Fijado a la izquierda */
+  top: 1rem;
+  transform: translateY(-50%);
+  display: flex;
+  flex-flow: row;
+}
+
+.carritoContainerDesktop {
+  position: absolute;
+  right: 1rem; /* Fijado a la derecha */
+  top: 1rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f4f4f4;
+  padding: 0 0.5rem;
+}
+
+.carritoContainerDesktop li img {
+  margin: 0 0.5rem 0 0;
+}
+
+.logoImg {
+  width: 120px; /* Ajusta según sea necesario */
 }
 
 .link {
@@ -67,15 +93,6 @@
   z-index: 10000;
   padding: 0.5rem 0;
   margin-bottom: 3rem;
-}
-
-.userMenuDesktop {
-  display: flex;
-  flex-flow: row;
-}
-
-.userMenuDesktop li {
-  font-size: 0.8rem;
 }
 
 .usernameNav {
@@ -143,22 +160,6 @@
   list-style: none;
 }
 
-.carritoContainerDesktop {
-  border: 1px solid #f4f4f4;
-}
-
-.carritoContainerDesktop li {
-  padding: 0 1rem;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.carritoContainerDesktop li img{
-  margin: 0 0.5rem 0 0;
-}
-
 .headerCartIcon {
   width: 22px;
 }
@@ -192,6 +193,10 @@
 
   .menuIcon {
     display: flex;
+  }
+
+  .nav{
+    padding: 0 0.5rem;
   }
 
   .navMenu,
