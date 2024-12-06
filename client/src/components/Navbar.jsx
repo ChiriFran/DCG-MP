@@ -76,8 +76,8 @@ const Navbar = () => {
         <ul className="carritoContainerDesktop">
           <li>
             <Link to="/Carrito" className="link">
-              <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
               <span>{getTotalItems()}</span>
+              <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
             </Link>
           </li>
         </ul>
@@ -105,8 +105,8 @@ const Navbar = () => {
           <ul className="carritoContainer">
             <li>
               <Link to="/Carrito" className="link" onClick={toggleMenu}>
-                <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
                 <span>{getTotalItems()}</span>
+                <img src={cartIcon} alt="cart" title="cart" className="headerCartIcon" />
               </Link>
             </li>
           </ul>
