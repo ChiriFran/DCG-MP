@@ -22,7 +22,7 @@ const Carrito = () => {
   const [isProcessing, setIsProcessing] = useState(false); // Estado para manejar el clic repetido en el botón
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
-  const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD; // Cambiado a VITE_ para acceso correcto
+  const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
   // Maneja los cambios en los campos de envío
@@ -70,11 +70,11 @@ const Carrito = () => {
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
-      console.log(`Pedido guardado con ID: ${doc.id}`);
+      console.log(`Order saved with ID: ${doc.id}`);
       return true;
     } catch (error) {
-      console.error("Error al guardar el pedido en Firebase:", error);
-      alert("Hubo un problema al guardar el pedido. Intenta nuevamente.");
+      console.error("Error saving the order in Firebase:", error);
+      alert("There was a problem saving the order. Please try again.");
       return false;
     }
   };
@@ -87,26 +87,28 @@ const Carrito = () => {
 
     setIsProcessing(true); // Activar el estado de procesamiento
 
-    const saved = await saveOrderToFirebase();
-    if (!saved) {
-      setIsProcessing(false); // Desactivar el estado de procesamiento si falla
-      return;
-    }
-
-    const id = await createPreference();
+    const id = await createPreference(); // Crear la preferencia en Mercado Pago
     if (id) {
       setPreferenceId(id);
 
-      // Redirigir al checkout de Mercado Pago en una nueva pestaña
-      const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-      window.open(checkoutUrl, "_blank");
+      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
+      if (saved) {
+        // Redirigir al checkout de Mercado Pago en una nueva pestaña
+        const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+        window.open(checkoutUrl, "_blank");
 
-      // Vaciar el carrito después de guardar el pedido y abrir el checkout
-      vaciarCarrito();
+        // Vaciar el carrito después de completar el proceso exitosamente
+        vaciarCarrito();
+      } else {
+        alert("The order could not be saved. Please try again.");
+      }
+    } else {
+      alert("It was not possible to create the preference in Mercado Pago. Please try again.");
     }
 
     setIsProcessing(false); // Desactivar el estado de procesamiento después de completar el flujo
   };
+
 
   return (
     <div className="carritoContainer">
