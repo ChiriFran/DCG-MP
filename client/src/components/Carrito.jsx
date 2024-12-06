@@ -80,7 +80,6 @@ const Carrito = () => {
 
   // Maneja la compra
   const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
-
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -95,21 +94,24 @@ const Carrito = () => {
 
       const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
       if (saved) {
-        // Redirigir al checkout de Mercado Pago en una nueva pestaña
-        const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-        window.open(checkoutUrl, "_blank");
+        // Esperar 2 segundos antes de redirigir
+        setTimeout(() => {
+          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
-        // Vaciar el carrito después de completar el proceso exitosamente
-        vaciarCarrito();
+          vaciarCarrito(); // Vaciar el carrito después de redirigir
+          setIsProcessing(""); // Resetear el estado después del flujo
+        }, 2000);
       } else {
         alert("The order could not be saved. Please try again.");
+        setIsProcessing(""); // Resetear el estado si hay un error
       }
     } else {
       alert("It was not possible to create the preference in Mercado Pago. Please try again.");
+      setIsProcessing(""); // Resetear el estado si hay un error
     }
-
-    setIsProcessing(""); // Resetear el estado después del flujo
   };
+
 
 
   return (
@@ -214,7 +216,7 @@ const Carrito = () => {
                   }}
                   disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
                 >
-                  {isProcessing ? "Processing..." : "Checkout MP"}
+                  {isProcessing || "Checkout MP"}
                 </button>
               </form>
               <button onClick={vaciarCarrito} className="vaciarCarrito">
