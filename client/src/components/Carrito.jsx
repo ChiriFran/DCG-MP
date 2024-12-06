@@ -19,7 +19,6 @@ const Carrito = () => {
     province: "",
     phone: "",
   });
-  const [isProcessing, setIsProcessing] = useState(false); // Estado para manejar el clic repetido en el botón
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -80,16 +79,19 @@ const Carrito = () => {
   };
 
   // Maneja la compra
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
+
   const handleBuy = async (e) => {
     e.preventDefault();
 
     if (isProcessing) return; // Evita clics repetidos
 
-    setIsProcessing(true); // Activar el estado de procesamiento
+    setIsProcessing("Processing..."); // Mostrar que se está procesando
 
     const id = await createPreference(); // Crear la preferencia en Mercado Pago
     if (id) {
       setPreferenceId(id);
+      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
       const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
       if (saved) {
@@ -106,7 +108,7 @@ const Carrito = () => {
       alert("It was not possible to create the preference in Mercado Pago. Please try again.");
     }
 
-    setIsProcessing(false); // Desactivar el estado de procesamiento después de completar el flujo
+    setIsProcessing(""); // Resetear el estado después del flujo
   };
 
 
