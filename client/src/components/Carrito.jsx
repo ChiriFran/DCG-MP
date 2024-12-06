@@ -53,8 +53,8 @@ const Carrito = () => {
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error al crear la preferencia en Mercado Pago:", error);
-      alert("Hubo un problema al generar la preferencia. Intenta nuevamente.");
+      console.error("Error when creating the preference in Mercado Pago:", error);
+      alert("There was a problem generating the preference. Please try again.");
     }
   };
 
