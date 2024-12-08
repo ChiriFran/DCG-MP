@@ -1,7 +1,7 @@
 .itemDetailContainer {
   display: flex;
   flex-flow: row;
-  align-items: stretch;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
   padding: 0 20%;

@@ -69,6 +69,14 @@
   justify-content: center;
 }
 
+
+@media (min-width: 701px) and (max-width: 3000px) {
+
+  .musicItem {
+    height: 280px;
+  }
+}
+
 @media screen and (max-width: 700px) {
 
   .musicItemContainer {
@@ -76,14 +84,14 @@
     height: 100%;
   }
 
-    .musicItem {
-      width: 100%;
-      height: 185px;
-      margin: 1.5rem 0.25rem;
-    }
-
-    .bandcampBackground:nth-last-child(1),
-    .bandcampBackground:nth-last-child(2) {
-      display: none;
-    }
+  .musicItem {
+    width: 100%;
+    height: 205px;
+    margin: 1.5rem 0.25rem;
   }
+
+  .bandcampBackground:nth-last-child(1),
+  .bandcampBackground:nth-last-child(2) {
+    display: none;
+  }
+}

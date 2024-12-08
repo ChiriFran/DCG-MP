@@ -93,14 +93,27 @@ const Navbar = () => {
             &#10005;
           </div>
           <ul className="navMenu">
-            {["/", "/Productos", "/Music", "/Eventos", "/Blogs", "/AboutUs", "/Faq"].map((path, index) => (
+            {["/", "/Productos", "/Music", "/Eventos", "/AcademyDCG", "/AboutUs", "/Faq"].map((path, index) => (
               <li key={index}>
-                <Link to={path} className={`link ${location.pathname === path ? "active" : ""}`} onClick={toggleMenu}>
-                  {path === "/" ? "Home" : path === "/Productos" ? "Shop" : path.slice(1)}
-                </Link>
+                {path === "/AcademyDCG" ? (
+                  <a
+                    href="https://academydcg.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link"
+                    onClick={toggleMenu}
+                  >
+                    AcademyDCG
+                  </a>
+                ) : (
+                  <Link to={path} className={`link ${location.pathname === path ? "active" : ""}`} onClick={toggleMenu}>
+                    {path === "/" ? "Home" : path === "/Productos" ? "Shop" : path.slice(1)}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
+
 
           <ul className="carritoContainer">
             <li>
@@ -125,24 +138,38 @@ const Navbar = () => {
           </ul>
         </div>
       </nav>
-
       <div className="navBarDesktopContainer">
         <ul className="navMenuDesktop">
-          {["/", "/Productos", "/Music", "/Eventos", "/Blogs", "/AboutUs", "/Faq"].map((path, index) => (
+          {["/", "/Productos", "/Music", "/Eventos", "/Academy", "/AboutUs", "/Faq"].map((path, index) => (
             <li key={index}>
-              <Link to={path} className={`link ${location.pathname === path ? "active" : ""}`}>
-                {path === "/"
-                  ? "Home"
-                  : path === "/Productos"
-                    ? "Shop"
-                    : path === "/Eventos"
-                      ? "Events"
-                      : path.slice(1)}
-              </Link>
+              {path === "/Academy" ? (
+                <a
+                  href="https://academydcg.com/"
+                  className="link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Academy
+                </a>
+              ) : (
+                <Link
+                  to={path}
+                  className={`link ${location.pathname === path ? "active" : ""}`}
+                >
+                  {path === "/"
+                    ? "Home"
+                    : path === "/Productos"
+                      ? "Shop"
+                      : path === "/Eventos"
+                        ? "Events"
+                        : path.slice(1)}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
       </div>
+
     </>
   );
 };

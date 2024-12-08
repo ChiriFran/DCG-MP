@@ -23,9 +23,14 @@ function HomeNavLinks() {
         </Link>
       </ul>
       <ul>
-        <Link to="/Blogs" className={`homeNavLink ${location.pathname === "/Blogs" ? "active" : ""}`}>
-          Blogs
-        </Link>
+        <a
+          href="https://academydcg.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="homeNavLink"
+        >
+          AcademyDCG
+        </a>
       </ul>
       <ul>
         <Link to="/AboutUs" className={`homeNavLink ${location.pathname === "/AboutUs" ? "active" : ""}`}>
