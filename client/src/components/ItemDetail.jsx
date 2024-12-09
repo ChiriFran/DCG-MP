@@ -72,7 +72,7 @@ const ItemDetail = ({ item }) => {
         </div>
 
         <p className="cantidadEnCarrito">
-          Cart: {cantidadEnCarrito} unit/s added.
+          You have {cantidadEnCarrito} units in cart
           <button className="eliminarDelCarrito" onClick={handleEliminarDelCarrito}>
             Remove
           </button>

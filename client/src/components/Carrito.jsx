@@ -14,11 +14,15 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
+    apartment: "", // Nuevo campo para casa/departamento
     zipCode: "",
     city: "",
     province: "",
     phone: "",
+    email: "", // Nuevo campo para el email
+    comments: "", // Nuevo campo para mensajes opcionales
   });
+
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -155,6 +159,7 @@ const Carrito = () => {
                     name="name"
                     value={shippingData.name}
                     onChange={handleShippingChange}
+                    placeholder="John Doe"
                     required
                   />
                 </div>
@@ -165,36 +170,18 @@ const Carrito = () => {
                     name="address"
                     value={shippingData.address}
                     onChange={handleShippingChange}
+                    placeholder="123 Main St, Apt 4B"
                     required
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>City</label>
+                  <label>Email</label>
                   <input
-                    type="text"
-                    name="city"
-                    value={shippingData.city}
+                    type="email"
+                    name="email"
+                    value={shippingData.email}
                     onChange={handleShippingChange}
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={shippingData.zipCode}
-                    onChange={handleShippingChange}
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Phone</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={shippingData.phone}
-                    onChange={handleShippingChange}
+                    placeholder="john.doe@example.com"
                     required
                   />
                 </div>
@@ -205,7 +192,60 @@ const Carrito = () => {
                     name="province"
                     value={shippingData.province}
                     onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
                     required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={shippingData.zipCode}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>City</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={shippingData.city}
+                    onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Phone</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={shippingData.phone}
+                    onChange={handleShippingChange}
+                    placeholder="+54 011-1234-5678"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>House details</label>
+                  <input
+                    type="text"
+                    name="apartment"
+                    value={shippingData.apartment}
+                    onChange={handleShippingChange}
+                    placeholder="Apt 4B"
+                  />
+                </div>
+                <div className="formEnvioGroupComments">
+                  <label>Comments (Optional)</label>
+                  <textarea
+                    name="comments"
+                    value={shippingData.comments}
+                    onChange={handleShippingChange}
+                    placeholder="Special instructions for vendors, shipping, and additional."
                   />
                 </div>
                 <button
