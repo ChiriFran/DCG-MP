@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     try {
       const { items, shipping } = req.body;
 
-      if (!shipping || !shipping.name || !shipping.address || !shipping.zip_code) {
+      if (!shipping || !shipping.name || !shipping.address) {
         return res.status(400).json({ error: "Missing shipping data" });
       }
 
@@ -35,32 +35,8 @@ export default async function handler(req, res) {
         auto_return: "approved",
         payer: {
           name: shipping.name,
-          email: shipping.email || "",
-          phone: {
-            area_code: shipping.phone_area || "",
-            number: shipping.phone_number || "",
-          },
           address: {
-            zip_code: shipping.zip_code,
             street_name: shipping.address,
-            street_number: shipping.street_number || "0",
-          },
-        },
-        shipments: {
-          mode: "me2", // Configurar Mercado Envíos
-          dimensions: "30x30x30,500", // Dimensiones y peso del paquete (largo x ancho x alto, peso en gramos)
-          local_pickup: false, // Indicar si está disponible el retiro en persona
-          cost: null, // Deja que Mercado Pago calcule el costo
-          free_methods: [], // Si deseas envíos gratuitos, configura los métodos aquí
-          receiver_address: {
-            zip_code: shipping.zip_code,
-            street_name: shipping.address,
-            street_number: shipping.street_number || "0",
-            floor: shipping.floor || "",
-            apartment: shipping.apartment || "",
-            city: shipping.city || "",
-            state_name: shipping.province || "",
-            country: "AR", // Código de país
           },
         },
       };
