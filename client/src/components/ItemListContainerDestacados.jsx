@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import ItemListDestacados from "./ItemListDestacados";
 import LoaderDestacados from "./LoaderDestacados";
-import useDestacados from "../helpers/useDestacados";
+import useDestacados from "../helpers/useProductos";
 
 const ItemListContainerDestacados = () => {
   const { category } = useParams();

@@ -1,20 +1,3 @@
-.productosDestacadosContainer {
-  display: flex;
-  width: 100%;
-  flex-flow: row;
-  align-items: center;
-  justify-content: center;
-}
-
-.productosDestacados {
-  display: flex;
-  width: 80%;
-  flex-flow: row;
-  align-items: center;
-  justify-content: space-around;
-  margin-bottom: 10%;
-}
-
 .homeText {
   width: 50%;
   text-align: center;
@@ -26,17 +9,58 @@
   text-transform: uppercase;
 }
 
+.productosDestacadosContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 80%;
+}
+
+.productosDestacadosWrapper {
+  overflow: hidden;
+  /* Oculta los productos que no están visibles */
+  width: 80%;
+}
+
+.productosDestacados {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  /* Transición suave */
+}
+
+.sliderItem {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  /* Espaciado entre los productos */
+}
+
+.sliderButton {
+  background-color: transparent;
+  color: rgb(185, 185, 185);
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 1.5rem;
+}
+
+.sliderButton.prevButton {
+  position: absolute;
+  left: 10px;
+}
+
+.sliderButton.nextButton {
+  position: absolute;
+  right: 10px;
+}
+
 @media screen and (max-width: 700px) {
-
-  .productosDestacados {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-    padding: 1rem 1rem;
-  }
-
-  .productosDestacados {
+  .productosDestacadosWrapper {
     width: 90%;
   }
 
+  .sliderItem {
+    padding: 0 5px;
+  }
 }
