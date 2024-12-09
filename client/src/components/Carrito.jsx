@@ -239,7 +239,7 @@ const Carrito = () => {
                     placeholder="Apt 4B"
                   />
                 </div>
-                <div className="formEnvioGroupComments">
+                <div className="formEnvioGroup">
                   <label>Comments (Optional)</label>
                   <textarea
                     name="comments"
