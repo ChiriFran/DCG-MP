@@ -14,21 +14,18 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
-    apartment: "", // Nuevo campo para casa/departamento
+    apartment: "",
     zipCode: "",
     city: "",
     province: "",
     phone: "",
-    email: "", // Nuevo campo para el email
-    comments: "", // Nuevo campo para mensajes opcionales
+    email: "",
+    comments: "",
   });
 
-
-  // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
-  // Maneja los cambios en los campos de envío
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingData((prevData) => ({
@@ -37,7 +34,6 @@ const Carrito = () => {
     }));
   };
 
-  // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
@@ -46,8 +42,7 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+      const apiUrl = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -62,7 +57,6 @@ const Carrito = () => {
     }
   };
 
-  // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
@@ -82,41 +76,32 @@ const Carrito = () => {
     }
   };
 
-  // Maneja la compra
-  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
+  const [isProcessing, setIsProcessing] = useState(false);
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (isProcessing) return; // Evita clics repetidos
+    if (isProcessing) return;
+    setIsProcessing(true);
 
-    setIsProcessing("Processing..."); // Mostrar que se está procesando
-
-    const id = await createPreference(); // Crear la preferencia en Mercado Pago
+    const id = await createPreference();
     if (id) {
       setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
+      const saved = await saveOrderToFirebase();
       if (saved) {
-        // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
-
-          vaciarCarrito(); // Vaciar el carrito después de redirigir
-          setIsProcessing(""); // Resetear el estado después del flujo
+          window.open(checkoutUrl, "_blank");
+          vaciarCarrito();
+          setIsProcessing(false);
         }, 1500);
       } else {
-        alert("The order could not be saved. Please try again.");
-        setIsProcessing(""); // Resetear el estado si hay un error
+        setIsProcessing(false);
       }
     } else {
-      alert("It was not possible to create the preference in Mercado Pago. Please try again.");
-      setIsProcessing(""); // Resetear el estado si hay un error
+      setIsProcessing(false);
     }
   };
-
-
 
   return (
     <div className="carritoContainer">
@@ -128,6 +113,7 @@ const Carrito = () => {
         </h1>
         {carrito.length > 0 ? (
           <>
+            {/* Product List */}
             <div className="carritoHeader">
               <span className="headerItem">Products</span>
               <span className="headerItem">Unit Price</span>
@@ -141,122 +127,33 @@ const Carrito = () => {
                   <h2 className="titulo">{prod.title}</h2>
                 </div>
                 <h3 className="precio">${prod.price}</h3>
-                <h3 className="carritoCantidad">
-                  <p className="mobileCantidad">Quantity: </p>
-                  {prod.cantidad}
-                </h3>
+                <h3 className="carritoCantidad">{prod.cantidad}</h3>
                 <h3 className="precioTotal">${prod.price * prod.cantidad}</h3>
               </div>
             ))}
             <h2 className="precioFinal">Total: ${precioTotal()}</h2>
 
+            {/* Shipping Form */}
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
-                <div className="formEnvioGroup">
-                  <label>Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={shippingData.name}
-                    onChange={handleShippingChange}
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={shippingData.address}
-                    onChange={handleShippingChange}
-                    placeholder="123 Main St, Apt 4B"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={shippingData.email}
-                    onChange={handleShippingChange}
-                    placeholder="john.doe@example.com"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Province</label>
-                  <input
-                    type="text"
-                    name="province"
-                    value={shippingData.province}
-                    onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={shippingData.zipCode}
-                    onChange={handleShippingChange}
-                    placeholder="10001"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={shippingData.city}
-                    onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Phone</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={shippingData.phone}
-                    onChange={handleShippingChange}
-                    placeholder="+54 011-1234-5678"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>House details</label>
-                  <input
-                    type="text"
-                    name="apartment"
-                    value={shippingData.apartment}
-                    onChange={handleShippingChange}
-                    placeholder="Apt 4B"
-                  />
-                </div>
-                <div className="formEnvioGroupComments">
-                  <label>Comments (Optional)</label>
-                  <textarea
-                    name="comments"
-                    value={shippingData.comments}
-                    onChange={handleShippingChange}
-                    placeholder="Special instructions for vendors, shipping, and additional."
-                  />
-                </div>
+                {Object.entries(shippingData).map(([key, value]) => (
+                  <div className="formEnvioGroup" key={key}>
+                    <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                    <input
+                      type={key === "email" ? "email" : "text"}
+                      name={key}
+                      value={value}
+                      onChange={handleShippingChange}
+                      required={key !== "apartment" && key !== "comments"}
+                    />
+                  </div>
+                ))}
                 <button
                   type="submit"
+                  disabled={isProcessing}
                   className="mercadoPagoBtn"
-                  style={{
-                    cursor: isProcessing ? "not-allowed" : "pointer",
-                  }}
-                  disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
                 >
-                  {isProcessing || "Checkout MP"}
+                  {isProcessing ? "Processing..." : "Checkout MP"}
                 </button>
               </form>
               <button onClick={vaciarCarrito} className="vaciarCarrito">
@@ -267,10 +164,10 @@ const Carrito = () => {
               FAQ / Shipping
             </Link>
           </>
-        ) : null}
+        ) : (
+          <ItemListContainerDestacados />
+        )}
       </div>
-
-      {carrito.length === 0 && <ItemListContainerDestacados />}
     </div>
   );
 };
