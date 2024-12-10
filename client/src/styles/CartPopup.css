@@ -20,7 +20,7 @@
 }
 
 .cart-popup.show {
-    right: 20px;
+    right: -20px;
     /* El popup entra desde la derecha */
     opacity: 1;
     visibility: visible;

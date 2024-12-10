@@ -17,12 +17,7 @@ const PopUpNewsletter = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setIsVisible(true);
       }, 10);
-      document.body.style.overflow = "hidden";
-      window.scrollTo(0, 0);
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
   }, [isOpen]);
 
   const handleSubmit = async (e) => {
