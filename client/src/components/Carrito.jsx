@@ -57,7 +57,7 @@ const Carrito = () => {
           number: shippingData.phone, // Número del teléfono
         },
         address: {
-          zip_code: shippingData.zipCode, // Código postal
+          zip_code: shippingData.zip_code, // Código postal
           street_name: shippingData.address, // Dirección
           street_number: Number(shippingData.street_number), // Número de la calle
           floor: shippingData.floor || null, // Piso, opcional
