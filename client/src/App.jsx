@@ -9,7 +9,7 @@ import Blogs from "./components/Blogs.jsx";
 import AboutUs from "./components/AboutUs.jsx";
 import Faq from "./components/Faq.jsx";
 import LogIn from "./components/LogIn.jsx";
-import SignUp from "./components/SingUp.jsx";
+import SignUp from "./components/SignUp.jsx"; 
 import Carrito from "./components/Carrito.jsx";
 import Sucess from "./components/Sucess.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
@@ -37,12 +37,11 @@ function App() {
               <Route path="/Faq" element={<Faq />} />
               <Route path="/Eventos" element={<Eventos />} />
               <Route path="/Blogs" element={<Blogs />} />
-              <Route path="*" element={<p>Not Found</p>} />
               <Route path="/LogIn" element={<LogIn />} />
-              <Route path="/SingUp" element={<SignUp />} />
+              <Route path="/SignUp" element={<SignUp />} /> 
               <Route path="/Carrito" element={<Carrito />} />
               <Route path="/Sucess" element={<Sucess />} />
-              
+              <Route path="*" element={<p>Not Found</p>} />
             </Routes>
           </ScrollToTop>
           <CartPopup />
