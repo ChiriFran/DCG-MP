@@ -17,11 +17,11 @@ const Carrito = () => {
     street_number: "",
     apartment: "",
     floor: "",
-    zipCode: "",
+    zip_code: "",
     city: "",
     province: "",
-    phone: "",
     phone_area: "",
+    phone: "",
     email: "",
     comments: "",
   });
@@ -44,16 +44,37 @@ const Carrito = () => {
     try {
       const items = carrito.map((prod) => ({
         title: prod.title,
-        unit_price: prod.price,
-        quantity: prod.cantidad,
+        unit_price: Number(prod.price), // Asegura que el precio sea un número
+        quantity: Number(prod.cantidad), // Asegura que la cantidad sea un número
       }));
 
+      // Formato adecuado de los datos de envío
+      const shipping = {
+        name: shippingData.name,
+        email: shippingData.email,
+        phone: {
+          area_code: shippingData.phone_area, // Código de área del teléfono
+          number: shippingData.phone, // Número del teléfono
+        },
+        address: {
+          zip_code: shippingData.zipCode, // Código postal
+          street_name: shippingData.address, // Dirección
+          street_number: Number(shippingData.street_number), // Número de la calle
+          floor: shippingData.floor || null, // Piso, opcional
+          apartment: shippingData.apartment || null, // Departamento, opcional
+          city: shippingData.city, // Ciudad
+          state_name: shippingData.province, // Provincia o estado
+          country: "AR", // Código del país
+        },
+        comments: shippingData.comments || "", // Comentarios opcionales
+      };
+
       // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+      const apiUrl = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
-        shipping: shippingData,
+        shipping, // Datos de envío estructurados
       });
 
       const { id } = response.data;
@@ -63,6 +84,7 @@ const Carrito = () => {
       alert("There was a problem generating the preference. Please try again.");
     }
   };
+
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
@@ -202,7 +224,7 @@ const Carrito = () => {
                   <label>Zip Code</label>
                   <input
                     type="text"
-                    name="zipCode"
+                    name="zip_code"
                     value={shippingData.zipCode}
                     onChange={handleShippingChange}
                     placeholder="10001"
@@ -224,7 +246,7 @@ const Carrito = () => {
                   <label>Phone area</label>
                   <input
                     type="text"
-                    name="phoneArea"
+                    name="phon_area"
                     value={shippingData.phone_area}
                     onChange={handleShippingChange}
                     placeholder="011"
@@ -235,7 +257,7 @@ const Carrito = () => {
                   <label>Street Number</label>
                   <input
                     type="text"
-                    name="streetNumber"
+                    name="street_number"
                     value={shippingData.street_number}
                     onChange={handleShippingChange}
                     placeholder="123"
