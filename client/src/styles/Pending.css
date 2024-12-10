@@ -5,4 +5,12 @@
     justify-content: center;
     width: 100%;
     height: 80vh;
+    color: #f4f4f4;
+}
+
+.pendingContainer Link{
+    text-decoration: none;
+    color: #f4f4f4;
+    font-weight: 400;
+    letter-spacing: 2px;
 }
