@@ -246,7 +246,7 @@ const Carrito = () => {
                   <label>Phone area</label>
                   <input
                     type="text"
-                    name="phon_area"
+                    name="phone_area"
                     value={shippingData.phone_area}
                     onChange={handleShippingChange}
                     placeholder="011"
