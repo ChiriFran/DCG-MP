@@ -37,7 +37,7 @@
 
 .sliderButton {
   background-color: transparent;
-  color: rgb(185, 185, 185);
+  color: rgba(185, 185, 185, 0.753);
   border: none;
   padding: 10px 20px;
   cursor: pointer;
