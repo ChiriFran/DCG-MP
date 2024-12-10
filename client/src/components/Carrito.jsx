@@ -14,17 +14,15 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
-    street_number: "",
-    apartment: "",
-    floor: "",
-    zip_code: "",
+    apartment: "", // Nuevo campo para casa/departamento
+    zipCode: "",
     city: "",
     province: "",
-    phone_area: "",
     phone: "",
-    email: "",
-    comments: "",
+    email: "", // Nuevo campo para el email
+    comments: "", // Nuevo campo para mensajes opcionales
   });
+
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -44,37 +42,16 @@ const Carrito = () => {
     try {
       const items = carrito.map((prod) => ({
         title: prod.title,
-        unit_price: Number(prod.price), // Asegura que el precio sea un número
-        quantity: Number(prod.cantidad), // Asegura que la cantidad sea un número
+        unit_price: prod.price,
+        quantity: prod.cantidad,
       }));
 
-      // Formato adecuado de los datos de envío
-      const shipping = {
-        name: shippingData.name,
-        email: shippingData.email,
-        phone: {
-          area_code: shippingData.phone_area, // Código de área del teléfono
-          number: shippingData.phone, // Número del teléfono
-        },
-        address: {
-          zip_code: shippingData.zip_code, // Código postal
-          street_name: shippingData.address, // Dirección
-          street_number: Number(shippingData.street_number), // Número de la calle
-          floor: shippingData.floor || null, // Piso, opcional
-          apartment: shippingData.apartment || null, // Departamento, opcional
-          city: shippingData.city, // Ciudad
-          state_name: shippingData.province, // Provincia o estado
-          country: "AR", // Código del país
-        },
-        comments: shippingData.comments || "", // Comentarios opcionales
-      };
-
       // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
-        shipping, // Datos de envío estructurados
+        shipping: shippingData,
       });
 
       const { id } = response.data;
@@ -84,7 +61,6 @@ const Carrito = () => {
       alert("There was a problem generating the preference. Please try again.");
     }
   };
-
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
@@ -188,13 +164,13 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
+                  <label>Address</label>
                   <input
                     type="text"
-                    name="province"
-                    value={shippingData.province}
+                    name="address"
+                    value={shippingData.address}
                     onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
+                    placeholder="123 Main St, Apt 4B"
                     required
                   />
                 </div>
@@ -210,6 +186,28 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
+                  <label>Province</label>
+                  <input
+                    type="text"
+                    name="province"
+                    value={shippingData.province}
+                    onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={shippingData.zipCode}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
                   <label>City</label>
                   <input
                     type="text"
@@ -221,57 +219,13 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zip_code"
-                    value={shippingData.zipCode}
-                    onChange={handleShippingChange}
-                    placeholder="10001"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={shippingData.address}
-                    onChange={handleShippingChange}
-                    placeholder="Main St"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Phone area</label>
-                  <input
-                    type="text"
-                    name="phone_area"
-                    value={shippingData.phone_area}
-                    onChange={handleShippingChange}
-                    placeholder="011"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Street Number</label>
-                  <input
-                    type="text"
-                    name="street_number"
-                    value={shippingData.street_number}
-                    onChange={handleShippingChange}
-                    placeholder="123"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
                   <label>Phone</label>
                   <input
                     type="text"
                     name="phone"
                     value={shippingData.phone}
                     onChange={handleShippingChange}
-                    placeholder="12345678"
+                    placeholder="+54 011-1234-5678"
                     required
                   />
                 </div>
