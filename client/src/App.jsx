@@ -11,7 +11,7 @@ import Faq from "./components/Faq.jsx";
 import LogIn from "./components/LogIn.jsx";
 import SignUp from "./components/SingUp.jsx";
 import Carrito from "./components/Carrito.jsx";
-import Checkout from "./components/Checkout.jsx";
+import Sucess from "./components/Sucess.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
 import CartPopup from "./components/CartPopup.jsx";
@@ -41,7 +41,8 @@ function App() {
               <Route path="/LogIn" element={<LogIn />} />
               <Route path="/SingUp" element={<SignUp />} />
               <Route path="/Carrito" element={<Carrito />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/Sucess" element={<Sucess />} />
+              
             </Routes>
           </ScrollToTop>
           <CartPopup />
