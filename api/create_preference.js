@@ -29,8 +29,8 @@ export default async function handler(req, res) {
         })),
         back_urls: {
           success: "https://dcgstore.vercel.app/#/Sucess",
-          failure: "https://dcgstore.vercel.app/",
-          pending: "https://dcgstore.vercel.app/",
+          failure: "https://dcgstore.vercel.app/#/Failure",
+          pending: "https://dcgstore.vercel.app/#/Pending",
         },
         auto_return: "approved",
         payer: {

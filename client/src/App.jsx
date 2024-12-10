@@ -12,6 +12,8 @@ import LogIn from "./components/LogIn.jsx";
 import SignUp from "./components/SignUp.jsx"; 
 import Carrito from "./components/Carrito.jsx";
 import Sucess from "./components/Sucess.jsx";
+import Pending from "./components/pending.jsx";
+import Failure from "./components/Failure.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
 import CartPopup from "./components/CartPopup.jsx";
@@ -41,6 +43,8 @@ function App() {
               <Route path="/SignUp" element={<SignUp />} /> 
               <Route path="/Carrito" element={<Carrito />} />
               <Route path="/Sucess" element={<Sucess />} />
+              <Route path="/Failure" element={<Failure />} />
+              <Route path="/Pending" element={<Pending />} />
               <Route path="*" element={<p>Not Found</p>} />
             </Routes>
           </ScrollToTop>
