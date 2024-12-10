@@ -147,6 +147,7 @@
   letter-spacing: 3px;
   padding-left: 1rem;
   box-sizing: border-box;
+  margin-top: 0.2rem;
   margin-bottom: 0.5rem;
 }
 
@@ -200,6 +201,7 @@
   justify-content: center;
   width: 50%;
 }
+
 .formEnvioGroup.half {
   width: 100%;
   box-sizing: border-box;
@@ -212,6 +214,7 @@
   justify-content: center;
   width: 100%;
   padding: 0 0.5rem;
+  margin-top: 0.2rem;
 }
 
 .formEnvioGroup textarea {
@@ -223,6 +226,7 @@
   padding: 8px;
   font-size: 0.8rem;
   box-sizing: border-box;
+  margin-top: 0.2rem;
   margin-bottom: 0.5rem;
   resize: none;
 }
@@ -317,7 +321,16 @@
     margin-top: 2rem;
   }
 
+  
+.formEnvioGroup input {
+  margin-bottom: 1rem;
+}
+
   .formEnvioGroupComments textarea {
     min-height: 100px;
+  }
+
+  .half-container {
+    width: 100%;
   }
 }
