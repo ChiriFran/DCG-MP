@@ -192,10 +192,23 @@
   opacity: 0.6;
 }
 
+/* Estilos específicos para los campos House Floor y Apart Detail */
+.half-container {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+}
+.formEnvioGroup.half {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .formEnvioGroup:last-of-type {
   display: flex;
   flex-flow: column;
-  align-items: self-start;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
   padding: 0 0.5rem;

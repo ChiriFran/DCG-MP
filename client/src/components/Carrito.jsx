@@ -14,11 +14,14 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
+    street_number: "",
     apartment: "",
+    floor: "",
     zipCode: "",
     city: "",
     province: "",
     phone: "",
+    phone_area: "",
     email: "",
     comments: "",
   });
@@ -163,13 +166,13 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Address</label>
+                  <label>Province</label>
                   <input
                     type="text"
-                    name="address"
-                    value={shippingData.address}
+                    name="province"
+                    value={shippingData.province}
                     onChange={handleShippingChange}
-                    placeholder="123 Main St, Apt 4B"
+                    placeholder="Buenos Aires"
                     required
                   />
                 </div>
@@ -185,11 +188,11 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
+                  <label>City</label>
                   <input
                     type="text"
-                    name="province"
-                    value={shippingData.province}
+                    name="city"
+                    value={shippingData.city}
                     onChange={handleShippingChange}
                     placeholder="Buenos Aires"
                     required
@@ -207,13 +210,35 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>City</label>
+                  <label>Address</label>
                   <input
                     type="text"
-                    name="city"
-                    value={shippingData.city}
+                    name="address"
+                    value={shippingData.address}
                     onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
+                    placeholder="Main St"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Phone area</label>
+                  <input
+                    type="text"
+                    name="phoneArea"
+                    value={shippingData.phone_area}
+                    onChange={handleShippingChange}
+                    placeholder="011"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Street Number</label>
+                  <input
+                    type="text"
+                    name="streetNumber"
+                    value={shippingData.street_number}
+                    onChange={handleShippingChange}
+                    placeholder="123"
                     required
                   />
                 </div>
@@ -224,19 +249,31 @@ const Carrito = () => {
                     name="phone"
                     value={shippingData.phone}
                     onChange={handleShippingChange}
-                    placeholder="+54 011-1234-5678"
+                    placeholder="12345678"
                     required
                   />
                 </div>
-                <div className="formEnvioGroup">
-                  <label>House details</label>
-                  <input
-                    type="text"
-                    name="apartment"
-                    value={shippingData.apartment}
-                    onChange={handleShippingChange}
-                    placeholder="Apt 4B"
-                  />
+                <div className="half-container">
+                  <div className="formEnvioGroup half">
+                    <label>House Floor</label>
+                    <input
+                      type="text"
+                      name="floor"
+                      value={shippingData.floor}
+                      onChange={handleShippingChange}
+                      placeholder="4"
+                    />
+                  </div>
+                  <div className="formEnvioGroup half">
+                    <label>Apart Detail</label>
+                    <input
+                      type="text"
+                      name="apartment"
+                      value={shippingData.apartment}
+                      onChange={handleShippingChange}
+                      placeholder="B"
+                    />
+                  </div>
                 </div>
                 <div className="formEnvioGroup">
                   <label>Comments (Optional)</label>
