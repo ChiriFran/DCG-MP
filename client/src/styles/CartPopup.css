@@ -20,7 +20,7 @@
 }
 
 .cart-popup.show {
-    right: -20px;
+    right: 1rem;
     /* El popup entra desde la derecha */
     opacity: 1;
     visibility: visible;
@@ -43,7 +43,6 @@
 .popup-product-image {
     width: 80px;
     /* Ajusta el tamaño de la imagen */
-    height: 80px;
     object-fit: cover;
     border-radius: 8px;
 }
@@ -91,7 +90,7 @@
 
 @media screen and (max-width: 700px) {
     .cart-popup {
-        right: -120px;
+        right: -20px;
         width: 280px;
     }
     .popup-product-image {
