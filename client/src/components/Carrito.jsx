@@ -14,15 +14,14 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
-    apartment: "", // Nuevo campo para casa/departamento
+    apartment: "",
     zipCode: "",
     city: "",
     province: "",
     phone: "",
-    email: "", // Nuevo campo para el email
-    comments: "", // Nuevo campo para mensajes opcionales
+    email: "",
+    comments: "",
   });
-
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;

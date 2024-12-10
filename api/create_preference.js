@@ -35,8 +35,37 @@ export default async function handler(req, res) {
         auto_return: "approved",
         payer: {
           name: shipping.name,
+          email: shipping.email,
+          phone: {
+            area_code: shipping.phone_area,
+            number: shipping.phone_number,
+          },
           address: {
+            zip_code: shipping.zip_code,
             street_name: shipping.address,
+            street_number: shipping.street_number,
+          },
+        },
+        shipments: {
+          mode: "me2", // Configurar Mercado Envíos
+          dimensions: "30x30x30,1000", // Dimensiones y peso del paquete (largo x ancho x alto, peso en gramos)
+          local_pickup: false, // Indicar si está disponible el retiro en persona
+          cost: null, // Deja que Mercado Pago calcule el costo
+          free_methods: [], // Si deseas envíos gratuitos, configura los métodos aquí
+          receiver_address: {
+            zip_code: shipping.zip_code,
+            street_name: shipping.address,
+            street_number: shipping.street_number,
+            floor: shipping.floor,
+            apartment: shipping.apartment,
+            city: shipping.city,
+            state_name: shipping.province,
+            country: "AR", // Código de país
+          },
+          origin: {
+            zip_code: "1426", // Código postal de origen (tu depósito)
+            state_name: "Buenos Aires", // Provincia del origen
+            city_name: "CABA", // Ciudad del origen
           },
         },
       };
