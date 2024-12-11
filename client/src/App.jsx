@@ -9,9 +9,9 @@ import Blogs from "./components/Blogs.jsx";
 import AboutUs from "./components/AboutUs.jsx";
 import Faq from "./components/Faq.jsx";
 import LogIn from "./components/LogIn.jsx";
-import SignUp from "./components/SignUp.jsx"; 
+import SignUp from "./components/SignUp.jsx";
 import Carrito from "./components/Carrito.jsx";
-import Sucess from "./components/Sucess.jsx";
+import Success from "./components/Success.jsx";
 import Pending from "./components/pending.jsx";
 import Failure from "./components/Failure.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
@@ -40,9 +40,9 @@ function App() {
               <Route path="/Eventos" element={<Eventos />} />
               <Route path="/Blogs" element={<Blogs />} />
               <Route path="/LogIn" element={<LogIn />} />
-              <Route path="/SignUp" element={<SignUp />} /> 
+              <Route path="/SignUp" element={<SignUp />} />
               <Route path="/Carrito" element={<Carrito />} />
-              <Route path="/Sucess" element={<Sucess />} />
+              <Route path="/Success/:orderId" element={<Success />} />
               <Route path="/Failure" element={<Failure />} />
               <Route path="/Pending" element={<Pending />} />
               <Route path="*" element={<p>Not Found</p>} />
