@@ -35,6 +35,7 @@ export default async function handler(req, res) {
         auto_return: "approved",
         payer: {
           name: shipping.name,
+          email: shipping.email,
           address: {
             street_name: shipping.street_name,
             street_number: shipping.street_number,
