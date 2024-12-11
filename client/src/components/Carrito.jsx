@@ -15,12 +15,14 @@ const Carrito = () => {
     name: "",
     email: "",
     city: "",
-    province: "",
+    state_name: "",
     zip_code: "",
-    address: "",
+    street_name: "",
+    street_number: "",
     apartment: "",
+    floor: "",
     phone_area: "",
-    phone_number: "",
+    phone: "",
     comments: "",
   });
   const [isProcessing, setIsProcessing] = useState("");
