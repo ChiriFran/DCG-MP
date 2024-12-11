@@ -22,7 +22,6 @@ const Carrito = () => {
     email: "", // Nuevo campo para el email
     comments: "", // Nuevo campo para mensajes opcionales
   });
-  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
 
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
@@ -65,62 +64,57 @@ const Carrito = () => {
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
-    const pedidoId = `pedido-${Date.now()}-${Math.floor(Math.random() * 1000000)}`; // Generar un ID único
     const pedido = {
-      id: pedidoId,
       cliente: shippingData,
-      productos: carrito.map((prod) => ({
-        ...prod,
-        status: "pendiente", // Estado inicial del producto
-      })),
+      productos: carrito,
       total: precioTotal(),
-      createdAt: new Date().toISOString(),
     };
 
     try {
       const pedidoDb = collection(db, "pedidos");
-      await addDoc(pedidoDb, pedido);
-      console.log(`Order saved with ID: ${pedidoId}`);
-      return pedidoId; // Retorna el ID del pedido
+      const doc = await addDoc(pedidoDb, pedido);
+      console.log(`Order saved with ID: ${doc.id}`);
+      return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return null;
+      return false;
     }
   };
 
   // Maneja la compra
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
-
     e.preventDefault();
 
-    if (isProcessing) return;
+    if (isProcessing) return; // Evita clics repetidos
 
-    setIsProcessing("Processing...");
+    setIsProcessing("Processing..."); // Mostrar que se está procesando
 
-    const preferenceId = await createPreference();
-    if (preferenceId) {
-      setPreferenceId(preferenceId);
-      setIsProcessing("Redirecting to Mercado Pago...");
+    const id = await createPreference(); // Crear la preferencia en Mercado Pago
+    if (id) {
+      setPreferenceId(id);
+      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const pedidoId = await saveOrderToFirebase(); // Guardar la orden en Firebase
-      if (pedidoId) {
+      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
+      if (saved) {
+        // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
-          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${preferenceId}`;
-          window.open(checkoutUrl, "_blank");
-          vaciarCarrito();
-          setIsProcessing("");
+          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
+
+          vaciarCarrito(); // Vaciar el carrito después de redirigir
+          setIsProcessing(""); // Resetear el estado después del flujo
         }, 1500);
       } else {
         alert("The order could not be saved. Please try again.");
-        setIsProcessing("");
+        setIsProcessing(""); // Resetear el estado si hay un error
       }
     } else {
       alert("It was not possible to create the preference in Mercado Pago. Please try again.");
-      setIsProcessing("");
+      setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
-
 
 
 

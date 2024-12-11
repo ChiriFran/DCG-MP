@@ -8,10 +8,10 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
-      const { items, shipping, pedido_id } = req.body;
+      const { items, shipping } = req.body;
 
-      if (!shipping || !shipping.name || !shipping.address || !pedido_id) {
-        return res.status(400).json({ error: "Missing shipping data or pedido_id" });
+      if (!shipping || !shipping.name || !shipping.address) {
+        return res.status(400).json({ error: "Missing shipping data" });
       }
 
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
@@ -28,9 +28,9 @@ export default async function handler(req, res) {
           currency_id: "ARS",
         })),
         back_urls: {
-          success: `https://dcgstore.vercel.app/#/Success?pedido_id=${pedido_id}`,
-          failure: `https://dcgstore.vercel.app/#/Failure?pedido_id=${pedido_id}`,
-          pending: `https://dcgstore.vercel.app/#/Pending?pedido_id=${pedido_id}`,
+          success: "https://dcgstore.vercel.app/#/Sucess",
+          failure: "https://dcgstore.vercel.app/#/Failure",
+          pending: "https://dcgstore.vercel.app/#/Pending",
         },
         auto_return: "approved",
         payer: {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       const preference = new Preference(client);
       const result = await preference.create({ body });
 
-      console.log("Preferencia creada:", result); // Log de la respuesta de Mercado Pago
+      console.log(result); // Log de la respuesta de Mercado Pago
       res.status(200).json({ id: result.id });
     } catch (error) {
       console.error("Error al crear la preferencia:", error);
