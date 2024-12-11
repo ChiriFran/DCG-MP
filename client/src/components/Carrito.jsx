@@ -16,7 +16,7 @@ const Carrito = () => {
     email: "",
     phone_area: "",
     phone: "",
-    address: "",
+    street_name: "",
     street_number: "",
     zip_code: "",
     city: "",
@@ -175,17 +175,6 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={shippingData.email}
-                    onChange={handleShippingChange}
-                    placeholder="john.doe@example.com"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
                   <label>Province</label>
                   <input
                     type="text"
@@ -196,38 +185,14 @@ const Carrito = () => {
                     required
                   />
                 </div>
-                <div className="half-container">
-                  <div className="formEnvioGroup half">
-                    <label>Street Number</label>
-                    <input
-                      type="text"
-                      name="street_number"
-                      value={shippingData.street_number}
-                      onChange={handleShippingChange}
-                      placeholder="Main St"
-                      required
-                    />
-                  </div>
-                  <div className="formEnvioGroup half">
-                    <label>Adress</label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={shippingData.address}
-                      onChange={handleShippingChange}
-                      placeholder="123"
-                      required
-                    />
-                  </div>
-                </div>
                 <div className="formEnvioGroup">
-                  <label>Zip Code</label>
+                  <label>Email</label>
                   <input
-                    type="text"
-                    name="zip_code"
-                    value={shippingData.zip_code}
+                    type="email"
+                    name="email"
+                    value={shippingData.email}
                     onChange={handleShippingChange}
-                    placeholder="10001"
+                    placeholder="john.doe@example.com"
                     required
                   />
                 </div>
@@ -241,6 +206,41 @@ const Carrito = () => {
                     placeholder="Buenos Aires"
                     required
                   />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zip_code"
+                    value={shippingData.zip_code}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
+                    required
+                  />
+                </div>
+                <div className="half-container">
+                  <div className="formEnvioGroup half">
+                    <label>Street name</label>
+                    <input
+                      type="text"
+                      name="street_name"
+                      value={shippingData.street_number}
+                      onChange={handleShippingChange}
+                      placeholder="Main St"
+                      required
+                    />
+                  </div>
+                  <div className="formEnvioGroup half">
+                    <label>Adress</label>
+                    <input
+                      type="text"
+                      name="street_number"
+                      value={shippingData.stret_number}
+                      onChange={handleShippingChange}
+                      placeholder="123"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
