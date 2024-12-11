@@ -1,57 +1,35 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const Success = () => {
-    const [searchParams] = useSearchParams();
-    const [status, setStatus] = useState("processing");
+    const [status, setStatus] = useState("");
+    const location = useLocation();
 
     useEffect(() => {
-        const validatePayment = async () => {
-            const paymentId = searchParams.get("payment_id");
-            const externalReference = searchParams.get("external_reference");
-            const paymentStatus = searchParams.get("status");
+        const queryParams = new URLSearchParams(location.search);
+        const orderId = queryParams.get("orderId");
 
-            if (!paymentId || !externalReference || !paymentStatus) {
-                setStatus("error");
-                return;
-            }
+        if (orderId) {
+            updateOrderStatus(orderId);
+        }
+    }, [location]);
 
-            try {
-                // Validar el estado del pago con la API de Mercado Pago
-                const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-                    headers: {
-                        Authorization: `Bearer ${import.meta.env.VITE_MP_ACCESS_TOKEN}`, // Reemplaza con tu token
-                    },
-                });
-
-                const payment = await response.json();
-
-                if (payment.status === "approved") {
-                    // Actualizar el estado del pedido en Firebase
-                    const orderRef = doc(db, "pedidos", externalReference); // external_reference es el ID del pedido en tu base de datos
-                    await updateDoc(orderRef, { status: "completed" });
-
-                    setStatus("completed");
-                } else {
-                    setStatus("failed");
-                }
-            } catch (error) {
-                console.error("Error validating payment:", error);
-                setStatus("error");
-            }
-        };
-
-        validatePayment();
-    }, [searchParams]);
+    const updateOrderStatus = async (orderId) => {
+        try {
+            const orderRef = doc(db, "pedidos", orderId);
+            await updateDoc(orderRef, { status: "completed" });
+            setStatus("Your order was successfully completed!");
+        } catch (error) {
+            console.error("Error updating order status:", error);
+            setStatus("There was an issue updating your order.");
+        }
+    };
 
     return (
         <div>
-            {status === "processing" && <h1>Processing your payment...</h1>}
-            {status === "completed" && <h1>Payment successful! Thank you for your purchase.</h1>}
-            {status === "failed" && <h1>Payment failed. Please try again.</h1>}
-            {status === "error" && <h1>An error occurred. Please contact support.</h1>}
+            <h1>{status}</h1>
         </div>
     );
 };
