@@ -218,7 +218,7 @@ const Carrito = () => {
                   <label>Zip Code</label>
                   <input
                     type="text"
-                    name="zi_code"
+                    name="zip_code"
                     value={shippingData.zip_code}
                     onChange={handleShippingChange}
                     placeholder="10001"
