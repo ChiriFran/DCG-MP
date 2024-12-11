@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
+import '../styles/Success.css'
 
 const Success = () => {
     const [status, setStatus] = useState("");
