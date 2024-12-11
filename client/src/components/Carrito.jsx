@@ -22,6 +22,7 @@ const Carrito = () => {
     email: "", // Nuevo campo para el email
     comments: "", // Nuevo campo para mensajes opcionales
   });
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
 
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
@@ -90,7 +91,6 @@ const Carrito = () => {
 
   // Maneja la compra
   const handleBuy = async (e) => {
-    const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
 
     e.preventDefault();
 
