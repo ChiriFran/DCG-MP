@@ -2,8 +2,8 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  width: 350px;
-  height: 280px;
+  width: 500px;
+  height: 220px;
   margin: 1rem 1rem;
   display: flex;
   justify-content: center;
@@ -12,7 +12,7 @@
   border: 1px solid rgba(128, 128, 128, 0.482);
   transition: 0.6s ease-in-out;
   opacity: 0;
-  z-index: 10000;
+  z-index: 1000;
   transform: translateX(100%);
   /* Inicia desde la derecha */
 }
@@ -34,7 +34,7 @@
   height: 100%;
   margin: 0 auto;
   border: none;
-  padding: 2% 5%;
+  padding: 2% 2%;
   background-color: #0a0a0a;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -178,7 +178,7 @@
 @media screen and (max-width: 700px) {
 
   .popupOverlay {
-    width: 300px;
+    width: 90%;
     height: 260px;
   }
 
