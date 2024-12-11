@@ -22,7 +22,7 @@ const Carrito = () => {
     email: "", // Nuevo campo para el email
     comments: "", // Nuevo campo para mensajes opcionales
   });
-  const [processing, setProcessing] = useState(false);
+  const [isProcessing, setProcessing] = useState(false);
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
