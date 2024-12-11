@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
 import "../styles/Carrito.css";
 import { CartContext } from "../context/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import ItemListContainerDestacados from "./ItemListContainerDestacados";
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const Carrito = () => {
@@ -16,17 +16,18 @@ const Carrito = () => {
     email: "",
     phone_area: "",
     phone: "",
-    street_name: "",
-    street_number: "",
-    zip_code: "",
-    city: "",
+
     province: "",
-    floor: "",
+    city: "",
+    zip_code: "",
+    street_number: "",
+    street_name: "",
     apartment: "",
+    floor: "",
+
     comments: "",
   });
-  const [isProcessing, setIsProcessing] = useState("");
-  const navigate = useNavigate(); // Para redirigir después de la compra
+
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -50,7 +51,8 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      const apiUrl = import.meta.env.VITE_API_URL;
+      // URL base del backend desde las variables de entorno
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -65,69 +67,61 @@ const Carrito = () => {
     }
   };
 
-  // Función para generar un ID único basado en la hora actual y un valor aleatorio
-  const generateUniqueId = () => {
-    return `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  };
-
-  // Guarda la orden en Firebase con el ID único generado
+  // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
-    const pedidoId = generateUniqueId(); // Generar ID único
     const pedido = {
-      id: pedidoId,
       cliente: shippingData,
       productos: carrito,
       total: precioTotal(),
-      estado: "pending", // Estado inicial del pedido
     };
 
     try {
       const pedidoDb = collection(db, "pedidos");
-      const docRef = await addDoc(pedidoDb, pedido);
-      console.log(`Order saved with ID: ${pedidoId}`);
-      return { pedidoId, docRef }; // Devolver ID para usarlo en la preferencia
+      const doc = await addDoc(pedidoDb, pedido);
+      console.log(`Order saved with ID: ${doc.id}`);
+      return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return null;
+      return false;
     }
   };
 
   // Maneja la compra
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (isProcessing) return;
+    if (isProcessing) return; // Evita clics repetidos
 
-    setIsProcessing("Processing...");
+    setIsProcessing("Processing..."); // Mostrar que se está procesando
 
-    const id = await createPreference();
+    const id = await createPreference(); // Crear la preferencia en Mercado Pago
     if (id) {
       setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago...");
+      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const { pedidoId, docRef } = await saveOrderToFirebase();
-      if (pedidoId) {
-        setTimeout(async () => {
+      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
+      if (saved) {
+        // Esperar 2 segundos antes de redirigir
+        setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-          window.open(checkoutUrl, "_blank");
+          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
-          // Actualiza el estado del pedido a 'paid' en Firebase después del pago
-          await updateDoc(docRef, { estado: "paid" });
-
-          vaciarCarrito();
-          setIsProcessing("");
-          navigate(`/success/${pedidoId}`); // Redirige al componente Success
+          vaciarCarrito(); // Vaciar el carrito después de redirigir
+          setIsProcessing(""); // Resetear el estado después del flujo
         }, 1500);
       } else {
         alert("The order could not be saved. Please try again.");
-        setIsProcessing("");
+        setIsProcessing(""); // Resetear el estado si hay un error
       }
     } else {
       alert("It was not possible to create the preference in Mercado Pago. Please try again.");
-      setIsProcessing("");
+      setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
+
+
 
   return (
     <div className="carritoContainer">
@@ -175,17 +169,6 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
-                  <input
-                    type="text"
-                    name="province"
-                    value={shippingData.province}
-                    onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
                   <label>Email</label>
                   <input
                     type="email"
@@ -197,24 +180,13 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>City</label>
+                  <label>Province</label>
                   <input
                     type="text"
-                    name="city"
-                    value={shippingData.city}
+                    name="province"
+                    value={shippingData.province}
                     onChange={handleShippingChange}
                     placeholder="Buenos Aires"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zip_code"
-                    value={shippingData.zip_code}
-                    onChange={handleShippingChange}
-                    placeholder="10001"
                     required
                   />
                 </div>
@@ -231,7 +203,7 @@ const Carrito = () => {
                     />
                   </div>
                   <div className="formEnvioGroup half">
-                    <label>Street number</label>
+                    <label>Street Number</label>
                     <input
                       type="text"
                       name="street_number"
@@ -241,6 +213,28 @@ const Carrito = () => {
                       required
                     />
                   </div>
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zi_code"
+                    value={shippingData.zip_code}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>City</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={shippingData.city}
+                    onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
+                    required
+                  />
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
@@ -268,7 +262,7 @@ const Carrito = () => {
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
-                    <label>Floor</label>
+                    <label>House Floor</label>
                     <input
                       type="text"
                       name="floor"
