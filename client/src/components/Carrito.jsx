@@ -62,9 +62,16 @@ const Carrito = () => {
     }
   };
 
-  // Guarda la orden en Firebase
+  // Función para generar un ID único basado en la hora actual y un valor aleatorio
+  const generateUniqueId = () => {
+    return `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  };
+
+  // Guarda la orden en Firebase con el ID único generado
   const saveOrderToFirebase = async () => {
+    const pedidoId = generateUniqueId(); // Generar ID único
     const pedido = {
+      id: pedidoId, // Usar el ID generado
       cliente: shippingData,
       productos: carrito,
       total: precioTotal(),
@@ -73,17 +80,16 @@ const Carrito = () => {
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
-      console.log(`Order saved with ID: ${doc.id}`);
-      return true;
+      console.log(`Order saved with ID: ${pedidoId}`);
+      return pedidoId; // Devolver el ID para utilizarlo en la preferencia
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return false;
+      return null; // Retornar null si no se pudo guardar el pedido
     }
   };
 
   // Maneja la compra
-  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -96,8 +102,8 @@ const Carrito = () => {
       setPreferenceId(id);
       setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
-      if (saved) {
+      const savedOrderId = await saveOrderToFirebase(); // Guardar el pedido con ID único
+      if (savedOrderId) {
         // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
@@ -115,8 +121,6 @@ const Carrito = () => {
       setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
-
-
 
   return (
     <div className="carritoContainer">
