@@ -13,13 +13,14 @@ const Carrito = () => {
   const [preferenceId, setPreferenceId] = useState(null);
   const [shippingData, setShippingData] = useState({
     name: "",
-    address: "",
-    apartment: "", // Nuevo campo para casa/departamento
-    zipCode: "",
+    email: "", // Nuevo campo para el email
     city: "",
     province: "",
-    phone: "",
-    email: "", // Nuevo campo para el email
+    zip_code: "",
+    address: "",
+    apartment: "", // Nuevo campo para casa/departamento
+    phone_area: "",
+    phone_number: "",
     comments: "", // Nuevo campo para mensajes opcionales
   });
 
