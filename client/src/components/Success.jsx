@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore"; // Cambiado a setDoc
 import { db } from "../firebase/config";
 
 import "../styles/Success.css";
@@ -9,7 +9,7 @@ const Success = ({ orderId }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const updateOrderStatus = async () => {
+        const createOrderStatus = async () => {
             if (!orderId) {
                 setError("No order ID provided.");
                 setLoading(false);
@@ -20,21 +20,21 @@ const Success = ({ orderId }) => {
                 // Referencia al pedido usando el ID
                 const orderRef = doc(db, "pedidos", orderId);
 
-                // Actualiza el estado del pedido a 'success'
-                await updateDoc(orderRef, {
-                    status: "success",
-                });
+                // Crea un nuevo documento o establece un nuevo campo `status` como 'success'
+                await setDoc(orderRef, {
+                    status: "success", // Se crea el campo status con valor 'success'
+                }, { merge: true }); // El merge asegura que no se sobrescriban otros campos del documento
 
-                console.log("Order updated successfully!");
+                console.log("Order status created successfully!");
             } catch (err) {
-                console.error("Error updating the order:", err);
-                setError("There was a problem updating the order.");
+                console.error("Error creating the order status:", err);
+                setError("There was a problem creating the order status.");
             } finally {
                 setLoading(false);
             }
         };
 
-        updateOrderStatus();
+        createOrderStatus();
     }, [orderId]); // Ejecuta cuando `orderId` cambie
 
     if (loading) {
@@ -47,8 +47,8 @@ const Success = ({ orderId }) => {
 
     return (
         <div>
-            <h1>Order Status Updated</h1>
-            <p>Order ID: {orderId} has been updated with status 'success'.</p>
+            <h1>Order Status Created</h1>
+            <p>Order ID: {orderId} has been created with status 'success'.</p>
         </div>
     );
 };
