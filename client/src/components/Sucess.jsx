@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useEffect, useState } from "react";
-import '../styles/Success.css'
 
 const Success = () => {
     const { orderId } = useParams();
