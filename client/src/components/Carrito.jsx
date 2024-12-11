@@ -98,14 +98,14 @@ const Carrito = () => {
 
       const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
       if (saved) {
-        // Esperar 2 segundos antes de redirigir
+        // Esperar 1 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
           window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
           vaciarCarrito(); // Vaciar el carrito después de redirigir
           setIsProcessing(""); // Resetear el estado después del flujo
-        }, 1500);
+        }, 500);
       } else {
         alert("The order could not be saved. Please try again.");
         setIsProcessing(""); // Resetear el estado si hay un error
