@@ -68,17 +68,17 @@ const Carrito = () => {
       cliente: shippingData,
       productos: carrito,
       total: precioTotal(),
+      status: "created", // Estado inicial del pedido
     };
-
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
-      return true;
+      return { success: true, orderId: doc.id }; // Retorna el ID del pedido
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return false;
+      return { success: false };
     }
   };
 
