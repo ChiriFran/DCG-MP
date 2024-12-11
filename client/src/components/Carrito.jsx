@@ -169,6 +169,17 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
+                  <label>Province</label>
+                  <input
+                    type="text"
+                    name="province"
+                    value={shippingData.province}
+                    onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
                   <label>Email</label>
                   <input
                     type="email"
@@ -180,13 +191,24 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
+                  <label>City</label>
                   <input
                     type="text"
-                    name="province"
-                    value={shippingData.province}
+                    name="city"
+                    value={shippingData.city}
                     onChange={handleShippingChange}
                     placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zip_code"
+                    value={shippingData.zip_code}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
                     required
                   />
                 </div>
@@ -213,28 +235,6 @@ const Carrito = () => {
                       required
                     />
                   </div>
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zip_code"
-                    value={shippingData.zip_code}
-                    onChange={handleShippingChange}
-                    placeholder="10001"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={shippingData.city}
-                    onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
-                    required
-                  />
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
