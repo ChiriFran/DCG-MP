@@ -235,7 +235,7 @@ const Carrito = () => {
                     <input
                       type="text"
                       name="street_number"
-                      value={shippingData.stret_number}
+                      value={shippingData.street_number}
                       onChange={handleShippingChange}
                       placeholder="123"
                       required
