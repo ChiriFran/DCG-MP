@@ -1,51 +1,57 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { useSearchParams } from "react-router-dom";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
-import '../styles/Success.css'
 
 const Success = () => {
-    const { orderId } = useParams(); // Suponiendo que pasas el ID como parámetro en la URL
-    const [status, setStatus] = useState("validating");
+    const [searchParams] = useSearchParams();
+    const [status, setStatus] = useState("processing");
 
     useEffect(() => {
-        const validateOrder = async () => {
+        const validatePayment = async () => {
+            const paymentId = searchParams.get("payment_id");
+            const externalReference = searchParams.get("external_reference");
+            const paymentStatus = searchParams.get("status");
+
+            if (!paymentId || !externalReference || !paymentStatus) {
+                setStatus("error");
+                return;
+            }
+
             try {
-                const orderRef = doc(db, "pedidos", orderId);
-                const orderSnap = await getDoc(orderRef);
+                // Validar el estado del pago con la API de Mercado Pago
+                const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+                    headers: {
+                        Authorization: `Bearer ${import.meta.env.VITE_MP_ACCESS_TOKEN}`, // Reemplaza con tu token
+                    },
+                });
 
-                if (orderSnap.exists()) {
-                    const orderData = orderSnap.data();
+                const payment = await response.json();
 
-                    // Aquí deberías incluir la lógica para validar la compra.
-                    const isValid = true; // Sustituir con la lógica real de validación
+                if (payment.status === "approved") {
+                    // Actualizar el estado del pedido en Firebase
+                    const orderRef = doc(db, "pedidos", externalReference); // external_reference es el ID del pedido en tu base de datos
+                    await updateDoc(orderRef, { status: "completed" });
 
-                    if (isValid) {
-                        await updateDoc(orderRef, { status: "completed" });
-                        setStatus("completed");
-                    } else {
-                        setStatus("failed");
-                    }
+                    setStatus("completed");
                 } else {
-                    console.error("Order not found");
-                    setStatus("not-found");
+                    setStatus("failed");
                 }
             } catch (error) {
-                console.error("Error validating order:", error);
+                console.error("Error validating payment:", error);
                 setStatus("error");
             }
         };
 
-        validateOrder();
-    }, [orderId]);
+        validatePayment();
+    }, [searchParams]);
 
     return (
-        <div className="successContainer">
-            {status === "validating" && <p>Validating your order...</p>}
-            {status === "completed" && <p>Your order has been successfully completed!</p>}
-            {status === "failed" && <p>There was an issue with your order validation.</p>}
-            {status === "not-found" && <p>Order not found.</p>}
-            {status === "error" && <p>An error occurred during validation. Please try again later.</p>}
+        <div>
+            {status === "processing" && <h1>Processing your payment...</h1>}
+            {status === "completed" && <h1>Payment successful! Thank you for your purchase.</h1>}
+            {status === "failed" && <h1>Payment failed. Please try again.</h1>}
+            {status === "error" && <h1>An error occurred. Please contact support.</h1>}
         </div>
     );
 };
