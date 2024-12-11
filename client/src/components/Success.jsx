@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { doc, setDoc } from "firebase/firestore"; // Cambiado a setDoc
 import { db } from "../firebase/config";
+import { useParams } from "react-router-dom"; // Asegúrate de importar useParams
 
 import "../styles/Success.css";
 
-const Success = ({ orderId }) => {
+const Success = () => {
+    const { orderId } = useParams(); // Obtén el orderId de la URL
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
