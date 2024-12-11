@@ -1,33 +1,54 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";  // Para acceder a los parámetros de la ruta
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
+
 import "../styles/Success.css";
 
-const Success = () => {
-    const { orderId } = useParams();  // Accede al parámetro 'orderId' desde la URL
-    const [status, setStatus] = useState("");
+const Success = ({ orderId }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (orderId) {
-            updateOrderStatus(orderId);  // Llama a la función para actualizar el estado del pedido
-        }
-    }, [orderId]);  // Asegúrate de que el efecto se ejecute cuando cambie el orderId
+        const updateOrderStatus = async () => {
+            if (!orderId) {
+                setError("No order ID provided.");
+                setLoading(false);
+                return;
+            }
 
-    const updateOrderStatus = async (orderId) => {
-        try {
-            const orderRef = doc(db, "pedidos", orderId);
-            await updateDoc(orderRef, { status: "completed" });  // Actualiza el estado del pedido en Firebase
-            setStatus("Your order was successfully completed!");
-        } catch (error) {
-            console.error("Error updating order status:", error);
-            setStatus("There was an issue updating your order.");
-        }
-    };
+            try {
+                // Referencia al pedido usando el ID
+                const orderRef = doc(db, "pedidos", orderId);
+
+                // Actualiza el estado del pedido a 'success'
+                await updateDoc(orderRef, {
+                    status: "success",
+                });
+
+                console.log("Order updated successfully!");
+            } catch (err) {
+                console.error("Error updating the order:", err);
+                setError("There was a problem updating the order.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        updateOrderStatus();
+    }, [orderId]); // Ejecuta cuando `orderId` cambie
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <div>
-            <h1>{status}</h1>
+            <h1>Order Status Updated</h1>
+            <p>Order ID: {orderId} has been updated with status 'success'.</p>
         </div>
     );
 };
