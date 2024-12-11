@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
 import "../styles/Carrito.css";
 import { CartContext } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import ItemListContainerDestacados from "./ItemListContainerDestacados";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const Carrito = () => {
@@ -13,17 +13,18 @@ const Carrito = () => {
   const [preferenceId, setPreferenceId] = useState(null);
   const [shippingData, setShippingData] = useState({
     name: "",
-    email: "", // Nuevo campo para el email
+    email: "",
     city: "",
     province: "",
     zip_code: "",
     address: "",
-    apartment: "", // Nuevo campo para casa/departamento
+    apartment: "",
     phone_area: "",
     phone_number: "",
-    comments: "", // Nuevo campo para mensajes opcionales
+    comments: "",
   });
-
+  const [isProcessing, setIsProcessing] = useState("");
+  const navigate = useNavigate(); // Para redirigir después de la compra
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -47,8 +48,7 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+      const apiUrl = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -72,21 +72,22 @@ const Carrito = () => {
   const saveOrderToFirebase = async () => {
     const pedidoId = generateUniqueId(); // Generar ID único
     const pedido = {
-      id: pedidoId, // Usar el ID generado
+      id: pedidoId,
       cliente: shippingData,
       productos: carrito,
       total: precioTotal(),
+      estado: "pending", // Estado inicial del pedido
     };
 
     try {
       const pedidoDb = collection(db, "pedidos");
-      const doc = await addDoc(pedidoDb, pedido);
+      const docRef = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${pedidoId}`);
-      return pedidoId; // Devolver el ID para utilizarlo en la preferencia
+      return { pedidoId, docRef }; // Devolver ID para usarlo en la preferencia
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return null; // Retornar null si no se pudo guardar el pedido
+      return null;
     }
   };
 
@@ -94,32 +95,35 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (isProcessing) return; // Evita clics repetidos
+    if (isProcessing) return;
 
-    setIsProcessing("Processing..."); // Mostrar que se está procesando
+    setIsProcessing("Processing...");
 
-    const id = await createPreference(); // Crear la preferencia en Mercado Pago
+    const id = await createPreference();
     if (id) {
       setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
+      setIsProcessing("Redirecting to Mercado Pago...");
 
-      const savedOrderId = await saveOrderToFirebase(); // Guardar el pedido con ID único
-      if (savedOrderId) {
-        // Esperar 2 segundos antes de redirigir
-        setTimeout(() => {
+      const { pedidoId, docRef } = await saveOrderToFirebase();
+      if (pedidoId) {
+        setTimeout(async () => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
+          window.open(checkoutUrl, "_blank");
 
-          vaciarCarrito(); // Vaciar el carrito después de redirigir
-          setIsProcessing(""); // Resetear el estado después del flujo
+          // Actualiza el estado del pedido a 'paid' en Firebase después del pago
+          await updateDoc(docRef, { estado: "paid" });
+
+          vaciarCarrito();
+          setIsProcessing("");
+          navigate(`/success/${pedidoId}`); // Redirige al componente Success
         }, 1500);
       } else {
         alert("The order could not be saved. Please try again.");
-        setIsProcessing(""); // Resetear el estado si hay un error
+        setIsProcessing("");
       }
     } else {
       alert("It was not possible to create the preference in Mercado Pago. Please try again.");
-      setIsProcessing(""); // Resetear el estado si hay un error
+      setIsProcessing("");
     }
   };
 
