@@ -90,6 +90,8 @@ const Carrito = () => {
 
   // Maneja la compra
   const handleBuy = async (e) => {
+    const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
+
     e.preventDefault();
 
     if (isProcessing) return;
