@@ -1,8 +1,29 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import "../styles/Sucess.css";
+import { db } from "../firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
 
-const Success = ({ orderId, customerName }) => {
+const Success = () => {
+    const [searchParams] = useSearchParams();
+    const pedidoId = searchParams.get("pedido_id"); // Recuperar el ID del pedido desde la URL
+
+    useEffect(() => {
+        const updateOrderStatus = async () => {
+            if (!pedidoId) return;
+            try {
+                const pedidoRef = doc(db, "pedidos", pedidoId);
+                await updateDoc(pedidoRef, {
+                    "productos[].status": "aprobado", // Cambiar el estado a "aprobado"
+                });
+                console.log(`Order ${pedidoId} status updated to approved.`);
+            } catch (error) {
+                console.error("Error updating order status:", error);
+            }
+        };
+        updateOrderStatus();
+    }, [pedidoId]);
+
     return (
         <div className="successContainer">
             <div className="successCard">
@@ -11,10 +32,7 @@ const Success = ({ orderId, customerName }) => {
                     Your order has been successfully processed.
                 </p>
                 <p className="orderDetails">
-                    Order ID: <span className="orderId">{orderId}</span>
-                </p>
-                <p className="customerDetails">
-                    Customer Name: <span className="customerName">{customerName}</span>
+                    Order ID: <span className="orderId">{pedidoId}</span>
                 </p>
                 <p className="additionalInfo">
                     You will receive a confirmation email shortly with the order details.
