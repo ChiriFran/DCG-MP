@@ -231,7 +231,7 @@ const Carrito = () => {
                     />
                   </div>
                   <div className="formEnvioGroup half">
-                    <label>Adress</label>
+                    <label>Street number</label>
                     <input
                       type="text"
                       name="street_number"
