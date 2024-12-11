@@ -22,7 +22,7 @@ const Carrito = () => {
     email: "", // Nuevo campo para el email
     comments: "", // Nuevo campo para mensajes opcionales
   });
-  const [isProcessing, setIsProcessing] = useState(false);
+
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -62,8 +62,7 @@ const Carrito = () => {
     }
   };
 
-
-  // Dentro de la función saveOrderToFirebase en el componente Carrito
+  // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
@@ -73,19 +72,18 @@ const Carrito = () => {
 
     try {
       const pedidoDb = collection(db, "pedidos");
-      const docRef = await addDoc(pedidoDb, pedido); // Guardamos el pedido y obtenemos la referencia del documento
-      console.log(`Order saved with ID: ${docRef.id}`);
-
-      // Aquí puedes redirigir o renderizar el componente Success pasando el orderId
-      return docRef.id; // Retorna el ID del pedido guardado
+      const doc = await addDoc(pedidoDb, pedido);
+      console.log(`Order saved with ID: ${doc.id}`);
+      return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
-      return null;
+      return false;
     }
   };
 
-  // Luego, al manejar la compra, pasamos el orderId al componente Success
+  // Maneja la compra
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -102,10 +100,12 @@ const Carrito = () => {
       if (saved) {
         // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
-          navigate(`/success/${id}`); // Redirige usando navigate
+          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
+
           vaciarCarrito(); // Vaciar el carrito después de redirigir
           setIsProcessing(""); // Resetear el estado después del flujo
-        }, 1000);
+        }, 1500);
       } else {
         alert("The order could not be saved. Please try again.");
         setIsProcessing(""); // Resetear el estado si hay un error
@@ -115,6 +115,8 @@ const Carrito = () => {
       setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
+
+
 
   return (
     <div className="carritoContainer">

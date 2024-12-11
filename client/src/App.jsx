@@ -42,7 +42,7 @@ function App() {
               <Route path="/LogIn" element={<LogIn />} />
               <Route path="/SignUp" element={<SignUp />} />
               <Route path="/Carrito" element={<Carrito />} />
-              <Route path="/success/:orderId" element={<Success />} />
+              <Route path="/Success" element={<Success />} />
               <Route path="/Failure" element={<Failure />} />
               <Route path="/Pending" element={<Pending />} />
               <Route path="*" element={<p>Not Found</p>} />
