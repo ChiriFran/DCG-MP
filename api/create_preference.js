@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         payer: {
           name: shipping.name,
           address: {
-            street_name: shipping.streetName,
+            street_name: shipping.address,
           },
         },
       };
