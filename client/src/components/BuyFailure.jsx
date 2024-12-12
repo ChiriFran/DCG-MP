@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { useOrdenCompraContext } from "../context/OrdenCompraContext";
 import { db } from "../firebase/config";
+import '../styles/Failure.css'
 
 function BuyFailure() {
-  const { orderId } = useOrderContext();
+  const { orderId } = useOrdenCompraContext();
 
   useEffect(() => {
     if (orderId) {

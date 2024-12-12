@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { useOrdenCompraContext } from "../context/OrdenCompraContext";
 import { db } from "../firebase/config";
+import '../styles/Pending.css'
 
 function BuyPending() {
   const { orderId } = useOrdenCompraContext();
