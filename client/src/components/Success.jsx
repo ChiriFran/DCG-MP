@@ -3,7 +3,7 @@ import '../styles/Success.css'
 
 function Success() {
   return (
-    <div>
+    <div className='successContainer'>
       <h1>success</h1>
     </div>
   )
