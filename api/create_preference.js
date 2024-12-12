@@ -47,7 +47,7 @@ export default async function handler(req, res) {
             zip_code: Number(shipping.zipCode) || "0000",
             street_name: shipping.address || "Sin dirección",
             street_number: Number(shipping.streetNumber) || 0,
-            floor: Number(shipping.floor) || "",
+            floor: shipping.floor || "",
             apartment: shipping.apartment || "",
             city: shipping.city || "Ciudad",
             state_name: shipping.province || "Provincia",
