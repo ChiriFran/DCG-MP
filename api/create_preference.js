@@ -45,7 +45,7 @@ export default async function handler(req, res) {
             apartment: shipping.apartment || "",
             city: shipping.city || "Ciudad",
             state_name: shipping.province || "Provincia",
-            country: shipping.country || "Argentina", // Código de país obligatorio
+            country: shipping.country || "AR", // Código de país obligatorio
           },
         },
         shipments: {
