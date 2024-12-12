@@ -28,7 +28,7 @@ export default async function handler(req, res) {
           currency_id: "ARS",
         })),
         back_urls: {
-          success: "https://dcgstore.vercel.app/#/Sucess",
+          success: "https://dcgstore.vercel.app/#/Success",
           failure: "https://dcgstore.vercel.app/#/Failure",
           pending: "https://dcgstore.vercel.app/#/Pending",
         },
