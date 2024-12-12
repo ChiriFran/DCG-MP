@@ -21,40 +21,43 @@ import ContactFooter from "./components/ContactFooter.jsx";
 import Footer from "./components/Footer.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
+import { OrdenCompraProvider } from "./context/OrdenCompraContext.jsx";
 
 function App() {
   return (
-    <UserProvider>
-      <CartProvider>
-        <HashRouter>
-          <Navbar />
-          <ScrollToTop>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/Productos" element={<ItemListContainer />} />
-              <Route path="/Productos/:category" element={<ItemListContainer />} />
-              <Route path="/Music" element={<MusicList />} />
-              <Route path="/ProductoDetalles/:id" element={<ItemDetailContainer />} />
-              <Route path="/AboutUs" element={<AboutUs />} />
-              <Route path="/Faq" element={<Faq />} />
-              <Route path="/Eventos" element={<Eventos />} />
-              <Route path="/Blogs" element={<Blogs />} />
-              <Route path="/LogIn" element={<LogIn />} />
-              <Route path="/SignUp" element={<SignUp />} />
-              <Route path="/Carrito" element={<Carrito />} />
-              <Route path="/BuySuccess" element={<BuySuccess />} />
-              <Route path="/BuyFailure" element={<BuyFailure />} />
-              <Route path="/BuyPending" element={<BuyPending />} />
-              <Route path="*" element={<p>Not Found</p>} />
-            </Routes>
-          </ScrollToTop>
-          <CartPopup />
-          <ContactFooter />
-          <Footer />
-        </HashRouter>
-      </CartProvider>
-    </UserProvider>
-  );
+    <OrdenCompraProvider>
+      <UserProvider>
+        <CartProvider>
+          <HashRouter>
+            <Navbar />
+            <ScrollToTop>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/Productos" element={<ItemListContainer />} />
+                <Route path="/Productos/:category" element={<ItemListContainer />} />
+                <Route path="/Music" element={<MusicList />} />
+                <Route path="/ProductoDetalles/:id" element={<ItemDetailContainer />} />
+                <Route path="/AboutUs" element={<AboutUs />} />
+                <Route path="/Faq" element={<Faq />} />
+                <Route path="/Eventos" element={<Eventos />} />
+                <Route path="/Blogs" element={<Blogs />} />
+                <Route path="/LogIn" element={<LogIn />} />
+                <Route path="/SignUp" element={<SignUp />} />
+                <Route path="/Carrito" element={<Carrito />} />
+                <Route path="/BuySuccess" element={<BuySuccess />} />
+                <Route path="/BuyFailure" element={<BuyFailure />} />
+                <Route path="/BuyPending" element={<BuyPending />} />
+                <Route path="*" element={<p>Not Found</p>} />
+              </Routes>
+            </ScrollToTop>
+            <CartPopup />
+            <ContactFooter />
+            <Footer />
+          </HashRouter>
+        </CartProvider>
+      </UserProvider>
+      </OrdenCompraProvider>
+        );
 }
 
-export default App;
+        export default App;

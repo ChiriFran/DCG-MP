@@ -7,6 +7,7 @@ import { initMercadoPago } from "@mercadopago/sdk-react";
 import ItemListContainerDestacados from "./ItemListContainerDestacados";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useOrdenCompraContext } from "../context/OrdenCompraContext";
 
 const Carrito = () => {
   const { carrito, precioTotal, vaciarCarrito } = useContext(CartContext);
@@ -25,6 +26,7 @@ const Carrito = () => {
     email: "",
     comments: "",
   });
+  const { updateOrderId } = useOrdenCompraContext();
 
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
@@ -77,6 +79,7 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
+      updateOrderId(doc.id); // Actualiza el contexto con el ID del pedido
       return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
