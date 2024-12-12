@@ -15,13 +15,13 @@ const Carrito = () => {
     name: "",
     address: "",
     streetNumber: "",
-    apartment: "", // Nuevo campo para casa/departamento
+    apartment: "",
     zipCode: "",
     city: "",
     province: "",
     phone: "",
-    email: "", // Nuevo campo para el email
-    comments: "", // Nuevo campo para mensajes opcionales
+    email: "",
+    comments: "",
   });
 
 
