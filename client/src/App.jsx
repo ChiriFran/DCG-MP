@@ -12,7 +12,7 @@ import LogIn from "./components/LogIn.jsx";
 import SignUp from "./components/SignUp.jsx";
 import Carrito from "./components/Carrito.jsx";
 import Success from "./components/Success.jsx";
-import Pending from "./components/pending.jsx";
+import Pending from "./components/Pending.jsx";
 import Failure from "./components/Failure.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
