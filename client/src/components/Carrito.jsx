@@ -16,6 +16,7 @@ const Carrito = () => {
     address: "",
     streetNumber: "",
     apartment: "",
+    floor: "",
     zipCode: "",
     city: "",
     province: "",

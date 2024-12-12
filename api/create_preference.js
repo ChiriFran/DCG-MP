@@ -34,12 +34,31 @@ export default async function handler(req, res) {
         },
         auto_return: "approved",
         payer: {
-          name: shipping.name,
+          name: shipping.name || "N/A", // Nombre del comprador (valor por defecto)
           address: {
-            street_name: shipping.address,
+            street_name: shipping.address || "Sin dirección", // Dirección obligatoria
           },
         },
+        shipments: {
+          mode: "me2", // Configuración de Mercado Envíos
+          dimensions: shipping.dimensions || "30x30x30,1000", // Valor por defecto si no se proporciona
+          local_pickup: shipping.local_pickup || false, // Evita errores si no está definido
+          receiver_address: {
+            zip_code: shipping.zipCode || "0000",
+            street_name: shipping.address || "Sin dirección",
+            street_number: Number(shipping.streetNumber) || 0,
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
+            city: shipping.city || "Ciudad",
+            state_name: shipping.province || "Provincia",
+            country: shipping.country || "AR", // Código de país obligatorio
+          },
+        },
+        metadata: {
+          comments: shipping.comments,
+        }
       };
+
 
       const preference = new Preference(client);
       const result = await preference.create({ body });
