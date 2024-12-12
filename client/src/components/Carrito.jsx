@@ -15,14 +15,14 @@ const Carrito = () => {
     name: "",
     address: "",
     streetNumber: "",
-    apartment: "", // Nuevo campo para casa/departamento
-    floor: "", // Nuevo campo para casa/departamento
+    apartment: "",
+    floor: "",
     zipCode: "",
     city: "",
     province: "",
     phone: "",
-    email: "", // Nuevo campo para el email
-    comments: "", // Nuevo campo para mensajes opcionales
+    email: "",
+    comments: "",
   });
 
 
@@ -203,8 +203,8 @@ const Carrito = () => {
                     <label>Adress Number</label>
                     <input
                       type="text"
-                      name="streetName"
-                      value={shippingData.streetName}
+                      name="streetNumber"
+                      value={shippingData.streetNumber}
                       onChange={handleShippingChange}
                       placeholder="123"
                       required
