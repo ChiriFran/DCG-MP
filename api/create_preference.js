@@ -44,10 +44,10 @@ export default async function handler(req, res) {
           dimensions: shipping.dimensions || "30x30x30,1000", // Valor por defecto si no se proporciona
           local_pickup: shipping.local_pickup || false, // Evita errores si no está definido
           receiver_address: {
-            zip_code: shipping.zipCode || "0000",
+            zip_code: Number(shipping.zipCode) || "0000",
             street_name: shipping.address || "Sin dirección",
             street_number: Number(shipping.streetNumber) || 0,
-            floor: shipping.floor || "",
+            floor: Number(shipping.floor) || "",
             apartment: shipping.apartment || "",
             city: shipping.city || "Ciudad",
             state_name: shipping.province || "Provincia",
