@@ -14,6 +14,7 @@ const Carrito = () => {
   const [shippingData, setShippingData] = useState({
     name: "",
     address: "",
+    streetNumber: "",
     apartment: "", // Nuevo campo para casa/departamento
     zipCode: "",
     city: "",
@@ -223,8 +224,8 @@ const Carrito = () => {
                     <label>Adress Number</label>
                     <input
                       type="text"
-                      name="address"
-                      value={shippingData.address}
+                      name="streetNumber"
+                      value={shippingData.streetNumber}
                       onChange={handleShippingChange}
                       placeholder="123"
                       required
