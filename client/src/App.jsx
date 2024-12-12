@@ -11,9 +11,9 @@ import Faq from "./components/Faq.jsx";
 import LogIn from "./components/LogIn.jsx";
 import SignUp from "./components/SignUp.jsx";
 import Carrito from "./components/Carrito.jsx";
-import Success from "./components/Success.jsx";
-import Pending from "./components/Pending.jsx";
-import Failure from "./components/Failure.jsx";
+import BuySuccess from "./components/BuySuccess.jsx";
+import BuyPending from "./components/BuyPending.jsx";
+import BuyFailure from "./components/BuyFailure.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
 import CartPopup from "./components/CartPopup.jsx";
@@ -42,9 +42,9 @@ function App() {
               <Route path="/LogIn" element={<LogIn />} />
               <Route path="/SignUp" element={<SignUp />} />
               <Route path="/Carrito" element={<Carrito />} />
-              <Route path="/Success" element={<Success />} />
-              <Route path="/Failure" element={<Failure />} />
-              <Route path="/Pending" element={<Pending />} />
+              <Route path="/BuySuccess" element={<BuySuccess />} />
+              <Route path="/BuyFailure" element={<BuyFailure />} />
+              <Route path="/BuyPending" element={<BuyPending />} />
               <Route path="*" element={<p>Not Found</p>} />
             </Routes>
           </ScrollToTop>
