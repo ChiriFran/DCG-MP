@@ -101,7 +101,7 @@ const Carrito = () => {
         // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
+          window.open(checkoutUrl, "_self"); // Redirigir al checkout en nueva pestaña
 
           vaciarCarrito(); // Vaciar el carrito después de redirigir
           setIsProcessing(""); // Resetear el estado después del flujo
@@ -164,6 +164,17 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
+                  <label>Province</label>
+                  <input
+                    type="text"
+                    name="province"
+                    value={shippingData.province}
+                    onChange={handleShippingChange}
+                    placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
                   <label>Email</label>
                   <input
                     type="email"
@@ -175,13 +186,24 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
+                  <label>City</label>
                   <input
                     type="text"
-                    name="province"
-                    value={shippingData.province}
+                    name="city"
+                    value={shippingData.city}
                     onChange={handleShippingChange}
                     placeholder="Buenos Aires"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={shippingData.zipCode}
+                    onChange={handleShippingChange}
+                    placeholder="10001"
                     required
                   />
                 </div>
@@ -208,28 +230,6 @@ const Carrito = () => {
                       required
                     />
                   </div>
-                </div>
-                <div className="formEnvioGroup">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={shippingData.zipCode}
-                    onChange={handleShippingChange}
-                    placeholder="10001"
-                    required
-                  />
-                </div>
-                <div className="formEnvioGroup">
-                  <label>City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={shippingData.city}
-                    onChange={handleShippingChange}
-                    placeholder="Buenos Aires"
-                    required
-                  />
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
