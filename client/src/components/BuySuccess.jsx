@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { useOrdenCompraContext } from "../context/OrdenCompraContext";
 import { db } from "../firebase/config";
-import '../styles/Success.css'
+import '../styles/Success.css';
 
 function BuySuccess() {
   const { orderId } = useOrdenCompraContext();
@@ -10,8 +10,13 @@ function BuySuccess() {
   useEffect(() => {
     if (orderId) {
       const updateStatus = async () => {
-        const orderRef = doc(db, "pedidos", orderId);
-        await updateDoc(orderRef, { status: "success" });
+        try {
+          const orderRef = doc(db, "pedidos", orderId);
+          await updateDoc(orderRef, { status: "success" });
+          console.log(`Estado de la compra actualizado a "success" para el pedido: ${orderId}`);
+        } catch (error) {
+          console.error("Error al actualizar el estado del pedido:", error);
+        }
       };
       updateStatus();
     }
