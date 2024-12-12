@@ -38,7 +38,7 @@ export default async function handler(req, res) {
           email: shipping.email || "N/A", // email del comprador (valor por defecto)
           address: {
             street_name: shipping.address || "Sin dirección", // Dirección obligatoria
-            zip_code: Number(shipping.zipCode) || "0000",
+            zip_code: shipping.zipCode || "0000",
             street_name: shipping.address || "Sin dirección",
             street_number: Number(shipping.streetNumber) || 0,
             floor: shipping.floor || "",
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
           dimensions: shipping.dimensions || "30x30x30,1000", // Valor por defecto si no se proporciona
           local_pickup: shipping.local_pickup || false, // Evita errores si no está definido
           receiver_address: {
-            zip_code: Number(shipping.zipCode) || "0000",
+            zip_code: shipping.zipCode || "0000",
             street_name: shipping.address || "Sin dirección",
             street_number: Number(shipping.streetNumber) || 0,
             floor: shipping.floor || "",
