@@ -50,8 +50,8 @@ export default async function handler(req, res) {
         },
         shipments: {
           mode: "cost",  // Puede ser "free" si el envío es gratis
-          type: "standard",  // El tipo de envío, puede ser "standard" o "express"
-          cost: 10000,  // Costo del envío
+          type: "express",  // El tipo de envío, puede ser "standard" o "express"
+          cost: 5000,  // Costo del envío
         },
         metadata: {
           comments: shipping.comments,
