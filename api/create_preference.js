@@ -26,27 +26,36 @@ export default async function handler(req, res) {
           title: item.title,
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
-          currency_id: "ARS",
+          currency_id: "ARS"
         })),
 
         payer: {
           name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
           email: shipping.email || "Doe", // Email del comprador (valor por defecto)
+          phone: {
+            area_code: shipping.phoneArea || "11",
+            number: shipping.phone || "1234-1234"
+          },
           address: {
-            street_name: shipping.address || "Jose bianco", // Dirección obligatoria
-            zip_code: shipping.zipCode || "1706", // Código postal
-            street_number: Number(shipping.streetNumber) || 1521, // Número de calle
+            street_name: shipping.address || "Direccion", // Dirección obligatoria
+            zip_code: shipping.zipCode || "0000", // Código postal
+            street_number: Number(shipping.streetNumber) || 0, // Número de calle
             floor: shipping.floor || "", // Piso (opcional)
             apartment: shipping.apartment || "", // Departamento (opcional)
-            city: shipping.city || "Moron", // Ciudad
-            state_name: shipping.province || "Buenos Aires", // Provincia/estado
-            country: "Argentina", // País (obligatorio)
-          },
+            city: shipping.city || "Ciudad", // Ciudad
+            state_name: shipping.province || "Provincia", // Provincia/estado
+            country: "AR" // País (obligatorio)
+          }
         },
+
         shipments: {
-          mode: "cost",
-          type: "standar",
+          mode: "not_specified",
           cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
+          reciver_address: {
+            street_name: shipping.address || "Direccion", // Dirección obligatoria
+            street_number: Number(shipping.streetNumber) || 0,// Número de calle
+            zip_code: shipping.zipCode || "0000" // Código postal
+          }
         },
 
         back_urls: {
@@ -56,7 +65,8 @@ export default async function handler(req, res) {
         },
 
         statement_descriptor: "DCGSTORE",
-        auto_return: "approved",
+
+        auto_return: "approved"
       };
 
       const preference = new Preference(client);
