@@ -37,9 +37,9 @@ export default async function handler(req, res) {
           name: shipping.name,
           email: shipping.email,
           address: {
-            zip_code: shipping.zipCode,
+            zip_code: Number(shipping.zipCode),
             street_name: shipping.address,
-            street_number: shipping.streetNumber,
+            street_number: Number(shipping.streetNumber),
             state: shipping.province,
             city: shipping.city,
             country: "Argentina"
