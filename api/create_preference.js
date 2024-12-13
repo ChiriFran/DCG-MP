@@ -47,7 +47,7 @@ export default async function handler(req, res) {
           mode: "custom",
           cost: 5000, // Costo del envío en tu moneda
           receiver_address: {
-            zip_code: shipping.zip_code,
+            zip_code: shipping.zipCode,
             street_name: shipping.address,
             street_number: shipping.streetNumber,
             city_name: shipping.city,
