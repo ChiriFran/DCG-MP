@@ -29,24 +29,33 @@ export default async function handler(req, res) {
         })),
 
         payer: {
-          name: shipping.name || "N/A", // Nombre del comprador (valor por defecto)
-          email: shipping.email || "N/A", // Email del comprador (valor por defecto)
+          name: shipping.name || "N/A",
+          email: shipping.email || "N/A",
           address: {
-            street_name: shipping.address || "Sin dirección", // Dirección obligatoria
-            zip_code: shipping.zipCode || "0000", // Código postal
-            street_number: Number(shipping.streetNumber) || 0, // Número de calle
-            floor: shipping.floor || "", // Piso (opcional)
-            apartment: shipping.apartment || "", // Departamento (opcional)
-            city: shipping.city || "Ciudad", // Ciudad
-            state_name: shipping.province || "Provincia", // Provincia/estado
-            country: "Argentina", // País (obligatorio)
+            street_name: shipping.address || "Sin dirección",
+            zip_code: shipping.zipCode || "0000",
+            street_number: Number(shipping.streetNumber) || 0,
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
+            city: shipping.city || "Ciudad",
+            state_name: shipping.province || "Provincia",
+            country: shipping.country || "AR",
           },
         },
 
         shipments: {
-          mode: "cost", // Puede ser "free" si el envío es gratis
-          type: "standard", // Tipo de envío, puede ser "standard" o "express"
-          cost: 5000, // Costo del envío
+          mode: "me2", // Obligatorio para envíos estándar o personalizados
+          cost: 10000, // Costo del envío
+          receiver_address: {
+            zip_code: shipping.zipCode || "0000", // Código postal
+            street_name: shipping.address || "Sin dirección", // Dirección
+            street_number: Number(shipping.streetNumber) || 0, // Número de calle
+            floor: shipping.floor || "", // Piso (opcional)
+            apartment: shipping.apartment || "", // Departamento (opcional)
+            city_name: shipping.city || "Ciudad", // Ciudad
+            state_name: shipping.province || "Provincia", // Provincia
+            country_name: shipping.country || "AR", // País (ISO 3166-1 alpha-2)
+          },
         },
 
         back_urls: {
