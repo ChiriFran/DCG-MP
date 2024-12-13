@@ -35,10 +35,21 @@ export default async function handler(req, res) {
         auto_return: "approved",
         payer: {
           name: shipping.name,
+          email: shipping.email,
           address: {
+            zip_code: shipping.zipCode,
             street_name: shipping.address,
+            street_number: shipping.streetNumber,
+            state: shipping.province,
+            city: shipping.city,
+            country: "Argentina"
           },
         },
+        shipping: {
+          cost: 5000,  
+          mode: "cost",  
+          type: "standard" 
+        }
       };
 
       const preference = new Preference(client);
