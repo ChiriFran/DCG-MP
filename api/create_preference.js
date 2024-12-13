@@ -21,7 +21,6 @@ export default async function handler(req, res) {
       });
 
       const body = {
-
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
@@ -30,35 +29,33 @@ export default async function handler(req, res) {
         })),
 
         payer: {
-          name: shipping.name,
-          email: shipping.email,
+          name: shipping.name || "N/A", // Nombre del comprador (valor por defecto)
+          email: shipping.email || "N/A", // Email del comprador (valor por defecto)
           address: {
-            street_name: shipping.address,
-            street_number: Number(shipping.streetNumber),
-            zip_code: shipping.zip_code,
+            street_name: shipping.address || "Sin dirección", // Dirección obligatoria
+            zip_code: shipping.zipCode || "0000", // Código postal
+            street_number: Number(shipping.streetNumber) || 0, // Número de calle
+            floor: shipping.floor || "", // Piso (opcional)
+            apartment: shipping.apartment || "", // Departamento (opcional)
+            city: shipping.city || "Ciudad", // Ciudad
+            state_name: shipping.province || "Provincia", // Provincia/estado
+            country: "Argentina", // País (obligatorio)
           },
-
-          shipments: {
-            mode: "custom",
-            cost: 5000,
-            receiver_address: {
-              zip_code: shipping.zipCode,
-              street_name: shipping.address,
-              street_number: Number(shipping.streetNumber),
-              floor: shipping.floor || "",
-              apartment: shipping.apartment || "",
-              city_name: shipping.city,
-              state_name: shipping.province,
-            },
-          },
-
-          bak_urls: {
-            success: "https://dcgstore.vercel.app/#/BuySuccess",
-            failure: "https://dcgstore.vercel.app/#/BuyFailure",
-            pending: "https://dcgstore.vercel.app/#/BuyPending",
-          },
-          auto_return: "approved",
         },
+
+        shipments: {
+          mode: "cost", // Puede ser "free" si el envío es gratis
+          type: "standard", // Tipo de envío, puede ser "standard" o "express"
+          cost: 5000, // Costo del envío
+        },
+
+        back_urls: {
+          success: "https://dcgstore.vercel.app/#/BuySuccess",
+          failure: "https://dcgstore.vercel.app/#/BuyFailure",
+          pending: "https://dcgstore.vercel.app/#/BuyPending",
+        },
+
+        auto_return: "approved",
       };
 
       const preference = new Preference(client);
