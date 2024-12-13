@@ -27,7 +27,6 @@ export default async function handler(req, res) {
           unit_price: Number(item.unit_price),
           currency_id: "ARS",
         })),
-
         payer: {
           name: shipping.name || "N/A", // Nombre del comprador (valor por defecto)
           email: shipping.email || "N/A", // Email del comprador (valor por defecto)
@@ -42,19 +41,27 @@ export default async function handler(req, res) {
             country: "Argentina", // País (obligatorio)
           },
         },
-
         shipments: {
-          mode: "cost", // Puede ser "free" si el envío es gratis
-          type: "standard", // Tipo de envío, puede ser "standard" o "express"
-          cost: 5000, // Costo del envío
+          mode: "cost",
+          type: "standar",
+          cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
+          receiver_address: {
+            street_name: shipping.address || "Sin dirección",
+            street_number: Number(shipping.streetNumber) || 0,
+            zip_code: shipping.zipCode || "0000",
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
+            city: shipping.city || "Ciudad",
+            state_name: shipping.province || "Provincia",
+            country: shipping.country || "Argentina",
+          },
         },
-
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
           failure: "https://dcgstore.vercel.app/#/BuyFailure",
           pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
-
+        statement_descriptor: "DCGSTORE",
         auto_return: "approved",
       };
 
