@@ -38,6 +38,8 @@ export default async function handler(req, res) {
           email: shipping.email,
           address: {
             street_name: shipping.address,
+            street_number: Number(shipping.streetNumber),
+            zip_code: shipping.zip_code,
           },
           shipments: {
             mode: "custom",
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
             receiver_address: {
               zip_code: shipping.zipCode,
               street_name: shipping.address, 
-              street_number: shipping.streetNumber,
+              street_number: Number(shipping.streetNumber),
               floor: shipping.floor || "",
               apartment: shipping.apartment || "", 
               city_name: shipping.city,
