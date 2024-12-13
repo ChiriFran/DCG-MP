@@ -21,23 +21,25 @@ export default async function handler(req, res) {
       });
 
       const body = {
+
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
           currency_id: "ARS",
         })),
+
         payer: {
-          name: shipping.name || "N/A", // Nombre del comprador (valor por defecto)
-          email: shipping.email || "N/A", // Email del comprador (valor por defecto)
+          name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
+          email: shipping.email || "Doe", // Email del comprador (valor por defecto)
           address: {
-            street_name: shipping.address || "Sin dirección", // Dirección obligatoria
-            zip_code: shipping.zipCode || "0000", // Código postal
-            street_number: Number(shipping.streetNumber) || 0, // Número de calle
+            street_name: shipping.address || "Jose bianco", // Dirección obligatoria
+            zip_code: shipping.zipCode || "1706", // Código postal
+            street_number: Number(shipping.streetNumber) || 1521, // Número de calle
             floor: shipping.floor || "", // Piso (opcional)
             apartment: shipping.apartment || "", // Departamento (opcional)
-            city: shipping.city || "Ciudad", // Ciudad
-            state_name: shipping.province || "Provincia", // Provincia/estado
+            city: shipping.city || "Moron", // Ciudad
+            state_name: shipping.province || "Buenos Aires", // Provincia/estado
             country: "Argentina", // País (obligatorio)
           },
         },
@@ -45,22 +47,14 @@ export default async function handler(req, res) {
           mode: "cost",
           type: "standar",
           cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
-          receiver_address: {
-            street_name: shipping.address || "Sin dirección",
-            street_number: Number(shipping.streetNumber) || 0,
-            zip_code: shipping.zipCode || "0000",
-            floor: shipping.floor || "",
-            apartment: shipping.apartment || "",
-            city: shipping.city || "Ciudad",
-            state_name: shipping.province || "Provincia",
-            country: shipping.country || "Argentina",
-          },
         },
+
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
           failure: "https://dcgstore.vercel.app/#/BuyFailure",
           pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
+
         statement_descriptor: "DCGSTORE",
         auto_return: "approved",
       };
