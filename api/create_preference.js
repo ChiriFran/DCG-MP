@@ -38,16 +38,22 @@ export default async function handler(req, res) {
           email: shipping.email,
           address: {
             street_name: shipping.address,
-            street_number: Number(shipping.streetNumber),
-            floor: shipping.floor || "",
-            apartment: shipping.apartment || "",
+            zip_code: shipping.zipCode,
+            city: shipping.city,
+            state: shipping.province,
           },
         },
-        shipping: {
-          cost: 5000,  
-          mode: "cost",  
-          type: "standard" 
-        }
+        shipments: {
+          mode: "custom",
+          cost: 5000, // Costo del envío en tu moneda
+          receiver_address: {
+            zip_code: shipping.zip_code,
+            street_name: shipping.address,
+            street_number: shipping.streetNumber,
+            city_name: shipping.city,
+            state_name: shipping.province,
+          },
+        },
       };
 
       const preference = new Preference(client);
