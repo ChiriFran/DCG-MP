@@ -41,11 +41,13 @@ export default async function handler(req, res) {
           },
           shipments: {
             mode: "custom",
-            cost: 5000, // Costo del envío en tu moneda
+            cost: 5000,
             receiver_address: {
               zip_code: shipping.zipCode,
               street_name: shipping.address, 
-              street_number: shipping.streetNumber, 
+              street_number: shipping.streetNumber,
+              floor: shipping.floor || "",
+              apartment: shipping.apartment || "", 
               city_name: shipping.city,
               state_name: shipping.province,
             },
