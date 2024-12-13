@@ -37,12 +37,10 @@ export default async function handler(req, res) {
           name: shipping.name,
           email: shipping.email,
           address: {
-            zip_code: Number(shipping.zipCode),
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
-            state: shipping.province,
-            city: shipping.city,
-            country: "Argentina"
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
           },
         },
         shipping: {
