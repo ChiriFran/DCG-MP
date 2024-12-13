@@ -21,18 +21,14 @@ export default async function handler(req, res) {
       });
 
       const body = {
+
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
           currency_id: "ARS",
         })),
-        back_urls: {
-          success: "https://dcgstore.vercel.app/#/BuySuccess",
-          failure: "https://dcgstore.vercel.app/#/BuyFailure",
-          pending: "https://dcgstore.vercel.app/#/BuyPending",
-        },
-        auto_return: "approved",
+
         payer: {
           name: shipping.name,
           email: shipping.email,
@@ -41,19 +37,27 @@ export default async function handler(req, res) {
             street_number: Number(shipping.streetNumber),
             zip_code: shipping.zip_code,
           },
+
           shipments: {
             mode: "custom",
             cost: 5000,
             receiver_address: {
               zip_code: shipping.zipCode,
-              street_name: shipping.address, 
+              street_name: shipping.address,
               street_number: Number(shipping.streetNumber),
               floor: shipping.floor || "",
-              apartment: shipping.apartment || "", 
+              apartment: shipping.apartment || "",
               city_name: shipping.city,
               state_name: shipping.province,
             },
           },
+
+          bak_urls: {
+            success: "https://dcgstore.vercel.app/#/BuySuccess",
+            failure: "https://dcgstore.vercel.app/#/BuyFailure",
+            pending: "https://dcgstore.vercel.app/#/BuyPending",
+          },
+          auto_return: "approved",
         },
       };
 
