@@ -38,20 +38,17 @@ export default async function handler(req, res) {
           email: shipping.email,
           address: {
             street_name: shipping.address,
-            zip_code: shipping.zipCode,
-            city: shipping.city,
-            state: shipping.province,
           },
-        },
-        shipments: {
-          mode: "custom",
-          cost: 5000, // Costo del envío en tu moneda
-          receiver_address: {
-            zip_code: shipping.zipCode,
-            street_name: shipping.address,
-            street_number: shipping.streetNumber,
-            city_name: shipping.city,
-            state_name: shipping.province,
+          shipments: {
+            mode: "custom",
+            cost: 5000, // Costo del envío en tu moneda
+            receiver_address: {
+              zip_code: shipping.zipCode,
+              street_name: shipping.address, 
+              street_number: shipping.streetNumber, 
+              city_name: shipping.city,
+              state_name: shipping.province,
+            },
           },
         },
       };
