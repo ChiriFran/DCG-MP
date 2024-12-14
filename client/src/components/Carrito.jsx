@@ -79,8 +79,7 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
-      // Actualiza el orderId en el contexto
-      updateOrderId(docRef.id);
+      updateOrderId(doc.id);
       return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
