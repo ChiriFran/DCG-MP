@@ -57,8 +57,8 @@ export default async function handler(req, res) {
           name: shipping.name || "Jonh",
           email: shipping.email || "Doe",
           phone: {
-            area_code: "5411",
-            number: shipping.phone || "12341234"
+            area_code: "54",
+            number: shipping.phone || "1112341234"
           },
           address: {
             street_name: shipping.address || "Direccion",
