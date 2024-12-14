@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useOrdenCompraContext } from '../context/OrdenCompraContext';
 import { db } from '../firebase/config';
 import { doc, updateDoc } from 'firebase/firestore';
+import '../styles/Success.css'
 
 const BuySuccess = () => {
   const { orderId } = useOrdenCompraContext();
