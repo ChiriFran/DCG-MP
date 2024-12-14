@@ -19,22 +19,21 @@ export default async function handler(req, res) {
       const client = new MercadoPagoConfig({
         accessToken: mpAccessToken,
       });
-
+      
       const body = {
-
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
           currency_id: "ARS"
         })),
-
+      
         payer: {
-          name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
+          name: shipping.name || "Jonh", // Nombre del comprador (valor por defecto)
           email: shipping.email || "Doe", // Email del comprador (valor por defecto)
           phone: {
-            area_code: shipping.phoneArea || "11",
-            number: shipping.phone || "12341234"
+            area_code: "54", // Código de área de Argentina (sin necesidad de que el usuario lo ingrese)
+            number: shipping.phone || "12341234" // Número de teléfono del comprador (solo el número)
           },
           address: {
             street_name: shipping.address || "Direccion", // Dirección obligatoria
@@ -47,27 +46,29 @@ export default async function handler(req, res) {
             country: "AR" // País (obligatorio)
           }
         },
+      
         shipments: {
-          mode: "me2",
-          local_pickup: false,
-          dimensions: "30x30x30,1000",
-          zip_code: "1706", // vendedor (origen del envío) mismo que en MP
-          cost: 0, // Costo fijo del envío en tu moneda (ARS en este caso)
+          mode: "me2", // Usar Mercado Envíos en el modo estándar
+          local_pickup: false, // No es recogido en local
+          dimensions: "30x30x30,1000", // Ajusta las dimensiones y peso si es necesario
+          zip_code: "1706", // Código postal del vendedor (origen del envío)
+          cost: 0, // Costo del envío (se calcula dinámicamente)
           options: {
-            shipping_method: "standard" // Esto asegura que se utilice solo el servicio estándar
+            shipping_method: "standard" // Asegura que se utilice el servicio estándar de envío
           }
         },
-
+      
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
           failure: "https://dcgstore.vercel.app/#/BuyFailure",
-          pending: "https://dcgstore.vercel.app/#/BuyPending",
+          pending: "https://dcgstore.vercel.app/#/BuyPending"
         },
-
-        statement_descriptor: "DCGSTORE",
-
-        auto_return: "approved"
+      
+        statement_descriptor: "DCGSTORE", // Nombre que aparece en el estado de cuenta del comprador
+      
+        auto_return: "approved" // Redirige automáticamente a la URL de éxito si la compra es aprobada
       };
+      
 
       const preference = new Preference(client);
       const result = await preference.create({ body });
