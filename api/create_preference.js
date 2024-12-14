@@ -67,6 +67,7 @@ export default async function handler(req, res) {
         statement_descriptor: "DCGSTORE",
 
         payment_methods: {
+          excluded_payment_types: [],
           excluded_payment_methods: [
             { id: "pagofacil" },
             { id: "rapipago" },
