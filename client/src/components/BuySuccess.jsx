@@ -10,6 +10,7 @@ const BuySuccess = () => {
   useEffect(() => {
     if (orderId) {
       // Actualiza el estado del pedido a "Success"
+      console.log("Order ID:", orderId); // Verifica que el orderId esté correctamente definido
       const orderRef = doc(db, 'pedidos', orderId);
       updateDoc(orderRef, { estado: 'Success' })
         .then(() => {
