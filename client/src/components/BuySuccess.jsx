@@ -23,7 +23,7 @@ const BuySuccess = () => {
   }, [orderId]);
 
   return (
-    <div>
+    <div className='successContainer'>
       <h1>Compra exitosa</h1>
       <p>Gracias por tu compra.</p>
     </div>

@@ -22,7 +22,7 @@ const BuyPending = () => {
   }, [orderId]);
 
   return (
-    <div>
+    <div className='pendingContainer'>
       <h1>Compra pendiente</h1>
       <p>Estamos procesando tu compra. Te avisaremos pronto.</p>
     </div>

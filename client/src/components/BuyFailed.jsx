@@ -23,7 +23,7 @@ const BuyFailed = () => {
   }, [orderId]);
 
   return (
-    <div>
+    <div className='failedContainer'>
       <h1>Compra fallida</h1>
       <p>Lo sentimos, hubo un problema con tu compra.</p>
     </div>
