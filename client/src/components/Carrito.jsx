@@ -26,7 +26,7 @@ const Carrito = () => {
     email: "",
     comments: "",
   });
-  const { updateOrderId } = useOrdenCompraContext();
+  const { updateOrderId } = useOrdenCompraContext(); 
 
   // Inicializa Mercado Pago con clave pública
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
@@ -76,7 +76,7 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
-      updateOrderId(doc.id);
+      updateOrderId(docRef.id);
       return true;
     } catch (error) {
       console.error("Error saving order to Firebase:", error);
