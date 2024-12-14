@@ -34,7 +34,7 @@ export default async function handler(req, res) {
           email: shipping.email || "Doe", // Email del comprador (valor por defecto)
           phone: {
             area_code: shipping.phoneArea || "11",
-            number: shipping.phone || "1234-1234"
+            number: shipping.phone || "12341234"
           },
           address: {
             street_name: shipping.address || "Direccion", // Dirección obligatoria
@@ -47,14 +47,14 @@ export default async function handler(req, res) {
             country: "AR" // País (obligatorio)
           }
         },
-
         shipments: {
-          mode: "not_specified",
-          cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
-          reciver_address: {
-            street_name: shipping.address || "Direccion", // Dirección obligatoria
-            street_number: Number(shipping.streetNumber) || 0,// Número de calle
-            zip_code: shipping.zipCode || "0000" // Código postal
+          mode: "me2",
+          local_pickup: false,
+          dimensions: "30x30x30,1000",
+          zip_code: "1706", // vendedor (origen del envío) mismo que en MP
+          cost: 0, // Costo fijo del envío en tu moneda (ARS en este caso)
+          options: {
+            shipping_method: "standard" // Esto asegura que se utilice solo el servicio estándar
           }
         },
 
