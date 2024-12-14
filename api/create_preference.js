@@ -1,11 +1,10 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
-import axios from "axios";
 
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Permite solicitudes desde cualquier dominio
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS"); // Métodos permitidos
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Cabeceras permitidas
 
   if (req.method === "POST") {
     try {
@@ -16,36 +15,13 @@ export default async function handler(req, res) {
       }
 
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
+
       const client = new MercadoPagoConfig({
         accessToken: mpAccessToken,
       });
 
-      // Paso 1: Consultar el costo del envío usando la API de Mercado Envíos
-      const shipmentData = {
-        origin_zip_code: "1706", // Código postal del vendedor
-        destination_zip_code: shipping.zipCode, // Código postal del comprador
-        dimensions: "30x30x30,1000", // Dimensiones y peso del paquete
-      };
-
-      const getShippingCost = async () => {
-        try {
-          const response = await axios.post("https://api.mercadopago.com/ships/mercadopago/v1/shipments", shipmentData, {
-            headers: {
-              Authorization: `Bearer ${mpAccessToken}`,
-            },
-          });
-
-          return response.data.cost; // Retorna el costo del envío
-        } catch (error) {
-          console.error("Error al obtener el costo del envío:", error);
-          throw error;
-        }
-      };
-
-      const shippingCost = await getShippingCost();
-
-      // Paso 2: Crear la preferencia con el costo del envío calculado
       const body = {
+
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
@@ -54,39 +30,38 @@ export default async function handler(req, res) {
         })),
 
         payer: {
-          name: shipping.name || "Jonh",
-          email: shipping.email || "Doe",
+          name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
+          email: shipping.email || "Doe", // Email del comprador (valor por defecto)
           phone: {
-            area_code: "54",
-            number: shipping.phone || "1112341234"
+            area_code: shipping.phoneArea || "11",
+            number: shipping.phone || "1234-1234"
           },
           address: {
-            street_name: shipping.address || "Direccion",
-            zip_code: shipping.zipCode || "0000",
-            street_number: Number(shipping.streetNumber) || 0,
-            floor: shipping.floor || "",
-            apartment: shipping.apartment || "",
-            city: shipping.city || "Ciudad",
-            state_name: shipping.province || "Provincia",
-            country: "AR"
+            street_name: shipping.address || "Direccion", // Dirección obligatoria
+            zip_code: shipping.zipCode || "0000", // Código postal
+            street_number: Number(shipping.streetNumber) || 0, // Número de calle
+            floor: shipping.floor || "", // Piso (opcional)
+            apartment: shipping.apartment || "", // Departamento (opcional)
+            city: shipping.city || "Ciudad", // Ciudad
+            state_name: shipping.province || "Provincia", // Provincia/estado
+            country: "AR" // País (obligatorio)
           }
         },
 
         shipments: {
-          mode: "me2",
-          local_pickup: false,
-          dimensions: "30x30x30,1000",
-          zip_code: "1706",
-          cost: shippingCost, // Costo calculado dinámicamente
-          options: {
-            shipping_method: "standard"
+          mode: "not_specified",
+          cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
+          reciver_address: {
+            street_name: shipping.address || "Direccion", // Dirección obligatoria
+            street_number: Number(shipping.streetNumber) || 0,// Número de calle
+            zip_code: shipping.zipCode || "0000" // Código postal
           }
         },
 
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
           failure: "https://dcgstore.vercel.app/#/BuyFailure",
-          pending: "https://dcgstore.vercel.app/#/BuyPending"
+          pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
 
         statement_descriptor: "DCGSTORE",
