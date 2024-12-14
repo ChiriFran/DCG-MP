@@ -1,36 +1,31 @@
-import React, { useEffect } from "react";
-import { doc, updateDoc } from "firebase/firestore";
-import { useOrdenCompraContext } from "../context/OrdenCompraContext";
-import { db } from "../firebase/config";
-import "../styles/Success.css";
+import { useEffect } from 'react';
+import { useOrdenCompraContext } from '../context/OrdenCompraContext';
+import { db } from '../firebase/config';
+import { doc, updateDoc } from 'firebase/firestore';
 
-function BuySuccess() {
+const BuySuccess = () => {
   const { orderId } = useOrdenCompraContext();
 
   useEffect(() => {
-    const updateStatus = async () => {
-      if (orderId) {
-        try {
-          const orderRef = doc(db, "pedidos", orderId);
-          await updateDoc(orderRef, { status: "success" });
-          console.log(`Estado actualizado correctamente a "success" para el pedido con ID: ${orderId}`);
-        } catch (error) {
-          console.error("Error al actualizar el estado del pedido:", error);
-        }
-      } else {
-        console.warn("El ID del pedido no está definido");
-      }
-    };
-
-    updateStatus();
+    if (orderId) {
+      // Actualiza el estado del pedido a "Success"
+      const orderRef = doc(db, 'pedidos', orderId);
+      updateDoc(orderRef, { estado: 'Success' })
+        .then(() => {
+          console.log('Pedido actualizado a Success');
+        })
+        .catch((error) => {
+          console.error('Error al actualizar el pedido:', error);
+        });
+    }
   }, [orderId]);
 
   return (
-    <div className="successContainer">
-      <h1>Compra Exitosa</h1>
-      <p>Gracias por tu compra. Pronto recibirás un correo con los detalles.</p>
+    <div>
+      <h1>Compra exitosa</h1>
+      <p>Gracias por tu compra.</p>
     </div>
   );
-}
+};
 
 export default BuySuccess;

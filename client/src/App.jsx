@@ -13,7 +13,7 @@ import SignUp from "./components/SignUp.jsx";
 import Carrito from "./components/Carrito.jsx";
 import BuySuccess from "./components/BuySuccess.jsx";
 import BuyPending from "./components/BuyPending.jsx";
-import BuyFailure from "./components/BuyFailure.jsx";
+import BuyFailed from "./components/BuyFailed.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import MusicList from "./components/MusicList.jsx";
 import CartPopup from "./components/CartPopup.jsx";
@@ -45,7 +45,7 @@ function App() {
                 <Route path="/SignUp" element={<SignUp />} />
                 <Route path="/Carrito" element={<Carrito />} />
                 <Route path="/BuySuccess" element={<BuySuccess />} />
-                <Route path="/BuyFailure" element={<BuyFailure />} />
+                <Route path="/BuyFailed" element={<BuyFailed />} />
                 <Route path="/BuyPending" element={<BuyPending />} />
                 <Route path="*" element={<p>Not Found</p>} />
               </Routes>
