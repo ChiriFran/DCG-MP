@@ -26,9 +26,10 @@ const Carrito = () => {
     email: "",
     comments: "",
   });
-  const { updateOrderId } = useOrdenCompraContext(); 
+  const { updateOrderId } = useOrdenCompraContext();
 
-  // Inicializa Mercado Pago con clave pública
+
+  // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
@@ -50,7 +51,9 @@ const Carrito = () => {
         quantity: prod.cantidad,
       }));
 
-      const apiUrl = import.meta.env.VITE_API_URL;
+      // URL base del backend desde las variables de entorno
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
@@ -59,7 +62,7 @@ const Carrito = () => {
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error creating preference:", error);
+      console.error("Error when creating the preference in Mercado Pago:", error);
       alert("There was a problem generating the preference. Please try again.");
     }
   };
@@ -76,54 +79,61 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
+      // Actualiza el orderId en el contexto
       updateOrderId(docRef.id);
       return true;
     } catch (error) {
-      console.error("Error saving order to Firebase:", error);
+      console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
       return false;
     }
   };
 
   // Maneja la compra
-  const [isProcessing, setIsProcessing] = useState("");
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (isProcessing) return;
-    setIsProcessing("Processing...");
+    if (isProcessing) return; // Evita clics repetidos
 
-    const id = await createPreference();
+    setIsProcessing("Processing..."); // Mostrar que se está procesando
+
+    const id = await createPreference(); // Crear la preferencia en Mercado Pago
     if (id) {
       setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago...");
+      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const saved = await saveOrderToFirebase();
+      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
       if (saved) {
+        // Esperar 2 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-          window.open(checkoutUrl, "_blank");
+          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
-          vaciarCarrito();
-          setIsProcessing("");
+          vaciarCarrito(); // Vaciar el carrito después de redirigir
+          setIsProcessing(""); // Resetear el estado después del flujo
         }, 1500);
       } else {
-        alert("Order could not be saved. Please try again.");
-        setIsProcessing("");
+        alert("The order could not be saved. Please try again.");
+        setIsProcessing(""); // Resetear el estado si hay un error
       }
     } else {
-      alert("Could not create the preference. Please try again.");
-      setIsProcessing("");
+      alert("It was not possible to create the preference in Mercado Pago. Please try again.");
+      setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
+
+
 
   return (
     <div className="carritoContainer">
       <div className="carritoCard">
         <h1 className="carritoTitle">
-          {carrito.length > 0 ? "Shopping Cart" : "No items in your cart. Check out some products below!"}
+          {carrito.length > 0
+            ? "Shopping Cart"
+            : "Oops, you don't have any items in your cart! Here below are some of our products"}
         </h1>
-        {carrito.length > 0 && (
+        {carrito.length > 0 ? (
           <>
             <div className="carritoHeader">
               <span className="headerItem">Products</span>
@@ -146,6 +156,7 @@ const Carrito = () => {
               </div>
             ))}
             <h2 className="precioFinal">Total: ${precioTotal()}</h2>
+
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
                 <div className="formEnvioGroup">
@@ -288,17 +299,22 @@ const Carrito = () => {
                   style={{
                     cursor: isProcessing ? "not-allowed" : "pointer",
                   }}
-                  disabled={isProcessing}
+                  disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
                 >
                   {isProcessing || "Buy"}
                 </button>
               </form>
-              <button onClick={vaciarCarrito} className="vaciarCarrito">Empty Cart</button>
+              <button onClick={vaciarCarrito} className="vaciarCarrito">
+                Empty Cart
+              </button>
             </div>
-            <Link to="/Faq" className="carritoFaq">FAQ / Shipping</Link>
+            <Link to="/Faq" className="carritoFaq">
+              FAQ / Shipping
+            </Link>
           </>
-        )}
+        ) : null}
       </div>
+
       {carrito.length === 0 && <ItemListContainerDestacados />}
     </div>
   );
