@@ -77,7 +77,7 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
-      return true;
+      return doc.id; // Regresar el ID del pedido guardado
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
@@ -86,7 +86,6 @@ const Carrito = () => {
   };
 
   // Maneja la compra
-  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -99,16 +98,16 @@ const Carrito = () => {
       setPreferenceId(id);
       setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
-      const saved = await saveOrderToFirebase(); // Guardar el pedido en Firebase solo si se genera la preferencia
-      if (saved) {
-        // Esperar 2 segundos antes de redirigir
+      const orderId = await saveOrderToFirebase(); // Guardar el pedido en Firebase y obtener el ID
+      if (orderId) {
+        // Esperar 1 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
           window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
           vaciarCarrito(); // Vaciar el carrito después de redirigir
           setIsProcessing(""); // Resetear el estado después del flujo
-        }, 1500);
+        }, 1000);
       } else {
         alert("The order could not be saved. Please try again.");
         setIsProcessing(""); // Resetear el estado si hay un error

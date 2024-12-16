@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
-      const { items, shipping } = req.body;
+      const { items, shipping, orderId } = req.body; // Asegúrate de pasar `orderId` desde tu frontend
 
       if (!shipping || !shipping.name || !shipping.address) {
         return res.status(400).json({ error: "Missing shipping data" });
@@ -65,6 +65,8 @@ export default async function handler(req, res) {
         },
 
         statement_descriptor: "DCGSTORE",
+        
+        external_reference: orderId, // Aquí agregas el external_reference
 
         auto_return: "approved"
       };
