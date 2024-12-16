@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/webhook.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -17,6 +21,10 @@
     {
       "src": "/api/create_preference",
       "dest": "/api/create_preference.js"
+    },
+    {
+      "src": "/api/webhook",
+      "dest": "/api/webhook.js"
     },
     {
       "src": "/(.*)",
