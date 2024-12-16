@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
         shipments: {
           mode: "not_specified",
-          cost: 100, // Costo fijo del envío en tu moneda (ARS en este caso)
+          cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
           reciver_address: {
             street_name: shipping.address || "Direccion", // Dirección obligatoria
             street_number: Number(shipping.streetNumber) || 0,// Número de calle
@@ -60,20 +60,12 @@ export default async function handler(req, res) {
 
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
-          failure: "https://dcgstore.vercel.app/#/BuyFailure",
+          failure: "https://dcgstore.vercel.app/#/BuyFailed",
           pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
 
         statement_descriptor: "DCGSTORE",
 
-        payment_methods: {
-          excluded_payment_types: [],
-          excluded_payment_methods: [
-            { id: "pagofacil" },
-            { id: "rapipago" },
-          ],
-        },
-        external_reference: orderId,  // Aquí pasas el ID de Firebase
         auto_return: "approved"
       };
 

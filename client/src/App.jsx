@@ -1,5 +1,4 @@
 import React from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
 import Home from "./components/Home.jsx";
 import ItemListContainer from "./components/ItemListContainer.jsx";
 import ItemDetailContainer from "./components/ItemDetailContainer.jsx";
@@ -21,6 +20,7 @@ import ContactFooter from "./components/ContactFooter.jsx";
 import Footer from "./components/Footer.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
