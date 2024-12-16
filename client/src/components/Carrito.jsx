@@ -26,7 +26,6 @@ const Carrito = () => {
     comments: "",
   });
 
-
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
@@ -47,7 +46,6 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
-        status: "pending",
       }));
 
       // URL base del backend desde las variables de entorno
@@ -78,7 +76,6 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
-      updateOrderId(doc.id);
       return true;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
