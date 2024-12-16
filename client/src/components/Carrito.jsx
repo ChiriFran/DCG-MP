@@ -47,7 +47,7 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
-        status: "created",
+        status: "pending",
       }));
 
       // URL base del backend desde las variables de entorno
