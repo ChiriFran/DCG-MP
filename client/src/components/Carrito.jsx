@@ -10,6 +10,7 @@ import { db } from "../firebase/config";
 
 const Carrito = () => {
   const { carrito, precioTotal, vaciarCarrito } = useContext(CartContext);
+  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
   const [preferenceId, setPreferenceId] = useState(null);
   const [shippingData, setShippingData] = useState({
     name: "",
@@ -71,6 +72,7 @@ const Carrito = () => {
       cliente: shippingData,
       productos: carrito,
       total: precioTotal(),
+      status: "pending",
     };
 
     try {
