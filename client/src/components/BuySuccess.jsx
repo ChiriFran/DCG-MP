@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebase/config"; // Asegúrate de importar correctamente la configuración de Firebase
+import { db } from "../firebase/config";
 import { doc, updateDoc } from "firebase/firestore";
+import '../styles/Success.css'
 
 const BuySuccess = () => {
   const [orderId, setOrderId] = useState(null);
