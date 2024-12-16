@@ -1,31 +1,26 @@
 import { MercadoPagoConfig } from "mercadopago";
-import { db } from '../client/src/firebase/config'; // Suponiendo que tienes tu configuración de Firebase en lib/firebase.js
+import { db } from '../client/src/firebase/config'; // Ajusta la ruta según tu configuración
 
 export default async function handler(req, res) {
-    // Mercado Pago envía un POST con los datos de la notificación
     if (req.method === "POST") {
         try {
             const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
-            const webhookSecret = process.env.MP_WEBHOOK_SECRET; // La clave de seguridad del webhook que te dio Mercado Pago
+            const webhookSecret = process.env.MP_WEBHOOK_SECRET;
 
-            // Configuración de Mercado Pago
             const client = new MercadoPagoConfig({
                 accessToken: mpAccessToken,
             });
 
             const { data } = req.body;
 
-            // Verificar que el webhook sea legítimo
-            const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret); // Usamos la clave del webhook para verificar
+            // Verificación del webhook
+            const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret);
             if (!isValidWebhook) {
                 return res.status(400).json({ error: "Invalid webhook" });
             }
 
-            // Recuperar el estado del pago
-            const paymentStatus = data.status; // status puede ser 'approved', 'pending', 'rejected'
-
-            // Actualizar el estado del pedido en Firebase según el status del pago
-            const orderId = data.external_reference; // Aquí asumo que usas el external_reference como ID de pedido
+            const paymentStatus = data.status;
+            const orderId = data.external_reference;
             const orderRef = db.collection('pedidos').doc(orderId);
 
             let newStatus = "unknown";
