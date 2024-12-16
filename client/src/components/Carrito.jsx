@@ -7,7 +7,6 @@ import { initMercadoPago } from "@mercadopago/sdk-react";
 import ItemListContainerDestacados from "./ItemListContainerDestacados";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { useOrdenCompraContext } from "../context/OrdenCompraContext";
 
 const Carrito = () => {
   const { carrito, precioTotal, vaciarCarrito } = useContext(CartContext);
@@ -26,7 +25,6 @@ const Carrito = () => {
     email: "",
     comments: "",
   });
-  const { updateOrderId } = useOrdenCompraContext();
 
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
@@ -49,6 +47,7 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
+        status: "created",
       }));
 
       // URL base del backend desde las variables de entorno

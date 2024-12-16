@@ -21,51 +21,45 @@ export default async function handler(req, res) {
       });
 
       const body = {
-
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
-          currency_id: "ARS"
+          currency_id: "ARS",
         })),
-
         payer: {
-          name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
-          email: shipping.email || "Doe", // Email del comprador (valor por defecto)
+          name: shipping.name || "Jonh",
+          email: shipping.email || "Doe",
           phone: {
             area_code: shipping.phoneArea || "11",
-            number: shipping.phone || "1234-1234"
+            number: shipping.phone || "1234-1234",
           },
           address: {
-            street_name: shipping.address || "Direccion", // Dirección obligatoria
-            zip_code: shipping.zipCode || "0000", // Código postal
-            street_number: Number(shipping.streetNumber) || 0, // Número de calle
-            floor: shipping.floor || "", // Piso (opcional)
-            apartment: shipping.apartment || "", // Departamento (opcional)
-            city: shipping.city || "Ciudad", // Ciudad
-            state_name: shipping.province || "Provincia", // Provincia/estado
-            country: "AR" // País (obligatorio)
-          }
+            street_name: shipping.address || "Direccion",
+            zip_code: shipping.zipCode || "0000",
+            street_number: Number(shipping.streetNumber) || 0,
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
+            city: shipping.city || "Ciudad",
+            state_name: shipping.province || "Provincia",
+            country: "AR",
+          },
         },
-
         shipments: {
           mode: "not_specified",
-          cost: 100, // Costo fijo del envío en tu moneda (ARS en este caso)
+          cost: 100,
           reciver_address: {
-            street_name: shipping.address || "Direccion", // Dirección obligatoria
-            street_number: Number(shipping.streetNumber) || 0,// Número de calle
-            zip_code: shipping.zipCode || "0000" // Código postal
-          }
+            street_name: shipping.address || "Direccion",
+            street_number: Number(shipping.streetNumber) || 0,
+            zip_code: shipping.zipCode || "0000",
+          },
         },
-
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
-          failure: "https://dcgstore.vercel.app/#/BuyFailure",
+          failure: "https://dcgstore.vercel.app/#/BuyFailed",
           pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
-
         statement_descriptor: "DCGSTORE",
-
         payment_methods: {
           excluded_payment_types: [],
           excluded_payment_methods: [
@@ -73,8 +67,8 @@ export default async function handler(req, res) {
             { id: "rapipago" },
           ],
         },
-
-        auto_return: "approved"
+        auto_return: "approved",
+        external_reference: orderId,  // Aquí pasas el ID de Firebase
       };
 
       const preference = new Preference(client);
