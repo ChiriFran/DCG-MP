@@ -12,6 +12,8 @@ const BuySuccess = () => {
         const urlParams = new URLSearchParams(window.location.hash.substring(1));
         const orderId = urlParams.get("order_id");  // Asegúrate de que este sea el nombre correcto del parámetro
 
+        console.log("orderId obtenido de la URL:", orderId); // Asegúrate de que este valor esté presente
+
         if (orderId) {
           const orderRef = doc(db, "pedidos", orderId);
           const orderSnapshot = await getDoc(orderRef);
@@ -19,11 +21,15 @@ const BuySuccess = () => {
           if (orderSnapshot.exists()) {
             // Si el pedido existe, actualiza el estado
             await updateDoc(orderRef, {
-              status: "success",  // O el estado que desees
+              status: "completo",  // O el estado que desees
               updated_at: new Date(),
             });
             console.log(`Pedido ${orderId} actualizado a 'completo'`);
+          } else {
+            console.log(`Pedido con ID ${orderId} no encontrado.`);
           }
+        } else {
+          console.log("No se encontró el orderId en la URL.");
         }
       } catch (error) {
         console.error("Error al actualizar el estado del pedido:", error);
