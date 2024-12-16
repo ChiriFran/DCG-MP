@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
         shipments: {
           mode: "not_specified",
-          cost: 5000, // Costo fijo del envío en tu moneda (ARS en este caso)
+          cost: 5, // Costo fijo del envío en tu moneda (ARS en este caso)
           reciver_address: {
             street_name: shipping.address || "Direccion", // Dirección obligatoria
             street_number: Number(shipping.streetNumber) || 0,// Número de calle
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         },
 
         statement_descriptor: "DCGSTORE",
-        
+
         external_reference: orderId, // Aquí agregas el external_reference
 
         auto_return: "approved"
