@@ -78,9 +78,8 @@ const Carrito = () => {
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
-      console.log(`Order saved with ID: ${doc.id}`);
 
-      // Guardar el orderId en el localStorage
+      console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
 
       return doc.id; // Regresar el ID del pedido guardado
@@ -105,10 +104,11 @@ const Carrito = () => {
       setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
 
       const orderId = await saveOrderToFirebase(); // Guardar el pedido en Firebase y obtener el ID
+
       if (orderId) {
         // Esperar 1 segundos antes de redirigir
         setTimeout(() => {
-          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
           window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
 
           vaciarCarrito(); // Vaciar el carrito después de redirigir

@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react";
-import { db } from "../firebase/config";
-import { doc, updateDoc } from "firebase/firestore";
-import "../styles/Success.css";
+import { useLocation } from 'react-router-dom';
 
 const BuySuccess = () => {
   const [orderId, setOrderId] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
-    // Recuperar el orderId del localStorage
-    const savedOrderId = localStorage.getItem("orderId");
-
-    if (savedOrderId) {
-      setOrderId(savedOrderId);
+    // Verificar si el orderId está en los parámetros de la URL
+    const searchParams = new URLSearchParams(location.search);
+    const orderIdFromUrl = searchParams.get('orderId'); // Asegúrate de pasar 'orderId' en la URL al redirigir
+    if (orderIdFromUrl) {
+      setOrderId(orderIdFromUrl);
     } else {
-      console.error("No orderId found in localStorage");
+      // Intentar obtenerlo desde localStorage si no está en la URL
+      const savedOrderId = localStorage.getItem("orderId");
+      if (savedOrderId) {
+        setOrderId(savedOrderId);
+      } else {
+        console.error("No orderId found in URL or localStorage");
+      }
     }
-  }, []);
+  }, [location]);
 
   useEffect(() => {
     if (orderId) {
