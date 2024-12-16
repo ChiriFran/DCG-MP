@@ -71,7 +71,7 @@ const Carrito = () => {
     const pedido = {
       cliente: shippingData,
       productos: carrito,
-      total: precioTotal(),
+      total: precioTotal(), //Agregar valor de envio 
       status: "pending",
     };
 

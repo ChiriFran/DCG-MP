@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
         try {
             const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
-            const webhookSecret = process.env.MP_WEBHOOK_SECRET; // La clave de seguridad del webhook que te dio Mercado Pago
+            const webhookSecret = process.env.MP_WEBHOOK_SECRET; // La clave de seguridad del webhook
 
             // Configuración de Mercado Pago
             const client = new MercadoPagoConfig({
@@ -24,29 +24,31 @@ export default async function handler(req, res) {
             const paymentId = data.id;
             const paymentDetails = await client.payment.findById(paymentId);
 
-            // Aquí puedes verificar detalles del pago si lo necesitas
+            // Verificar detalles del pago
             const paymentStatus = paymentDetails.status; // Puede ser 'approved', 'pending', 'rejected'
 
             // Actualizar el estado del pedido en Firebase
-            const orderId = data.external_reference;
+            const orderId = data.external_reference; // El ID de tu pedido
             const orderRef = db.collection('pedidos').doc(orderId);
 
-            let newStatus = "unknown";
+            let newWebhookStatus = "unknown"; // Valor por defecto
+
             if (paymentStatus === "approved") {
-                newStatus = "success";
+                newWebhookStatus = "success";
             } else if (paymentStatus === "rejected") {
-                newStatus = "failed";
+                newWebhookStatus = "failed";
             } else if (paymentStatus === "pending") {
-                newStatus = "pending";
+                newWebhookStatus = "pending";
             }
 
+            // Actualizamos el estado del pedido con el nuevo campo 'webhook_status'
             await orderRef.update({
-                status: newStatus,
+                webhook_status: newWebhookStatus, // Aquí creamos el campo 'webhook_status'
                 payment_id: paymentId,
                 updated_at: new Date(),
             });
 
-            console.log(`Pedido ${orderId} actualizado a estado: ${newStatus}`);
+            console.log(`Pedido ${orderId} actualizado a estado: ${newWebhookStatus}`);
 
             res.status(200).json({ message: "Webhook procesado correctamente" });
         } catch (error) {
