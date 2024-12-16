@@ -79,6 +79,10 @@ const Carrito = () => {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
       console.log(`Order saved with ID: ${doc.id}`);
+
+      // Guardar el orderId en el localStorage
+      localStorage.setItem("orderId", doc.id);
+
       return doc.id; // Regresar el ID del pedido guardado
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);

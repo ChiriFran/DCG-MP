@@ -1,48 +1,38 @@
-import { useEffect } from "react";
-import { db } from "../firebase/config";  // Asegúrate de que la ruta sea correcta
-import { doc, getDoc, updateDoc } from "firebase/firestore"; // Funciones de Firebase
-
-import '../styles/Success.css';
+import { useEffect, useState } from "react";
+import { db } from "../firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
+import "../styles/Success.css";
 
 const BuySuccess = () => {
+  const [orderId, setOrderId] = useState(null);
+
   useEffect(() => {
-    const updateOrderStatus = async () => {
-      try {
-        // Obtener el ID del pedido desde la URL (o donde lo tengas almacenado)
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const orderId = urlParams.get("order_id");  // Asegúrate de que este sea el nombre correcto del parámetro
+    // Recuperar el orderId del localStorage
+    const savedOrderId = localStorage.getItem("orderId");
 
-        console.log("orderId obtenido de la URL:", orderId); // Asegúrate de que este valor esté presente
+    if (savedOrderId) {
+      setOrderId(savedOrderId);
+    } else {
+      console.error("No orderId found in localStorage");
+    }
+  }, []);
 
-        if (orderId) {
-          const orderRef = doc(db, "pedidos", orderId);
-          const orderSnapshot = await getDoc(orderRef);
+  useEffect(() => {
+    if (orderId) {
+      const updateOrderStatus = async () => {
+        const orderRef = doc(db, "pedidos", orderId);
+        await updateDoc(orderRef, { status: "completed" }); // Cambiar estado a "completed"
+        console.log(`Order ${orderId} status updated to completed`);
+      };
 
-          if (orderSnapshot.exists()) {
-            // Si el pedido existe, actualiza el estado
-            await updateDoc(orderRef, {
-              status: "completo",  // O el estado que desees
-              updated_at: new Date(),
-            });
-            console.log(`Pedido ${orderId} actualizado a 'completo'`);
-          } else {
-            console.log(`Pedido con ID ${orderId} no encontrado.`);
-          }
-        } else {
-          console.log("No se encontró el orderId en la URL.");
-        }
-      } catch (error) {
-        console.error("Error al actualizar el estado del pedido:", error);
-      }
-    };
-
-    updateOrderStatus();
-  }, []);  // El efecto solo se ejecutará una vez al montar el componente
+      updateOrderStatus();
+    }
+  }, [orderId]);
 
   return (
     <div className="successContainer">
       <h1>Compra exitosa</h1>
-      <p>Gracias por tu compra.</p>
+      <p>Gracias por tu compra. Tu pedido ha sido procesado.</p>
     </div>
   );
 };
