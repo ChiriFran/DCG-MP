@@ -1,19 +1,13 @@
 import { MercadoPagoConfig } from "mercadopago";
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import * as admin from 'firebase-admin'; // Cambiar la importación a firebase-admin
 
-// Configuración de Firebase
-const firebaseConfigBack = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfigBack);
-const db = getFirestore(app); // Firestore
+// Inicializar Firebase Admin (esto es para el backend)
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.applicationDefault(), // Usa las credenciales predeterminadas para el entorno de serverless
+    });
+}
+const db = admin.firestore(); // Obtener Firestore desde firebase-admin
 
 export default async function handler(req, res) {
     if (req.method === "POST") {
