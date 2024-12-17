@@ -1,5 +1,3 @@
-import pkg from 'firebase-admin';
-const { initializeApp, credential } = pkg;
 import * as admin from 'firebase-admin';
 
 // Desactiva el body parser en Vercel para manejar el webhook correctamente
@@ -34,30 +32,23 @@ export default async function handler(req, res) {
     const event = JSON.parse(rawBody);
 
     // Asegúrate de que los datos del evento sean válidos
-    if (!event || !event.data || !event.data.id) {
+    if (!event || !event.id) {
       console.error('Invalid event data:', event); // Log de error
       return res.status(400).json({ message: 'Invalid event data' });
     }
 
-    console.log('Event ID:', event.data.id); // Log del ID del evento para depuración
+    console.log('Event ID:', event.id); // Log del ID del evento para depuración
 
-    // Inicializa Firebase Admin si no está inicializado
+    // Verificar que la solicitud sea de Mercado Pago (si es necesario)
+    const authToken = req.headers['authorization'];
+    if (!authToken || authToken !== `Bearer ${process.env.MP_ACCESS_TOKEN}`) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Inicializar Firebase Admin si no lo está
     if (!admin.apps.length) {
-      const serviceAccount = {
-        type: 'service_account',
-        project_id: process.env.FIREBASE_PROJECT_ID,
-        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-        private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        client_email: process.env.FIREBASE_CLIENT_EMAIL,
-        client_id: process.env.FIREBASE_CLIENT_ID,
-        auth_uri: process.env.FIREBASE_AUTH_URI,
-        token_uri: process.env.FIREBASE_TOKEN_URI,
-        auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-        client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-      };
-
-      initializeApp({
-        credential: credential.cert(serviceAccount),
+      admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
       });
     }
 
@@ -66,23 +57,22 @@ export default async function handler(req, res) {
 
     // Dependiendo del estado del evento, actualiza el pedido
     if (event.action === 'payment.updated') {
-      const orderId = event.data.id; // El ID del pedido
-      const orderRef = db.collection('pedidos').doc(orderId);
+      console.log('Payment updated for order:', event.id); // Log del tipo de evento recibido
+
+      // Consultar el pedido por ID
+      const orderRef = db.collection('pedidos').doc(event.id);
       const order = await orderRef.get();
 
       if (!order.exists) {
-        console.error('Order not found:', orderId);
+        console.error('Order not found:', event.id);
         return res.status(404).json({ message: 'Order not found' });
       }
 
-      // Actualiza el estado del pedido según la información del evento
-      await orderRef.update({
-        status: 'updated by webhook', // O el estado que necesites
-        payment_status: event.data.status, // Si el evento trae el estado del pago
-      });
+      // Actualizar el estado del pedido
+      const updatedStatus = event.data.status === 'approved' ? 'approved' : event.data.status;
+      await orderRef.update({ status: updatedStatus });
 
-      console.log('Payment updated for order:', orderId);
-      return res.status(200).json({ message: 'Payment status updated' });
+      return res.status(200).json({ message: `Order status updated to ${updatedStatus}` });
     } else {
       console.error('Unsupported event action:', event.action); // Log si el evento no es reconocido
       return res.status(400).json({ message: 'Unsupported event action' });
