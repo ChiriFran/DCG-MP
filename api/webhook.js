@@ -1,5 +1,6 @@
 // api/webhook.js
-import { initializeApp, credential } from 'firebase-admin';
+import pkg from 'firebase-admin';
+const { initializeApp, credential } = pkg;
 import * as admin from 'firebase-admin';
 
 export default async function handler(req, res) {
@@ -51,13 +52,13 @@ export default async function handler(req, res) {
 
     // Dependiendo del estado del evento, actualiza el pedido
     if (event.status === 'approved') {
-      await orderRef.update({ status: 'approved by webhook' });
+      await orderRef.update({ status: 'approved' });
       return res.status(200).json({ message: 'Order status updated to approved' });
     } else if (event.status === 'pending') {
-      await orderRef.update({ status: 'pending by webhook' });
+      await orderRef.update({ status: 'pending' });
       return res.status(200).json({ message: 'Order status updated to pending' });
     } else if (event.status === 'failed') {
-      await orderRef.update({ status: 'failed by webhook' });
+      await orderRef.update({ status: 'failed' });
       return res.status(200).json({ message: 'Order status updated to failed' });
     } else {
       return res.status(400).json({ message: 'Invalid event status' });
