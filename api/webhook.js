@@ -1,56 +1,38 @@
-import { MercadoPagoConfig } from "mercadopago";
-import { db } from '../firebase/config';  // Asegúrate de que la ruta sea correcta
-
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    try {
-      const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
-      const webhookSecret = process.env.MP_WEBHOOK_SECRET; // La clave de seguridad del webhook que te dio Mercado Pago
-
-      // Configuración de Mercado Pago
-      const client = new MercadoPagoConfig({
-        accessToken: mpAccessToken,
-      });
-
-      const { data } = req.body;
-
-      // Verificar que el webhook sea legítimo
-      const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret);
-      if (!isValidWebhook) {
-        return res.status(400).json({ error: "Invalid webhook" });
+// Desactiva el body parser en Vercel para manejar el webhook correctamente
+export const config = {
+    api: {
+      bodyParser: false, // Desactiva el body parser de Vercel
+    },
+  };
+  
+  export default async function handler(req, res) {
+    if (req.method === "POST") {
+      try {
+        // Log para verificar que el webhook llegó correctamente
+        console.log("Webhook received:", req.body);
+  
+        // Si es necesario, puedes verificar el tipo de evento, por ejemplo:
+        if (req.body.event === "payment_approved") {
+          // Aquí procesas lo que debe ocurrir cuando un pago es aprobado
+          console.log("Payment Approved:", req.body);
+          
+          // Puedes actualizar el estado en tu base de datos o realizar otras acciones necesarias.
+        } else {
+          console.log("Other event received:", req.body.event);
+        }
+  
+        // Responde con 200 para confirmar que el webhook se procesó correctamente
+        return res.status(200).send("Webhook processed");
+  
+      } catch (error) {
+        console.error("Error processing webhook:", error);
+        // En caso de error, responder con 500
+        return res.status(500).send("Error processing webhook");
       }
-
-      // Recuperar el estado del pago
-      const paymentStatus = data.status; // Puede ser 'approved', 'pending', 'rejected'
-
-      // Actualizar el estado del pedido en Firebase
-      const orderId = data.external_reference;
-      const orderRef = db.collection('pedidos').doc(orderId);
-
-      let newStatus = "unknown";
-      if (paymentStatus === "approved") {
-        newStatus = "success";
-      } else if (paymentStatus === "rejected") {
-        newStatus = "failed";
-      } else if (paymentStatus === "pending") {
-        newStatus = "pending";
-      }
-
-      await orderRef.update({
-        status: newStatus,
-        payment_id: data.id,
-        updated_at: new Date(),
-      });
-
-      console.log(`Pedido ${orderId} actualizado a estado: ${newStatus}`);
-
-      res.status(200).json({ message: "Webhook procesado correctamente" });
-    } catch (error) {
-      console.error("Error al procesar el webhook:", error);
-      res.status(500).json({ error: "Error al procesar el webhook." });
+    } else {
+      // Responde con 405 si la solicitud no es POST
+      res.status(405).send("Method Not Allowed");
     }
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+  
+  
