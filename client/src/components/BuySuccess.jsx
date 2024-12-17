@@ -7,7 +7,7 @@ const BuySuccess = () => {
 
   useEffect(() => {
     const orderIdFromUrl = new URLSearchParams(window.location.search).get("orderId");
-    
+
     if (orderIdFromUrl) {
       setOrderId(orderIdFromUrl);
       // Llama al webhook para obtener el estado del pago
@@ -49,8 +49,8 @@ const BuySuccess = () => {
     <div className="successContainer">
       <h1>Compra exitosa</h1>
       <p>
-        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"} 
-        ha sido procesado. 
+        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"}
+        ha sido procesado.
         {paymentStatus && (
           <span>Estado del pago: {paymentStatus}</span>
         )}
