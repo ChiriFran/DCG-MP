@@ -1,40 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase/config";
 import { doc, updateDoc } from "firebase/firestore";
-import '../styles/Success.css'
+import '../styles/Success.css';
 
-const BuySuccess = () => {
-  const [orderId, setOrderId] = useState(null);
+const BuySuccess = ({ orderId }) => { // Recibe orderId como prop
+  const [orderProcessed, setOrderProcessed] = useState(false);
 
   useEffect(() => {
-    // Recupera el ID del pedido del localStorage
-    const savedOrderId = localStorage.getItem("orderId");
-
-    if (savedOrderId) {
-      setOrderId(savedOrderId);
-
-      // Llama a una función para actualizar el estado del pedido en Firebase
-      updateOrderStatus(savedOrderId);
+    if (orderId) {
+      updateOrderStatus(orderId);
     } else {
-      console.error("No orderId found in localStorage");
+      console.error("No orderId provided.");
     }
-  }, []);
+  }, [orderId]);
 
   const updateOrderStatus = async (orderId) => {
     try {
       // Referencia al documento de Firebase con el ID de la orden
       const orderRef = doc(db, "pedidos", orderId);
 
-      // Actualiza el estado de la orden a "completed" (o el estado que desees)
+      // Actualiza el estado de la orden a "completed"
       await updateDoc(orderRef, {
-        status: "completed", // Actualiza el estado según lo necesario
+        status: "completed", // Estado que deseas asignar
       });
 
       console.log(`Order ${orderId} status updated to 'completed'`);
-
-      // Borra el orderId del localStorage para seguridad
-      localStorage.removeItem("orderId");
-      console.log("orderId removed from localStorage");
+      setOrderProcessed(true);
     } catch (error) {
       console.error("Error updating order status:", error);
     }
@@ -44,7 +35,11 @@ const BuySuccess = () => {
     <div className="successContainer">
       <h1>Compra exitosa</h1>
       <p>
-        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"} ha sido procesado.
+        {orderProcessed ? (
+          `Gracias por tu compra. Tu pedido con ID ${orderId} ha sido procesado.`
+        ) : (
+          "Estamos procesando tu pedido..."
+        )}
       </p>
     </div>
   );
