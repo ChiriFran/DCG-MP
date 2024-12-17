@@ -1,5 +1,3 @@
-import * as admin from 'firebase-admin';
-
 // Desactiva el body parser en Vercel para manejar el webhook correctamente
 export const config = {
   api: {
@@ -39,40 +37,10 @@ export default async function handler(req, res) {
 
     console.log('Event ID:', event.id); // Log del ID del evento para depuración
 
-    // Verificar que la solicitud sea de Mercado Pago (si es necesario)
-    const authToken = req.headers['authorization'];
-    if (!authToken || authToken !== `Bearer ${process.env.MP_ACCESS_TOKEN}`) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    // Inicializar Firebase Admin si no lo está
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-      });
-    }
-
-    // Accede a Firestore
-    const db = admin.firestore();
-
-    // Dependiendo del estado del evento, actualiza el pedido
+    // Dependiendo del estado del evento, devuelve una respuesta
     if (event.action === 'payment.updated') {
       console.log('Payment updated for order:', event.id); // Log del tipo de evento recibido
-
-      // Consultar el pedido por ID
-      const orderRef = db.collection('pedidos').doc(event.id);
-      const order = await orderRef.get();
-
-      if (!order.exists) {
-        console.error('Order not found:', event.id);
-        return res.status(404).json({ message: 'Order not found' });
-      }
-
-      // Actualizar el estado del pedido
-      const updatedStatus = event.data.status === 'approved' ? 'approved' : event.data.status;
-      await orderRef.update({ status: updatedStatus });
-
-      return res.status(200).json({ message: `Order status updated to ${updatedStatus}` });
+      return res.status(200).json({ message: 'Payment status updated' });
     } else {
       console.error('Unsupported event action:', event.action); // Log si el evento no es reconocido
       return res.status(400).json({ message: 'Unsupported event action' });
