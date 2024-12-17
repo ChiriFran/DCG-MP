@@ -12,6 +12,8 @@ if (!admin.apps.length) {
 const db = admin.firestore();  // Obtener Firestore desde firebase-admin
 
 export default async function handler(req, res) {
+    console.log("Cuerpo de la solicitud:", req.body);  // Aquí agregamos el log para ver el cuerpo
+
     if (req.method === "POST") {
         try {
             const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
