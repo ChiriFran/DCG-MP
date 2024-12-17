@@ -1,10 +1,11 @@
-import { MercadoPagoConfig } from "mercadopago";
-import * as admin from 'firebase-admin';  // Cambia a importación de módulos ES
+import * as admin from 'firebase-admin';
+import { cert } from 'firebase-admin/app';
 
-// Inicializar Firebase Admin (esto es para el backend)
-if (!admin.apps || admin.apps.length === 0) {
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY); // Accede a la variable de entorno
+
+if (!admin.apps.length) {
     admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
+        credential: cert(serviceAccount), // Usa la clave de servicio para inicializar Firebase
     });
 }
 
