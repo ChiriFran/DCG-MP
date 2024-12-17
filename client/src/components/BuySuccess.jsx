@@ -1,74 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { db } from "../firebase/config";
+import React, { useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
-import '../styles/Success.css'
+import { useOrdenCompraContext } from "../context/OrdenCompraContext";
+import { db } from "../firebase/config";
+import "../styles/Success.css";
 
-const BuySuccess = () => {
-  const [orderId, setOrderId] = useState(null);
+function BuySuccess() {
+  const { orderId } = useOrdenCompraContext();
 
   useEffect(() => {
-    // Recupera el ID del pedido del localStorage
-    const savedOrderId = localStorage.getItem("orderId");
+    const updateStatus = async () => {
+      if (orderId) {
+        try {
+          const orderRef = doc(db, "pedidos", orderId);
+          await updateDoc(orderRef, { status: "success" });
+          console.log(`Estado actualizado correctamente a "success" para el pedido con ID: ${orderId}`);
+        } catch (error) {
+          console.error("Error al actualizar el estado del pedido:", error);
+        }
+      } else {
+        console.warn("El ID del pedido no está definido");
+      }
+    };
 
-    if (savedOrderId) {
-      setOrderId(savedOrderId);
-
-      // Llama a una función para actualizar el estado del pedido en Firebase
-      updateOrderStatus(savedOrderId);
-
-      // Llama al webhook de prueba después de actualizar el estado del pedido
-      testWebhook(savedOrderId);
-    } else {
-      console.error("No orderId found in localStorage");
-    }
-  }, []);
-
-  const updateOrderStatus = async (orderId) => {
-    try {
-      // Referencia al documento de Firebase con el ID de la orden
-      const orderRef = doc(db, "pedidos", orderId);
-
-      // Actualiza el estado de la orden a "completed" (o el estado que desees)
-      await updateDoc(orderRef, {
-        status: "completed", // Actualiza el estado según lo necesario
-      });
-
-      console.log(`Order ${orderId} status updated to 'completed'`);
-
-      // Borra el orderId del localStorage para seguridad
-      localStorage.removeItem("orderId");
-      console.log("orderId removed from localStorage");
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
-  };
-
-  const testWebhook = (orderId) => {
-    fetch('/api/webhook', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: 'payment.updated', // Tipo de acción simulada
-        data: { id: orderId }, // Simula el ID del pedido
-        id: orderId,
-        live_mode: false,
-      }),
-    })
-      .then(response => response.json())
-      .then(data => console.log('Response from webhook:', data))
-      .catch(error => console.error('Error in webhook test:', error));
-  };
+    updateStatus();
+  }, [orderId]);
 
   return (
     <div className="successContainer">
-      <h1>Compra exitosa</h1>
-      <p>
-        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"} ha sido procesado.
-      </p>
+      <h1>Compra Exitosa</h1>
+      <p>Gracias por tu compra. Pronto recibirás un correo con los detalles.</p>
     </div>
   );
-};
+}
 
 export default BuySuccess;
