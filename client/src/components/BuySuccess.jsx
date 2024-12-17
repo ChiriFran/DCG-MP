@@ -1,42 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebase/config";
-import { doc, updateDoc } from "firebase/firestore";
-import '../styles/Success.css'
+import '../styles/Success.css';
 
 const BuySuccess = () => {
   const [orderId, setOrderId] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   useEffect(() => {
-    // Recupera el ID del pedido del localStorage
-    const savedOrderId = localStorage.getItem("orderId");
-
-    if (savedOrderId) {
-      setOrderId(savedOrderId);
-
-      // Llama a una función para actualizar el estado del pedido en Firebase
-      updateOrderStatus(savedOrderId);
+    const orderIdFromUrl = new URLSearchParams(window.location.search).get("orderId");
+    
+    if (orderIdFromUrl) {
+      setOrderId(orderIdFromUrl);
+      // Llama al webhook para obtener el estado del pago
+      fetchWebhook(orderIdFromUrl);
     } else {
-      console.error("No orderId found in localStorage");
+      console.error("No orderId found in URL");
     }
   }, []);
 
-  const updateOrderStatus = async (orderId) => {
+  const fetchWebhook = async (orderId) => {
     try {
-      // Referencia al documento de Firebase con el ID de la orden
-      const orderRef = doc(db, "pedidos", orderId);
-
-      // Actualiza el estado de la orden a "completed" (o el estado que desees)
-      await updateDoc(orderRef, {
-        status: "completed", // Actualiza el estado según lo necesario
+      const response = await fetch(`/api/webhook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'payment.updated', // Tipo de acción simulada
+          data: { id: orderId }, // Simula el ID del pedido
+          id: orderId,
+          live_mode: false,
+        }),
       });
 
-      console.log(`Order ${orderId} status updated to 'completed'`);
+      const data = await response.json();
 
-      // Borra el orderId del localStorage para seguridad
-      localStorage.removeItem("orderId");
-      console.log("orderId removed from localStorage");
+      if (data && data.orderId && data.paymentStatus) {
+        setOrderId(data.orderId);
+        setPaymentStatus(data.paymentStatus);  // Actualiza el estado según lo enviado por el webhook
+      } else {
+        console.error("Invalid response from webhook:", data);
+      }
     } catch (error) {
-      console.error("Error updating order status:", error);
+      console.error('Error fetching webhook:', error);
     }
   };
 
@@ -44,7 +49,11 @@ const BuySuccess = () => {
     <div className="successContainer">
       <h1>Compra exitosa</h1>
       <p>
-        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"} ha sido procesado.
+        Gracias por tu compra. Tu pedido {orderId ? `con ID ${orderId}` : "no ha podido ser encontrado"} 
+        ha sido procesado. 
+        {paymentStatus && (
+          <span>Estado del pago: {paymentStatus}</span>
+        )}
       </p>
     </div>
   );
