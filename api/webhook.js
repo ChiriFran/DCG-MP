@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
     // Asegúrate de que los datos de autenticación sean válidos
     const authorizationHeader = req.headers['authorization'];
-    if (!authorizationHeader || authorizationHeader !== `Bearer ${process.env.MY_SECRET_API_KEY}`) {
+    if (!authorizationHeader || authorizationHeader !== `Bearer ${process.env.MP_WEBHOOK_SECRET}`) {
       console.error('Unauthorized request');
       return res.status(401).json({ message: 'Unauthorized' });
     }
