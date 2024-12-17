@@ -19,9 +19,8 @@ export default async function handler(req, res) {
       const client = new MercadoPagoConfig({
         accessToken: mpAccessToken,
       });
-
+      
       const body = {
-
         items: items.map((item) => ({
           title: item.title,
           quantity: Number(item.quantity),
@@ -30,7 +29,7 @@ export default async function handler(req, res) {
         })),
 
         payer: {
-          name: shipping.name || "Jonh ", // Nombre del comprador (valor por defecto)
+          name: shipping.name || "Jonh", // Nombre del comprador (valor por defecto)
           email: shipping.email || "Doe", // Email del comprador (valor por defecto)
           phone: {
             area_code: shipping.phoneArea || "11",
@@ -51,9 +50,9 @@ export default async function handler(req, res) {
         shipments: {
           mode: "not_specified",
           cost: 5, // Costo fijo del envío en tu moneda (ARS en este caso)
-          reciver_address: {
+          receiver_address: {
             street_name: shipping.address || "Direccion", // Dirección obligatoria
-            street_number: Number(shipping.streetNumber) || 0,// Número de calle
+            street_number: Number(shipping.streetNumber) || 0, // Número de calle
             zip_code: shipping.zipCode || "0000" // Código postal
           }
         },

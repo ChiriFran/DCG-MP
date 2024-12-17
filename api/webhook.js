@@ -73,8 +73,10 @@ export default async function handler(req, res) {
             console.error("Error al procesar el webhook:", error);
             res.status(500).json({ error: "Error al procesar el webhook." });
         }
+    } else if (req.method === "GET") {
+        res.status(200).json({ message: "Este es el endpoint del webhook. Usa POST para recibir eventos de Mercado Pago." });
     } else {
-        res.setHeader("Allow", ["POST"]);
+        res.setHeader("Allow", ["POST", "GET"]);
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }
