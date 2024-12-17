@@ -15,6 +15,9 @@ const BuySuccess = () => {
 
       // Llama a una función para actualizar el estado del pedido en Firebase
       updateOrderStatus(savedOrderId);
+
+      // Llama al webhook de prueba después de actualizar el estado del pedido
+      testWebhook(savedOrderId);
     } else {
       console.error("No orderId found in localStorage");
     }
@@ -38,6 +41,24 @@ const BuySuccess = () => {
     } catch (error) {
       console.error("Error updating order status:", error);
     }
+  };
+
+  const testWebhook = (orderId) => {
+    fetch('/api/webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'payment.updated', // Tipo de acción simulada
+        data: { id: orderId }, // Simula el ID del pedido
+        id: orderId,
+        live_mode: false,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => console.log('Response from webhook:', data))
+      .catch(error => console.error('Error in webhook test:', error));
   };
 
   return (
