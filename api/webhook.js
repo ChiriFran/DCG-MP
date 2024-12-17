@@ -1,55 +1,51 @@
-import * as admin from 'firebase-admin';
-import { cert } from 'firebase-admin/app';
+import { initializeApp, applicationDefault, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import MercadoPago from 'mercadopago';
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY); // Accede a la variable de entorno
+// Inicializar Firebase Admin SDK
+initializeApp({
+  credential: applicationDefault(), // Usa las credenciales predeterminadas para Vercel
+});
 
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: cert(serviceAccount), // Usa la clave de servicio para inicializar Firebase
-    });
-}
+const db = getFirestore();
 
-const db = admin.firestore();  // Obtener Firestore desde firebase-admin
+// Inicializar MercadoPago SDK
+MercadoPago.configurations.setAccessToken(process.env.MP_ACCESS_TOKEN_PROD);
 
+// Función que maneja el webhook
 export default async function handler(req, res) {
-    console.log("Cuerpo de la solicitud:", req.body);  // Aquí agregamos el log para ver el cuerpo
-
     if (req.method === "POST") {
+        console.log("Webhook recibido:", req.body);
         try {
-            const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
-            const webhookSecret = process.env.MP_WEBHOOK_SECRET;
-
-            // Configuración de Mercado Pago
-            const client = new MercadoPagoConfig({
-                accessToken: mpAccessToken,
-            });
-
+            // Recibe los datos del webhook de Mercado Pago
             const { data } = req.body;
 
-            // Verificar que el webhook sea legítimo
-            const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret);
-            if (!isValidWebhook) {
-                console.error("Webhook inválido");
-                return res.status(400).json({ error: "Invalid webhook" });
+            // Verifica la autenticidad del webhook (opcional si Mercado Pago incluye la firma)
+            const webhookSecret = process.env.MP_WEBHOOK_SECRET;
+
+            const signature = req.headers['x-mp-signature'];
+
+            // Validación de firma
+            if (!signature || signature !== webhookSecret) {
+                console.error("Firma de webhook no válida.");
+                return res.status(400).json({ error: "Firma inválida" });
             }
 
-            // Recuperar el estado del pago desde la API de Mercado Pago
+            // Verifica el estado del pago
             const paymentId = data.id;
-            const paymentDetails = await client.payment.findById(paymentId);
+            const paymentDetails = await MercadoPago.payment.findById(paymentId);
 
             if (!paymentDetails) {
                 console.error(`No se pudo encontrar el pago con ID: ${paymentId}`);
                 return res.status(404).json({ error: "Pago no encontrado" });
             }
 
-            // Verificar el estado del pago
+            console.log("Detalles del pago:", paymentDetails);
+
+            // Obtiene el estado del pago
             const paymentStatus = paymentDetails.status;
-
-            // Actualizar el estado del pedido en Firebase
-            const orderId = data.external_reference;
-            const orderRef = db.collection('pedidos').doc(orderId);
-
             let newStatus = "unknown";
+
             if (paymentStatus === "approved") {
                 newStatus = "success";
             } else if (paymentStatus === "rejected") {
@@ -57,6 +53,10 @@ export default async function handler(req, res) {
             } else if (paymentStatus === "pending") {
                 newStatus = "pending";
             }
+
+            // Recuperar el ID del pedido y actualizar el estado en Firestore
+            const orderId = data.external_reference;
+            const orderRef = db.collection('pedidos').doc(orderId);
 
             await orderRef.update({
                 webhook_status: newStatus,
@@ -71,10 +71,8 @@ export default async function handler(req, res) {
             console.error("Error al procesar el webhook:", error);
             res.status(500).json({ error: "Error al procesar el webhook." });
         }
-    } else if (req.method === "GET") {
-        res.status(200).json({ message: "Este es el endpoint del webhook. Usa POST para recibir eventos de Mercado Pago." });
     } else {
-        res.setHeader("Allow", ["POST", "GET"]);
+        res.setHeader("Allow", ["POST"]);
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }
