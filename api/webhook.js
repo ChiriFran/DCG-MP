@@ -2,10 +2,10 @@ import pkg from 'firebase-admin';
 const { initializeApp, credential } = pkg;
 import * as admin from 'firebase-admin';
 
-// Configura las variables para permitir el bodyParser en Vercel
+// Desactiva el body parser en Vercel para manejar el webhook correctamente
 export const config = {
   api: {
-    bodyParser: false,  // Necesario para procesar los webhooks correctamente
+    bodyParser: false, // Desactiva el body parser de Vercel
   },
 };
 
@@ -15,18 +15,6 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-
-    // Lee el cuerpo raw de la solicitud
-    const rawBody = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', chunk => {
-        data += chunk;
-      });
-      req.on('end', () => resolve(data));
-      req.on('error', (err) => reject(err));
-    });
-
-    const event = JSON.parse(rawBody);
 
     // Configura Firebase Admin con las credenciales del servicio desde las variables de entorno
     const serviceAccount = {
@@ -42,7 +30,7 @@ export default async function handler(req, res) {
       client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
     };
 
-    // Inicializa Firebase Admin solo si no ha sido inicializado
+    // Inicializa Firebase Admin si no está inicializado
     if (!admin.apps.length) {
       initializeApp({
         credential: credential.cert(serviceAccount),
@@ -52,12 +40,27 @@ export default async function handler(req, res) {
     // Accede a Firestore
     const db = admin.firestore();
 
+    // Leer el cuerpo del evento (esto es necesario porque Vercel no lo parsea automáticamente)
+    const rawBody = await new Promise((resolve, reject) => {
+      let data = '';
+      req.on('data', chunk => {
+        data += chunk;
+      });
+      req.on('end', () => {
+        resolve(data);
+      });
+      req.on('error', (err) => reject(err));
+    });
+
+    // El cuerpo del evento se encuentra en formato JSON
+    const event = JSON.parse(rawBody);
+
     // Asegúrate de que los datos del evento sean válidos
     if (!event || !event.id) {
       return res.status(400).json({ message: 'Invalid event data' });
     }
 
-    // Obtén el documento del pedido
+    // Actualiza el estado del pedido en Firebase
     const orderRef = db.collection('pedidos').doc(event.id);
     const order = await orderRef.get();
 
