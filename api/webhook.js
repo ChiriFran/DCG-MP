@@ -6,33 +6,48 @@ export const config = {
   };
   
   export default async function handler(req, res) {
-    if (req.method === "POST") {
-      try {
-        // Log para verificar que el webhook llegó correctamente
-        console.log("Webhook received:", req.body);
-  
-        // Si es necesario, puedes verificar el tipo de evento, por ejemplo:
-        if (req.body.event === "payment_approved") {
-          // Aquí procesas lo que debe ocurrir cuando un pago es aprobado
-          console.log("Payment Approved:", req.body);
-          
-          // Puedes actualizar el estado en tu base de datos o realizar otras acciones necesarias.
-        } else {
-          console.log("Other event received:", req.body.event);
-        }
-  
-        // Responde con 200 para confirmar que el webhook se procesó correctamente
-        return res.status(200).send("Webhook processed");
-  
-      } catch (error) {
-        console.error("Error processing webhook:", error);
-        // En caso de error, responder con 500
-        return res.status(500).send("Error processing webhook");
+    try {
+      // Verifica que la solicitud sea un POST
+      if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method Not Allowed' });
       }
-    } else {
-      // Responde con 405 si la solicitud no es POST
-      res.status(405).send("Method Not Allowed");
+  
+      // Leer el cuerpo del evento (esto es necesario porque Vercel no lo parsea automáticamente)
+      const rawBody = await new Promise((resolve, reject) => {
+        let data = '';
+        req.on('data', chunk => {
+          data += chunk;
+        });
+        req.on('end', () => {
+          resolve(data);
+        });
+        req.on('error', (err) => reject(err));
+      });
+  
+      console.log('Webhook received:', rawBody); // Agregado para ver el cuerpo recibido
+  
+      // El cuerpo del evento se encuentra en formato JSON
+      const event = JSON.parse(rawBody);
+  
+      // Asegúrate de que los datos del evento sean válidos
+      if (!event || !event.id) {
+        console.error('Invalid event data:', event); // Log de error
+        return res.status(400).json({ message: 'Invalid event data' });
+      }
+  
+      console.log('Event ID:', event.id); // Log del ID del evento para depuración
+  
+      // Dependiendo del estado del evento, devuelve una respuesta
+      if (event.action === 'payment.updated') {
+        console.log('Payment updated for order:', event.id); // Log del tipo de evento recibido
+        return res.status(200).json({ message: 'Payment status updated' });
+      } else {
+        console.error('Unsupported event action:', event.action); // Log si el evento no es reconocido
+        return res.status(400).json({ message: 'Unsupported event action' });
+      }
+    } catch (error) {
+      console.error('Error processing webhook:', error); // Log de error detallado
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
-  
   
