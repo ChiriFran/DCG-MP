@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Configuración de Firebase
-const firebaseConfig = {
+const firebaseConfigBack = {
     apiKey: process.env.FIREBASE_API_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -12,7 +12,7 @@ const firebaseConfig = {
     appId: process.env.FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfigBack);
 const db = getFirestore(app); // Firestore
 
 export default async function handler(req, res) {
