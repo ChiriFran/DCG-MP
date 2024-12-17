@@ -1,11 +1,25 @@
 import { MercadoPagoConfig } from "mercadopago";
-import { db } from '../firebase/config';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app); // Firestore
 
 export default async function handler(req, res) {
     if (req.method === "POST") {
         try {
             const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
-            const webhookSecret = process.env.MP_WEBHOOK_SECRET; // La clave de seguridad del webhook
+            const webhookSecret = process.env.MP_WEBHOOK_SECRET;
 
             // Configuración de Mercado Pago
             const client = new MercadoPagoConfig({
@@ -17,6 +31,7 @@ export default async function handler(req, res) {
             // Verificar que el webhook sea legítimo
             const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret);
             if (!isValidWebhook) {
+                console.error("Webhook inválido");
                 return res.status(400).json({ error: "Invalid webhook" });
             }
 
@@ -24,31 +39,34 @@ export default async function handler(req, res) {
             const paymentId = data.id;
             const paymentDetails = await client.payment.findById(paymentId);
 
-            // Verificar detalles del pago
-            const paymentStatus = paymentDetails.status; // Puede ser 'approved', 'pending', 'rejected'
-
-            // Actualizar el estado del pedido en Firebase
-            const orderId = data.external_reference; // El ID de tu pedido
-            const orderRef = db.collection('pedidos').doc(orderId);
-
-            let newWebhookStatus = "unknown"; // Valor por defecto
-
-            if (paymentStatus === "approved") {
-                newWebhookStatus = "success";
-            } else if (paymentStatus === "rejected") {
-                newWebhookStatus = "failed";
-            } else if (paymentStatus === "pending") {
-                newWebhookStatus = "pending";
+            if (!paymentDetails) {
+                console.error(`No se pudo encontrar el pago con ID: ${paymentId}`);
+                return res.status(404).json({ error: "Pago no encontrado" });
             }
 
-            // Actualizamos el estado del pedido con el nuevo campo 'webhook_status'
+            // Verificar el estado del pago
+            const paymentStatus = paymentDetails.status;
+
+            // Actualizar el estado del pedido en Firebase
+            const orderId = data.external_reference;
+            const orderRef = db.collection('pedidos').doc(orderId);
+
+            let newStatus = "unknown";
+            if (paymentStatus === "approved") {
+                newStatus = "success";
+            } else if (paymentStatus === "rejected") {
+                newStatus = "failed";
+            } else if (paymentStatus === "pending") {
+                newStatus = "pending";
+            }
+
             await orderRef.update({
-                webhook_status: newWebhookStatus, // Aquí creamos el campo 'webhook_status'
+                webhook_status: newStatus,
                 payment_id: paymentId,
                 updated_at: new Date(),
             });
 
-            console.log(`Pedido ${orderId} actualizado a estado: ${newWebhookStatus}`);
+            console.log(`Pedido ${orderId} actualizado a estado: ${newStatus}`);
 
             res.status(200).json({ message: "Webhook procesado correctamente" });
         } catch (error) {
