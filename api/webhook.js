@@ -1,13 +1,13 @@
 import { MercadoPagoConfig } from "mercadopago";
-import * as admin from 'firebase-admin'; // Cambiar la importación a firebase-admin
+import * as admin from 'firebase-admin';  // Cambia a importación de módulos ES
 
 // Inicializar Firebase Admin (esto es para el backend)
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.applicationDefault(), // Usa las credenciales predeterminadas para el entorno de serverless
-    });
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),  // Usando las credenciales predeterminadas para entornos serverless
+  });
 }
-const db = admin.firestore(); // Obtener Firestore desde firebase-admin
+const db = admin.firestore();  // Obtener Firestore desde firebase-admin
 
 export default async function handler(req, res) {
     if (req.method === "POST") {
