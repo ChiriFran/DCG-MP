@@ -49,4 +49,4 @@ export const config = {
       console.error('Error processing webhook:', error); // Log de error detallado
       return res.status(500).json({ message: 'Internal Server Error' });
     }
-  }
+  } 
