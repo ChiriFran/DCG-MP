@@ -1,92 +1,80 @@
-import * as admin from 'firebase-admin';
+import { MercadoPagoConfig } from "mercadopago";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
-// Desactiva el body parser en Vercel para manejar el webhook correctamente
-export const config = {
-  api: {
-    bodyParser: false, // Desactiva el body parser de Vercel
-  },
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
 };
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app); // Firestore
+
 export default async function handler(req, res) {
-  try {
-    // Verifica que la solicitud sea un POST
-    if (req.method !== 'POST') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
-    }
+    if (req.method === "POST") {
+        try {
+            const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
+            const webhookSecret = process.env.MP_WEBHOOK_SECRET;
 
-    // Leer el cuerpo del evento (esto es necesario porque Vercel no lo parsea automáticamente)
-    const rawBody = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', chunk => {
-        data += chunk;
-      });
-      req.on('end', () => {
-        resolve(data);
-      });
-      req.on('error', (err) => reject(err));
-    });
+            // Configuración de Mercado Pago
+            const client = new MercadoPagoConfig({
+                accessToken: mpAccessToken,
+            });
 
-    console.log('Webhook received:', rawBody); // Agregado para ver el cuerpo recibido
+            const { data } = req.body;
 
-    // El cuerpo del evento se encuentra en formato JSON
-    const event = JSON.parse(rawBody);
+            // Verificar que el webhook sea legítimo
+            const isValidWebhook = await client.webhook.verify(req.headers, req.body, webhookSecret);
+            if (!isValidWebhook) {
+                console.error("Webhook inválido");
+                return res.status(400).json({ error: "Invalid webhook" });
+            }
 
-    // Asegúrate de que los datos del evento sean válidos
-    if (!event || !event.data || !event.data.id) {
-      console.error('Invalid event data:', event); // Log de error
-      return res.status(400).json({ message: 'Invalid event data' });
-    }
+            // Recuperar el estado del pago desde la API de Mercado Pago
+            const paymentId = data.id;
+            const paymentDetails = await client.payment.findById(paymentId);
 
-    console.log('Event ID:', event.data.id); // Log del ID del evento para depuración
+            if (!paymentDetails) {
+                console.error(`No se pudo encontrar el pago con ID: ${paymentId}`);
+                return res.status(404).json({ error: "Pago no encontrado" });
+            }
 
-    // Inicializa Firebase Admin si no está inicializado
-    if (!admin.apps.length) {
-      const serviceAccount = {
-        type: 'service_account',
-        project_id: process.env.FIREBASE_PROJECT_ID,
-        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-        private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        client_email: process.env.FIREBASE_CLIENT_EMAIL,
-        client_id: process.env.FIREBASE_CLIENT_ID,
-        auth_uri: process.env.FIREBASE_AUTH_URI,
-        token_uri: process.env.FIREBASE_TOKEN_URI,
-        auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-        client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-      };
+            // Verificar el estado del pago
+            const paymentStatus = paymentDetails.status;
 
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-      });
-    }
+            // Actualizar el estado del pedido en Firebase
+            const orderId = data.external_reference;
+            const orderRef = db.collection('pedidos').doc(orderId);
 
-    // Accede a Firestore
-    const db = admin.firestore();
+            let newStatus = "unknown";
+            if (paymentStatus === "approved") {
+                newStatus = "success";
+            } else if (paymentStatus === "rejected") {
+                newStatus = "failed";
+            } else if (paymentStatus === "pending") {
+                newStatus = "pending";
+            }
 
-    // Dependiendo del estado del evento, actualiza el pedido
-    if (event.action === 'payment.updated') {
-      const orderId = event.data.id; // El ID del pedido
-      const orderRef = db.collection('pedidos').doc(orderId);
-      const order = await orderRef.get();
+            await orderRef.update({
+                webhook_status: newStatus,
+                payment_id: paymentId,
+                updated_at: new Date(),
+            });
 
-      if (!order.exists) {
-        console.error('Order not found:', orderId);
-        return res.status(404).json({ message: 'Order not found' });
-      }
+            console.log(`Pedido ${orderId} actualizado a estado: ${newStatus}`);
 
-      // Actualiza el estado del pedido según la información del evento
-      await orderRef.update({
-        status: 'updated by webhook', // O el estado que necesites
-        payment_status: event.data.status, // Si el evento trae el estado del pago
-      });
-
-      console.log('Payment updated for order:', orderId);
-      return res.status(200).json({ message: 'Payment status updated' });
+            res.status(200).json({ message: "Webhook procesado correctamente" });
+        } catch (error) {
+            console.error("Error al procesar el webhook:", error);
+            res.status(500).json({ error: "Error al procesar el webhook." });
+        }
     } else {
-      console.error('Unsupported event action:', event.action); // Log si el evento no es reconocido
-      return res.status(400).json({ message: 'Unsupported event action' });
+        res.setHeader("Allow", ["POST"]);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-  } catch (error) {
-    console.error('Error processing webhook:', error); // Log de error detallado
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
 }
