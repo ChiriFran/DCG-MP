@@ -1,5 +1,5 @@
-import { verifySignature } from './utils/verifySignature'; // Función para verificar la firma del webhook
-import { actualizarPedidoFirebase } from './utils/actualizarPedidoFirebase'; // Función para actualizar el estado en Firebase
+import { verifySignature } from './utils/verifySignature.js'; // Función para verificar la firma del webhook
+import { actualizarPedidoFirebase } from './utils/actualizarPedidoFirebase.js'; // Función para actualizar el estado en Firebase
 
 // Desactiva el body parser en Vercel para manejar el webhook correctamente
 export const config = {
