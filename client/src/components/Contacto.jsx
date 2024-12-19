@@ -8,7 +8,7 @@ function Contacto() {
       <p>contactDCG@gmail.com</p>
       <ul>
         <li>
-          <a href="#" target="blank">
+          <a href="https://www.youtube.com/@detroitclassicgallery7108" target="blank">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-youtube"
@@ -26,7 +26,7 @@ function Contacto() {
           </a>
         </li>
         <li>
-          <a href="#" target="blank">
+          <a href="https://www.facebook.com/detroitclassicgallery/" target="blank">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-meta"
@@ -44,7 +44,7 @@ function Contacto() {
           </a>
         </li>
         <li>
-          <a href="#" target="blank">
+          <a href="https://www.instagram.com/detroitclassicgallery/?hl=es" target="blank">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-instagram"
