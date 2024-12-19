@@ -116,7 +116,7 @@ function LogIn() {
           {!loggedIn && !loading && (
             <div className="form-section-log-in">
               <p>
-                Don't have an account? <Link to="/SingUp">Sign Up</Link> or{" "}
+                Don't have an account? <Link to="/SignUp">Sign Up</Link> or{" "}
                 <Link to="/">Go Home</Link>
               </p>
             </div>
