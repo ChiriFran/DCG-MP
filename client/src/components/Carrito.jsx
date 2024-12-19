@@ -285,7 +285,7 @@ const Carrito = () => {
                     />
                   </div>
                 </div>
-                <div className="formEnvioGroup">
+                <div className="formEnvio">
                   <label>Comments (Optional)</label>
                   <textarea
                     name="comments"
@@ -293,6 +293,10 @@ const Carrito = () => {
                     onChange={handleShippingChange}
                     placeholder="Special instructions for vendors, shipping, and additional."
                   />
+                </div>
+                <div className="redireccionMarkContainer">
+                  <p>Al realizar el pago seras redirigido nuevamente para confirmar la compra, por favor aguarda y seras redirigido automaticamente. </p>
+                  <p>At checkout you will be redirected again to confirm your purchase, please wait and you will be redirected automatically. </p>
                 </div>
                 <button
                   type="submit"
