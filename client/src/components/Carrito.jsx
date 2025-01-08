@@ -295,8 +295,8 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="redireccionMarkContainer">
-                  <p>Al realizar el pago seras redirigido nuevamente para confirmar la compra, por favor aguarda y seras redirigido automaticamente. </p>
-                  <p>At checkout you will be redirected again to confirm your purchase, please wait and you will be redirected automatically. </p>
+                  <p>Al finalizar el pago seras redirigido nuevamente para confirmar la compra, pro favor espera.</p>
+                  <p>At checkout you will be redirected to confirm your purchase, please wait. </p>
                 </div>
                 <button
                   type="submit"

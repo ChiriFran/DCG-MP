@@ -5,10 +5,16 @@ function Contacto() {
   return (
     <div className="contactoContainer">
       <h3>Contact</h3>
-      <p>contactDCG@gmail.com</p>
+      <a href="https://mail.google.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="email-link"
+      >
+        info@detroitclassicgallery.com
+      </a>
       <ul>
         <li>
-          <a href="https://www.youtube.com/@detroitclassicgallery7108" target="blank">
+          <a href="https://www.youtube.com/@detroitclassicgallery7108" target="_blank" rel="noopener noreferrer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-youtube"
@@ -26,7 +32,7 @@ function Contacto() {
           </a>
         </li>
         <li>
-          <a href="https://www.facebook.com/detroitclassicgallery/" target="blank">
+          <a href="https://www.facebook.com/detroitclassicgallery/" target="_blank" rel="noopener noreferrer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-meta"
@@ -44,7 +50,7 @@ function Contacto() {
           </a>
         </li>
         <li>
-          <a href="https://www.instagram.com/detroitclassicgallery/?hl=es" target="blank">
+          <a href="https://www.instagram.com/detroitclassicgallery/?hl=es" target="_blank" rel="noopener noreferrer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="icon icon-tabler icon-tabler-brand-instagram"

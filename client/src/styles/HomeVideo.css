@@ -1,6 +1,6 @@
 .homeVideoContainer {
   position: relative;
-  width: 100%;
+  width: 80%;
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -41,11 +41,13 @@
 .homeVideoContainer video {
   width: 100%;
   background-color: #0a0a0a;
+  padding-left: 7%;
 }
 
 @media screen and (max-width: 700px) {
 
   .homeVideoContainer video {
     margin-bottom: -50%;
+    padding-left: 0;
   }
 }
