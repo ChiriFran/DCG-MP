@@ -38,6 +38,38 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0a0a0a", endColorstr="#0a0a0a", GradientType=1);
 }
 
+.homeVideoContainerTexture {
+  position: relative;
+}
+
+.homeVideoContainerTexture::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(10, 10, 10);
+  background: -moz-linear-gradient(90deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  background: -webkit-linear-gradient(90deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  background: linear-gradient(90deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0a0a0a", endColorstr="#0a0a0a", GradientType=1);
+}
+
+.homeVideoContainerTexture::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(10, 10, 10);
+  background: -moz-linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  background: -webkit-linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  background: linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 1) 4%, rgba(10, 10, 10, 0) 39%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0a0a0a", endColorstr="#0a0a0a", GradientType=1);
+}
+
 .homeVideoContainer video {
   width: 100%;
   background-color: #0a0a0a;

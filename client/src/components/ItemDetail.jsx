@@ -172,11 +172,9 @@ const ItemDetail = ({ item }) => {
           <div className="careInstructions">
             <p>Care Instructions</p>
             <ul>
-              <li>Wash before use for the perfect look</li>
-              <li>Desired vintage effect can be enhanced by washing</li>
-              <li>Gentle cycle 30°</li>
+              <li>Wash inside-out on a gentle cycle at 30°C</li>
               <li>Wash with similar colors</li>
-              <li>Wash and iron inside-out</li>
+              <li>Avoid ironing over printed designs</li>
             </ul>
           </div>
 

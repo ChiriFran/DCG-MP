@@ -30,7 +30,7 @@ const ItemDestacados = ({ producto }) => {
           </h4>
         </div>
         <div className="card-footer">
-          <span className="ntext-title itemDestacadosPrice">
+          <span className="text-title itemDestacadosPrice">
             ${producto.price}.-
           </span>
         </div>

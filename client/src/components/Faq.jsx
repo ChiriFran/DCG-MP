@@ -10,7 +10,6 @@ function Faq() {
                 <ul>
                     <li>Mercadopago</li>
                     <li>Credit card, MasterCard, Maestro & Visa(MP)</li>
-                    <li>PayPal & PayPal Express</li>
                 </ul>
 
                 <h2 className='faqSubtitles'>How does shipping work?</h2>
@@ -24,13 +23,13 @@ function Faq() {
 
                 <h2 className='faqSubtitles'>What should I do if my product arrives damaged or defective?</h2>
                 <p className='faqTexts'>If your product arrives damaged or defective, you can file a claim directly through Mercado Pago. We are committed to resolving any issues, whether through a replacement or a refund, as needed.</p>
-            
+
                 <h2 className='faqSubtitles'>Can I return or exchange a product?</h2>
                 <p className='faqTexts'>We accept returns and exchanges within 7 business days of receiving your order. The product must be unused and in its original packaging. To start the process, contact us via email or social media.</p>
 
                 <h2 className='faqSubtitles'> Is my purchase protected?</h2>
                 <p className='faqTexts'>Your purchase is covered by Mercado Pago's protections, ensuring secure payment and delivery. If there’s an issue with your order, you can request assistance directly through your Mercado Libre or Mercado Pago account.</p>
-        
+
                 <h2 className='faqSubtitles'>How can I contact you if I have a question or issue?</h2>
                 <p className='faqTexts'>You can reach us via our social media platforms or by sending us an email. We’ll respond as quickly as possible to assist you.</p>
 

@@ -24,17 +24,19 @@ function HomeVideo() {
 
   return (
     <div className="homeVideoContainer">
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        playsInline
-        muted
-      >
-        <source src={homeVideoMobile} type="video/mp4" media="(max-width: 700px)" />
-        <source src={homeVideoDesktop} type="video/mp4" media="(min-width: 701px)" />
-        Su navegador no soporta la etiqueta de vídeo.
-      </video>
+      <div className="homeVideoContainerTexture">
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          playsInline
+          muted
+        >
+          <source src={homeVideoMobile} type="video/mp4" media="(max-width: 700px)" />
+          <source src={homeVideoDesktop} type="video/mp4" media="(min-width: 701px)" />
+          Su navegador no soporta la etiqueta de vídeo.
+        </video>
+      </div>
     </div>
   );
 }
