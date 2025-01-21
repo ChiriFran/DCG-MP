@@ -5,7 +5,7 @@ import { db } from "../firebase/config";
 const useProductos = (searchTerm = "", category = "", urlCategory = "") => {
   const [productos, setProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [titulo, setTitulo] = useState("Todos los productos");
+  const [titulo, setTitulo] = useState("All products");
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,7 +37,7 @@ const useProductos = (searchTerm = "", category = "", urlCategory = "") => {
         } else if (urlCategory) {
           setTitulo(capitalizeFirstLetter(urlCategory));
         } else {
-          setTitulo("Todos los productos");
+          setTitulo("All products");
         }
       })
       .catch((error) => {

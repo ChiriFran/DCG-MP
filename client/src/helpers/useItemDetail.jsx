@@ -22,11 +22,11 @@ const useItemDetail = (id) => {
           };
           setItem(itemWithStock);
         } else {
-          console.log("No existe el documento con el ID proporcionado");
-          alert("No existe el documento con el ID proporcionado");
+          console.log("The document with the provided ID does not exist");
+          alert("The document with the provided ID does not exist");
         }
       } catch (error) {
-        alert("Error obteniendo el documento:", error);
+        alert("Error obtaining the document:", error);
       } finally {
         setIsLoading(false);
       }
