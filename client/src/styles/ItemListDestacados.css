@@ -1,73 +1,35 @@
-.homeText {
-  width: 50%;
-  text-align: center;
-  margin: 0 0 4% 0;
-  font-size: 1rem;
-  letter-spacing: 3px;
-  font-weight: 500;
-  color: #f4f4f4;
-  text-transform: uppercase;
-}
-
 .productosDestacadosContainer {
   display: flex;
-  align-items: center;
   justify-content: center;
   position: relative;
   width: 100%;
-  padding: 0 10%;
-}
-
-.productosDestacadosContainer::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgb(10, 10, 10);
-  background: -moz-linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 8%, rgba(10, 10, 10, 0) 34%);
-  background: -webkit-linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 8%, rgba(10, 10, 10, 0) 34%);
-  background: linear-gradient(270deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 1) 8%, rgba(10, 10, 10, 0) 34%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0a0a0a", endColorstr="#0a0a0a", GradientType=1);
 }
 
 .productosDestacadosWrapper {
   overflow: hidden;
-  /* Oculta los productos que no están visibles */
   width: 80%;
 }
 
 .productosDestacados {
   display: flex;
   transition: transform 0.5s ease-in-out;
-  /* Transición suave */
 }
 
 .sliderItem {
   flex-shrink: 0;
   box-sizing: border-box;
-  /* Espaciado entre los productos */
 }
 
-.sliderButton {
-  background-color: transparent;
-  color: rgba(185, 185, 185, 0.753);
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  z-index: 10;
-  font-size: 1.5rem;
+.sliderItem[data-items-per-view="1"] {
+  width: 100%;
 }
 
-.sliderButton.prevButton {
-  position: absolute;
-  left: 10px;
+.sliderItem[data-items-per-view="2"] {
+  width: 50%;
 }
 
-.sliderButton.nextButton {
-  position: absolute;
-  right: 10px;
+.sliderItem[data-items-per-view="4"] {
+  width: 25%;
 }
 
 @media screen and (max-width: 700px) {
@@ -82,13 +44,4 @@
   .sliderItem {
     padding: 0 5px;
   }
-
-  .sliderButton.prevButton {
-    left: 0;
-  }
-
-  .sliderButton.nextButton {
-    right: 0;
-  }
-
 }

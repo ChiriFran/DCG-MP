@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ItemDestacados from "./ItemDestacados";
 import "../styles/ItemListDestacados.css";
-import arrowLeft from '../../media/icons/arrow-left.svg';
-import arrowRight from '../../media/icons/arrow-right.svg';
 
 const ItemListDestacados = ({ productos }) => {
   const [itemsPerView, setItemsPerView] = useState(4); // Número inicial de productos visibles
@@ -29,47 +27,27 @@ const ItemListDestacados = ({ productos }) => {
     };
   }, []);
 
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? productos.length - itemsPerView : prevIndex - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) =>
-      (prevIndex + 1) % productos.length
-    );
-  };
-
   return (
     <div className="productosDestacadosContainer">
-      <button className="sliderButton prevButton" onClick={handlePrev}>
-        <img src={arrowLeft} alt="prev" title="prev" />
-      </button>
       <div className="productosDestacadosWrapper">
         <div
           className="productosDestacados"
-          style={{
-            transform: `translateX(-${(currentIndex * 100) / itemsPerView}%)`,
-            width: `${(productos.length / itemsPerView) * 100}%`,
-          }}
+          data-items-per-view={itemsPerView}
+          data-current-index={currentIndex}
         >
           {productos.map((prod, index) => (
             <div
               className="sliderItem"
               key={`${prod.id}-${index}`}
-              style={{ width: `${100 / itemsPerView}%` }}
+              data-items-per-view={itemsPerView}
             >
               <ItemDestacados producto={prod} />
             </div>
           ))}
         </div>
       </div>
-      <button className="sliderButton nextButton" onClick={handleNext}>
-        <img src={arrowRight} alt="next" title="next" />
-      </button>
     </div>
   );
 };
 
-export default ItemListDestacados
+export default ItemListDestacados;
