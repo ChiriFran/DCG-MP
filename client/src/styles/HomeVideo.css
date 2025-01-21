@@ -8,6 +8,7 @@
   overflow: hidden;
   background-color: transparent;
   background-color: #0a0a0a;
+  margin-bottom: 1rem;
 }
 
 .homeVideoContainer::after {
