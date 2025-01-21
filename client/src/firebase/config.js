@@ -12,11 +12,11 @@ const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
 
 const firebaseConfig = {
   apiKey: firebaseApiKey,
-  authDomain: "ecommerce-ad14c.firebaseapp.com",
-  projectId: "ecommerce-ad14c",
-  storageBucket: "ecommerce-ad14c.appspot.com",
-  messagingSenderId: "239222382582",
-  appId: "1:239222382582:web:94cf50be10bae8594d71d7",
+  authDomain: "dcg-store-db-7dbe5.firebaseapp.com",
+  projectId: "dcg-store-db-7dbe5",
+  storageBucket: "dcg-store-db-7dbe5.firebasestorage.app",
+  messagingSenderId: "348286296150",
+  appId: "1:348286296150:web:a162b029f704245a9fdbf7",
 };
 
 // Inicializa Firebase
