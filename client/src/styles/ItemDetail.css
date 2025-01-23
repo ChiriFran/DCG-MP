@@ -32,7 +32,7 @@
 }
 
 .itemDetailTitle {
-  font-size: 4rem;
+  font-size: 2rem;
   margin: 1rem 0;
   font-family: 'Instrument-serif';
   font-weight: 400;
@@ -151,7 +151,7 @@
 
 .sizeChartContainerDesktop {
   margin: 1rem 0 1rem 0;
-  width: 100%;
+  width: 200%;
   border-top: 1px solid rgba(136, 135, 135, 0.48);
 }
 

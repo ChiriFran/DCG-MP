@@ -100,23 +100,20 @@ const ItemDetail = ({ item }) => {
               </li>
             </ul>
           </div>
-          <div className="sizeGridContainer">
+{/*           <div className="sizeGridContainer">
             <div className="sizeGrid">
-              {/* talles */}
               <div className="divVacio"></div>
               <div className="talleS">S</div>
               <div className="talleM">M</div>
               <div className="talleL">L</div>
               <div className="talleXL">XL</div>
               <div className="talleXXL">XXL</div>
-              {/* largo */}
               <div className="longitud">Length</div>
               <div className="longitudS">60</div>
               <div className="longitudM">62</div>
               <div className="longitudL">66</div>
               <div className="longitudXL">68</div>
               <div className="longitudXXL">70</div>
-              {/* pecho */}
               <div className="pecho">Chest</div>
               <div className="pechoS">62</div>
               <div className="pechoM">64</div>
@@ -124,7 +121,7 @@ const ItemDetail = ({ item }) => {
               <div className="pechoXL">68</div>
               <div className="pechoXXL">72</div>
             </div>
-          </div>
+          </div> */}
 
           <div className="sizeChartContainerDesktop">
             <p className="sizeTitle">Size Chart</p>
@@ -143,24 +140,21 @@ const ItemDetail = ({ item }) => {
       <div className="itemDetailImgContainer">
         <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
 
-        <div className="sizeGridContainerDesktop">
+{/*         <div className="sizeGridContainerDesktop">
 
           <div className="sizeGrid">
-            {/* talles */}
             <div className="divVacio"></div>
             <div className="talleS">S</div>
             <div className="talleM">M</div>
             <div className="talleL">L</div>
             <div className="talleXL">XL</div>
             <div className="talleXXL">XXL</div>
-            {/* largo */}
             <div className="longitud">Length</div>
             <div className="longitudS">60</div>
             <div className="longitudM">62</div>
             <div className="longitudL">66</div>
             <div className="longitudXL">68</div>
             <div className="longitudXXL">70</div>
-            {/* pecho */}
             <div className="pecho">Chest</div>
             <div className="pechoS">62</div>
             <div className="pechoM">64</div>
@@ -178,7 +172,7 @@ const ItemDetail = ({ item }) => {
             </ul>
           </div>
 
-        </div>
+        </div> */}
       </div>
     </div>
   );
