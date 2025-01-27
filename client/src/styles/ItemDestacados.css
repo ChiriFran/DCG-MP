@@ -36,7 +36,7 @@
 
 .card {
   width:  300px;
-  height: 440px;
+  height: 400px;
   padding: 1rem 2rem;
   background: #27272700;
   position: relative;
@@ -51,6 +51,13 @@
   background-color: transparent;
   height: 100%;
   width: 100%;
+  transition: 0.3s ease;
+  transform: scale(1);
+}
+
+/*Hover*/
+.card-img:hover {
+  transform: scale(1.1);
   transition: 0.3s ease;
 }
 
@@ -73,21 +80,11 @@
 }
 
 .text-body {
+  text-transform: uppercase;
   font-size: 1rem;
   font-weight: 400;
 }
 
-/*Hover*/
-.card-img:hover {
-  transform: translateY(-10%);
-  box-shadow: rgba(246, 246, 246, 0.165) 0px 13px 47px -5px,
-    rgba(94, 94, 94, 0.3) 0px 8px 16px -8px;
-}
-
-.card-button:hover {
-  border: 1px solid #d5cdc7;
-  background-color: #000000;
-}
 
 @media screen and (max-width: 700px) {
   .card {

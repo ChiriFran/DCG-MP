@@ -97,7 +97,7 @@
   justify-content: center;
   background-color: #0a0a0a;
   z-index: 10000;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0 1rem;
 }
 
 .usernameNav {
