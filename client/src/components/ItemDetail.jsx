@@ -100,28 +100,6 @@ const ItemDetail = ({ item }) => {
               </li>
             </ul>
           </div>
-{/*           <div className="sizeGridContainer">
-            <div className="sizeGrid">
-              <div className="divVacio"></div>
-              <div className="talleS">S</div>
-              <div className="talleM">M</div>
-              <div className="talleL">L</div>
-              <div className="talleXL">XL</div>
-              <div className="talleXXL">XXL</div>
-              <div className="longitud">Length</div>
-              <div className="longitudS">60</div>
-              <div className="longitudM">62</div>
-              <div className="longitudL">66</div>
-              <div className="longitudXL">68</div>
-              <div className="longitudXXL">70</div>
-              <div className="pecho">Chest</div>
-              <div className="pechoS">62</div>
-              <div className="pechoM">64</div>
-              <div className="pechoL">66</div>
-              <div className="pechoXL">68</div>
-              <div className="pechoXXL">72</div>
-            </div>
-          </div> */}
 
           <div className="sizeChartContainerDesktop">
             <p className="sizeTitle">Size Chart</p>
@@ -139,40 +117,6 @@ const ItemDetail = ({ item }) => {
 
       <div className="itemDetailImgContainer">
         <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
-
-{/*         <div className="sizeGridContainerDesktop">
-
-          <div className="sizeGrid">
-            <div className="divVacio"></div>
-            <div className="talleS">S</div>
-            <div className="talleM">M</div>
-            <div className="talleL">L</div>
-            <div className="talleXL">XL</div>
-            <div className="talleXXL">XXL</div>
-            <div className="longitud">Length</div>
-            <div className="longitudS">60</div>
-            <div className="longitudM">62</div>
-            <div className="longitudL">66</div>
-            <div className="longitudXL">68</div>
-            <div className="longitudXXL">70</div>
-            <div className="pecho">Chest</div>
-            <div className="pechoS">62</div>
-            <div className="pechoM">64</div>
-            <div className="pechoL">66</div>
-            <div className="pechoXL">68</div>
-            <div className="pechoXXL">72</div>
-          </div>
-
-          <div className="careInstructions">
-            <p>Care Instructions</p>
-            <ul>
-              <li>Wash inside-out on a gentle cycle at 30°C</li>
-              <li>Wash with similar colors</li>
-              <li>Avoid ironing over printed designs</li>
-            </ul>
-          </div>
-
-        </div> */}
       </div>
     </div>
   );
