@@ -17,11 +17,11 @@ const ItemDetail = ({ item }) => {
   };
 
   const handleAgregarAlCarrito = () => {
-    if (!talleSeleccionado) {
+    if (item.category === "T-shirts" && !talleSeleccionado) {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
-    agregarAlCarrito(item, cantidad, talleSeleccionado);
+    agregarAlCarrito(item, cantidad, talleSeleccionado || "One size");
     setCantidad(1);
     setTalleSeleccionado("");
   };
@@ -50,15 +50,23 @@ const ItemDetail = ({ item }) => {
         <div className="sizeSelectorContainer">
           <h3>Size</h3>
           <div id="size-selector">
-            {["S", "M", "L", "XL", "XXL"].map((talle) => (
-              <button
-                key={talle}
-                className={`size-button ${talle === talleSeleccionado ? "selected" : ""}`}
-                onClick={() => handleTalleSeleccionado(talle)}
-              >
-                {talle}
+            {item.category === "T-shirts" ? (
+              // Mostrar todos los talles disponibles
+              ["S", "M", "L", "XL", "XXL"].map((talle) => (
+                <button
+                  key={talle}
+                  className={`size-button ${talle === talleSeleccionado ? "selected" : ""}`}
+                  onClick={() => handleTalleSeleccionado(talle)}
+                >
+                  {talle}
+                </button>
+              ))
+            ) : (
+              // Mostrar un solo botón deshabilitado para talla única
+              <button className="size-button single-size" disabled>
+                Unique sizes available
               </button>
-            ))}
+            )}
           </div>
         </div>
 
@@ -79,6 +87,8 @@ const ItemDetail = ({ item }) => {
         </p>
 
         <p className="itemDetailDescription">{item.description}</p>
+
+
         <div className="itemDetailDescriptionList">
           <ul>
             <li>Unisex Hoodie</li>
@@ -118,7 +128,6 @@ const ItemDetail = ({ item }) => {
       <div className="itemDetailImgContainer">
         <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
       </div>
-
     </div>
   );
 };

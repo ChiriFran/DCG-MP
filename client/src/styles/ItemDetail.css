@@ -216,6 +216,13 @@
   color: rgb(136, 135, 135);
 }
 
+.size-button.single-size {
+  background-color: rgba(128, 128, 128, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+}
+
+
 @media screen and (max-width: 700px) {
 
   .itemDetailContainer {
