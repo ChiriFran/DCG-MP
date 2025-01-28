@@ -21,7 +21,7 @@ const ItemDetail = ({ item }) => {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
-    agregarAlCarrito(item, cantidad, talleSeleccionado || "One size");
+    agregarAlCarrito(item, cantidad, talleSeleccionado || "Unique sizes available");
     setCantidad(1);
     setTalleSeleccionado("");
   };
