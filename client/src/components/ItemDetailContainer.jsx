@@ -16,7 +16,10 @@ const ItemDetailContainer = () => {
   return (
     <>
       <div className="detailContainer">{item && <ItemDetail item={item} />}</div>
-      <ItemListContainerDestacados />
+      <div className="itemDetailDestacadosContainer">
+        <ItemListContainerDestacados />
+      </div>
+
     </>
   );
 };
