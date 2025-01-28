@@ -11,29 +11,52 @@ const ItemListDestacados = ({ productos }) => {
     const updateItemsPerView = () => {
       const width = window.innerWidth;
       if (width <= 700) {
-        setItemsPerView(1); // Solo 1 elemento visible hasta 700px
+        setItemsPerView(1);
       } else if (width <= 1024) {
-        setItemsPerView(2); // 2 elementos visibles hasta 1024px
+        setItemsPerView(2);
       } else {
-        setItemsPerView(4); // Valor por defecto para pantallas grandes
+        setItemsPerView(4);
       }
     };
 
-    updateItemsPerView(); // Inicializa el valor
-    window.addEventListener("resize", updateItemsPerView); // Escucha cambios en el tamaño de la ventana
-
+    updateItemsPerView();
+    window.addEventListener("resize", updateItemsPerView);
     return () => {
-      window.removeEventListener("resize", updateItemsPerView); // Limpia el evento al desmontar el componente
+      window.removeEventListener("resize", updateItemsPerView);
     };
   }, []);
 
+  // Manejar el avance del slider
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex + itemsPerView < productos.length ? prevIndex + itemsPerView : prevIndex
+    );
+  };
+
+  // Manejar el retroceso del slider
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex - itemsPerView >= 0 ? prevIndex - itemsPerView : 0
+    );
+  };
+
+  // Calcular el desplazamiento del slider
+  const sliderOffset = -(currentIndex * (100 / itemsPerView));
+
   return (
     <div className="productosDestacadosContainer">
+      <button
+        className="sliderButton prevButton"
+        onClick={handlePrev}
+        disabled={currentIndex === 0}
+      >
+        &#8592;
+      </button>
+
       <div className="productosDestacadosWrapper">
         <div
           className="productosDestacados"
-          data-items-per-view={itemsPerView}
-          data-current-index={currentIndex}
+          style={{ transform: `translateX(${sliderOffset}%)` }}
         >
           {productos.map((prod, index) => (
             <div
@@ -46,6 +69,14 @@ const ItemListDestacados = ({ productos }) => {
           ))}
         </div>
       </div>
+
+      <button
+        className="sliderButton nextButton"
+        onClick={handleNext}
+        disabled={currentIndex + itemsPerView >= productos.length}
+      >
+        &#8594;
+      </button>
     </div>
   );
 };

@@ -1,8 +1,10 @@
 .productosDestacadosContainer {
   display: flex;
+  align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
+  width: 80%;
+  margin: 1rem 0;
 }
 
 .homeText {
@@ -16,6 +18,7 @@
   padding: 1rem 0;
 }
 
+
 .productosDestacadosWrapper {
   overflow: hidden;
   width: 80%;
@@ -24,11 +27,13 @@
 .productosDestacados {
   display: flex;
   transition: transform 0.5s ease-in-out;
+  will-change: transform;
 }
 
 .sliderItem {
   flex-shrink: 0;
   box-sizing: border-box;
+  padding: 0 10px;
 }
 
 .sliderItem[data-items-per-view="1"] {
@@ -43,16 +48,60 @@
   width: 25%;
 }
 
+.sliderButton {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 10px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.sliderButton:hover {
+  opacity: 1;
+}
+
+.sliderButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
 @media screen and (max-width: 700px) {
+
+  .productosDestacadosContainer {
+    width: 95%;
+  }
+
   .productosDestacadosWrapper {
     width: 90%;
   }
 
-  .productosDestacadosContainer {
-    width: 100%;
-  }
-
   .sliderItem {
     padding: 0 5px;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
   }
+
+  .sliderButton {
+    font-size: 1.2rem;
+    padding: 8px;
+  }
+
+
 }
