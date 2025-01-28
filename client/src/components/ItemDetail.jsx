@@ -118,6 +118,7 @@ const ItemDetail = ({ item }) => {
       <div className="itemDetailImgContainer">
         <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
       </div>
+
     </div>
   );
 };
