@@ -44,23 +44,36 @@ export default async function handler(req, res) {
 
     const paymentId = event.data.id;
     const status = event.data.status;
-    const timestamp = admin.firestore.Timestamp.now();
+    const timestamp = admin.firestore.Timestamp.now();  // Se guarda la fecha y hora del webhook
 
-    // Registro dependiendo del estado
-    const orderRef = db.collection(
-      status === "approved" ? "pedidosExitosos" : status === "rejected" ? "pedidosRechazados" : "pedidosPendientes"
-    ).doc(paymentId);
+    // Determina la colección según el estado del pago
+    let collectionName;
+    let estado;
+
+    if (status === "approved") {
+      collectionName = "pedidosExitosos";
+      estado = "pago completado";
+    } else if (status === "rejected") {
+      collectionName = "pedidosRechazados";
+      estado = "pago rechazado";
+    } else {
+      collectionName = "pedidosPendientes";
+      estado = "pendiente";
+    }
+
+    // Registro en la colección correspondiente
+    const orderRef = db.collection(collectionName).doc(paymentId);
 
     await orderRef.set(
       {
-        estado: status === "approved" ? "pago completado" : status === "rejected" ? "pago rechazado" : "pendiente",
+        estado: estado,
         fechaHora: timestamp,
-        status: status,
+        status: status, // Guardamos también el estado de Mercado Pago
       },
       { merge: true }
     );
 
-    console.log(`Pago con ID: ${paymentId}, Estado: ${status}`);
+    console.log(`Pago con ID: ${paymentId}, Estado: ${estado}, Fecha: ${timestamp.toDate()}`);
 
     return res.status(200).json({ message: "Webhook processed" });
   } catch (error) {
@@ -68,4 +81,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
-
