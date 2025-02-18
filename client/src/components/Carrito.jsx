@@ -115,7 +115,7 @@ const Carrito = () => {
 
           vaciarCarrito(); // Vaciar el carrito después de redirigir
           setIsProcessing(""); // Resetear el estado después del flujo
-        }, 1000);
+        }, 200);
       } else {
         alert("The order could not be saved. Please try again.");
         setIsProcessing(""); // Resetear el estado si hay un error
