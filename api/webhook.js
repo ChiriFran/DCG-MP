@@ -1,6 +1,3 @@
-import admin from './firebaseAdmin';
-const db = admin.firestore(); // Usamos `admin.firestore()` para obtener la referencia a Firestore
-
 export const config = {
   api: {
     bodyParser: false, // Desactiva el body parser de Vercel
@@ -37,40 +34,17 @@ export default async function handler(req, res) {
 
     console.log('Event ID:', event.id); // Log del ID del evento
 
-    // Definir la fecha y hora del evento
-    const timestamp = new Date().toISOString();
-
-    // Datos básicos del pedido
-    const orderData = {
-      id: event.id,
-      timestamp: timestamp,
-      total_amount: event.data?.amount,  // Asumiendo que el total del pago está en `event.data.amount`
-      status: event.data?.status,  // Estado del pago
-      items: event.data?.items || [],  // Detalles de los artículos si están disponibles
-    };
-
-    // Registrar el evento según el tipo de pago
+    // Manejar diferentes tipos de eventos
     switch (event.action) {
       case 'payment.created':
         console.log('Payment created for order:', event.id);
-
-        // Crear un documento en "pedidosPendientes"
-        await db.collection('pedidosPendientes').doc(event.id).set(orderData);
-
+        // Registrar el pago en la colección "pedidos"
+        // Aquí puedes agregar la lógica para registrar el pago en Firebase o actualizar tu base de datos.
         return res.status(200).json({ message: 'Payment created' });
-
+        
       case 'payment.updated':
         console.log('Payment updated for order:', event.id);
-
-        // Verifica si el pago fue exitoso o rechazado
-        if (event.data.status === 'approved') {
-          // Si el pago fue exitoso, agregarlo a "pedidosExitosos"
-          await db.collection('pedidosExitosos').doc(event.id).set(orderData);
-        } else if (event.data.status === 'rejected') {
-          // Si el pago fue rechazado, agregarlo a "pedidosRechazados"
-          await db.collection('pedidosRechazados').doc(event.id).set(orderData);
-        }
-
+        // Aquí puedes manejar la actualización del pago, por ejemplo, confirmando un pago exitoso o rechazado
         return res.status(200).json({ message: 'Payment updated' });
 
       default:
