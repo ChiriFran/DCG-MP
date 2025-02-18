@@ -1,5 +1,6 @@
 import { db } from "./firebaseAdmin";
 import fetch from "node-fetch";
+import { Timestamp } from "firebase-admin/firestore";
 
 export const config = {
   api: {
@@ -53,11 +54,18 @@ export default async function handler(req, res) {
     const paymentData = await mpResponse.json();
     console.log("Payment data:", paymentData);
 
-    const orderId = paymentData.order.id;
+    const orderId = paymentData.external_reference; // Identificador de la orden en tu sistema
+    if (!orderId) {
+      console.error("No order ID found in payment data.");
+      return res.status(400).json({ message: "No order ID in payment data" });
+    }
+
     const status = paymentData.status; // "approved", "pending", "rejected"
     const amount = paymentData.transaction_amount;
-    const items = paymentData.additional_info.items;
-    const createdAt = paymentData.date_created;
+    const items = paymentData.additional_info?.items || [];
+    const createdAt = paymentData.date_created
+      ? Timestamp.fromDate(new Date(paymentData.date_created))
+      : Timestamp.now();
 
     let collectionName;
     if (status === "approved") {
