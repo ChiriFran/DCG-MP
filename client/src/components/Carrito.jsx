@@ -71,8 +71,11 @@ const Carrito = () => {
     const pedido = {
       cliente: shippingData,
       productos: carrito,
-      total: precioTotal(), //Agregar valor de envio 
-      status: "pending",
+      total: precioTotal(), // Puedes agregar aquí el valor del envío si corresponde
+      status: "pending", // Estado inicial del pedido
+      createdAt: new Date(), // Agrega la fecha de creación
+      paymentStatus: "pending", // Estatus de pago (pending por ahora)
+      paymentConfirmationCode: null, // Almacenará el código de confirmación de Mercado Pago
     };
 
     try {
@@ -90,7 +93,6 @@ const Carrito = () => {
     }
   };
 
-  // Maneja la compra
   const handleBuy = async (e) => {
     e.preventDefault();
 
@@ -123,6 +125,7 @@ const Carrito = () => {
       setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
+
 
 
 

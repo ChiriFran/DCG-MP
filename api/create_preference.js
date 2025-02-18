@@ -2,78 +2,70 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Permite solicitudes desde cualquier dominio
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS"); // Métodos permitidos
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Cabeceras permitidas
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "POST") {
     try {
-      const { items, shipping, orderId } = req.body; // Asegúrate de pasar `orderId` desde tu frontend
+      const { items, shipping, orderId } = req.body;
 
-      if (!shipping || !shipping.name || !shipping.address) {
-        return res.status(400).json({ error: "Missing shipping data" });
+      if (!items || items.length === 0 || !shipping || !shipping.name || !shipping.address) {
+        return res.status(400).json({ error: "Missing required data" });
       }
 
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
+      const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
-      const client = new MercadoPagoConfig({
-        accessToken: mpAccessToken,
-      });
-      
+      // Crear el cuerpo de la preferencia
       const body = {
-        items: items.map((item) => ({
-          title: item.title,
-          quantity: Number(item.quantity),
-          unit_price: Number(item.unit_price),
+        items: items.map(({ title, quantity, unit_price }) => ({
+          title,
+          quantity: Number(quantity),
+          unit_price: Number(unit_price),
           currency_id: "ARS"
         })),
-
         payer: {
-          name: shipping.name || "Jonh", // Nombre del comprador (valor por defecto)
-          email: shipping.email || "Doe", // Email del comprador (valor por defecto)
+          name: shipping.name,
+          email: shipping.email,
           phone: {
-            area_code: shipping.phoneArea || "11",
-            number: shipping.phone || "1234-1234"
+            area_code: shipping.phoneArea,
+            number: shipping.phone
           },
           address: {
-            street_name: shipping.address || "Direccion", // Dirección obligatoria
-            zip_code: shipping.zipCode || "0000", // Código postal
-            street_number: Number(shipping.streetNumber) || 0, // Número de calle
-            floor: shipping.floor || "", // Piso (opcional)
-            apartment: shipping.apartment || "", // Departamento (opcional)
-            city: shipping.city || "Ciudad", // Ciudad
-            state_name: shipping.province || "Provincia", // Provincia/estado
-            country: "AR" // País (obligatorio)
+            street_name: shipping.address,
+            zip_code: shipping.zipCode,
+            street_number: Number(shipping.streetNumber),
+            floor: shipping.floor || "",
+            apartment: shipping.apartment || "",
+            city: shipping.city,
+            state_name: shipping.province,
+            country: "AR"
           }
         },
-
         shipments: {
           mode: "not_specified",
-          cost: 5, // Costo fijo del envío en tu moneda (ARS en este caso)
+          cost: 5000,
           receiver_address: {
-            street_name: shipping.address || "Direccion", // Dirección obligatoria
-            street_number: Number(shipping.streetNumber) || 0, // Número de calle
-            zip_code: shipping.zipCode || "0000" // Código postal
+            street_name: shipping.address,
+            street_number: Number(shipping.streetNumber),
+            zip_code: shipping.zipCode
           }
         },
-
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
           failure: "https://dcgstore.vercel.app/#/BuyFailed",
           pending: "https://dcgstore.vercel.app/#/BuyPending",
         },
-
         statement_descriptor: "DCGSTORE",
-
-        external_reference: orderId, // Aquí agregas el external_reference
-
+        external_reference: orderId,
         auto_return: "approved"
       };
 
       const preference = new Preference(client);
       const result = await preference.create({ body });
 
-      console.log(result); // Log de la respuesta de Mercado Pago
+      console.log(result);
       res.status(200).json({ id: result.id });
     } catch (error) {
       console.error("Error al crear la preferencia:", error);
