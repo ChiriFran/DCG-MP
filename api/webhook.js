@@ -1,4 +1,4 @@
-import admin from "../../firebaseAdmin"; // Asegúrate de que esta ruta sea correcta
+import admin from './firebaseAdmin';
 const db = admin.firestore(); // Usamos `admin.firestore()` para obtener la referencia a Firestore
 
 export const config = {
