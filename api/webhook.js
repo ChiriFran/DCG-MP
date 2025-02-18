@@ -1,4 +1,4 @@
-import { db } from "./firebaseAdmin";
+import { db } from "../api/firebaseAdmin";
 import fetch from "node-fetch";
 import { Timestamp } from "firebase-admin/firestore";
 
