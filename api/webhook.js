@@ -1,95 +1,58 @@
-import { db } from "../api/firebaseAdmin";
-import fetch from "node-fetch";
-import { Timestamp } from "firebase-admin/firestore";
-
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: false, // Desactiva el body parser de Vercel
   },
 };
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ message: "Method Not Allowed" });
+    if (req.method !== 'POST') {
+      return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
     // Leer el cuerpo del evento
     const rawBody = await new Promise((resolve, reject) => {
-      let data = "";
-      req.on("data", (chunk) => {
+      let data = '';
+      req.on('data', chunk => {
         data += chunk;
       });
-      req.on("end", () => resolve(data));
-      req.on("error", (err) => reject(err));
+      req.on('end', () => {
+        resolve(data);
+      });
+      req.on('error', (err) => reject(err));
     });
 
-    console.log("Webhook received:", rawBody);
+    console.log('Webhook received:', rawBody); // Log para ver el cuerpo recibido
+
+    // El cuerpo del evento está en formato JSON
     const event = JSON.parse(rawBody);
 
-    if (!event || !event.data || !event.data.id) {
-      console.error("Invalid event data:", event);
-      return res.status(400).json({ message: "Invalid event data" });
+    if (!event || !event.id) {
+      console.error('Invalid event data:', event); // Log de error
+      return res.status(400).json({ message: 'Invalid event data' });
     }
 
-    const paymentId = event.data.id;
-    console.log("Processing payment ID:", paymentId);
+    console.log('Event ID:', event.id); // Log del ID del evento
 
-    // Consultar el estado real del pago en Mercado Pago
-    const mpResponse = await fetch(
-      `https://api.mercadopago.com/v1/payments/${paymentId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-        },
-      }
-    );
+    // Manejar diferentes tipos de eventos
+    switch (event.action) {
+      case 'payment.created':
+        console.log('Payment created for order:', event.id);
+        // Registrar el pago en la colección "pedidos"
+        // Aquí puedes agregar la lógica para registrar el pago en Firebase o actualizar tu base de datos.
+        return res.status(200).json({ message: 'Payment created' });
+        
+      case 'payment.updated':
+        console.log('Payment updated for order:', event.id);
+        // Aquí puedes manejar la actualización del pago, por ejemplo, confirmando un pago exitoso o rechazado
+        return res.status(200).json({ message: 'Payment updated' });
 
-    if (!mpResponse.ok) {
-      console.error("Error fetching payment details from Mercado Pago");
-      return res.status(500).json({ message: "Error fetching payment details" });
+      default:
+        console.error('Unsupported event action:', event.action);
+        return res.status(400).json({ message: 'Unsupported event action' });
     }
-
-    const paymentData = await mpResponse.json();
-    console.log("Payment data:", paymentData);
-
-    const orderId = paymentData.external_reference; // Identificador de la orden en tu sistema
-    if (!orderId) {
-      console.error("No order ID found in payment data.");
-      return res.status(400).json({ message: "No order ID in payment data" });
-    }
-
-    const status = paymentData.status; // "approved", "pending", "rejected"
-    const amount = paymentData.transaction_amount;
-    const items = paymentData.additional_info?.items || [];
-    const createdAt = paymentData.date_created
-      ? Timestamp.fromDate(new Date(paymentData.date_created))
-      : Timestamp.now();
-
-    let collectionName;
-    if (status === "approved") {
-      collectionName = "pedidosExitosos";
-    } else if (status === "pending") {
-      collectionName = "pedidosPendientes";
-    } else {
-      collectionName = "pedidosRechazados";
-    }
-
-    // Guardar en Firebase
-    await db.collection(collectionName).doc(String(orderId)).set({
-      orderId,
-      paymentId,
-      status,
-      amount,
-      items,
-      createdAt,
-    });
-
-    console.log(`Order ${orderId} saved in ${collectionName}`);
-    return res.status(200).json({ message: "Payment processed successfully" });
   } catch (error) {
-    console.error("Error processing webhook:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error processing webhook:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 }
