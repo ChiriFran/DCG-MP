@@ -1,4 +1,4 @@
-import { db } from "../../firebaseAdmin";
+import { db } from "./firebaseAdmin";
 import fetch from "node-fetch";
 
 export const config = {
