@@ -13,6 +13,11 @@ if (!admin.apps.length) {
 
 const db = getFirestore();
 
+// Configuración de Firestore para ignorar propiedades undefined
+db.settings({
+  ignoreUndefinedProperties: true,
+});
+
 export const config = {
   api: {
     bodyParser: false,
@@ -37,7 +42,7 @@ export default async function handler(req, res) {
     console.log("Webhook received:", rawBody);
     const event = JSON.parse(rawBody);
 
-    if (!event || !event.data || !event.data.id) {
+    if (!event || !event.data || !event.data.id || !event.data.status) {
       console.error("Invalid event data:", event);
       return res.status(400).json({ message: "Invalid event data" });
     }
