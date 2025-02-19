@@ -1,4 +1,4 @@
-import { db } from './firebaseAdmin';
+import { db } from './firebaseAdmin.js';
 
 export const config = {
   api: {
