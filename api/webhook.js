@@ -1,4 +1,4 @@
-const { db } = require('./firebaseAdmin'); // Importar el objeto db de firebaseAdmin
+import { db } from './firebaseAdmin'; // Importar el objeto db de firebaseAdmin
 
 export const config = {
   api: {

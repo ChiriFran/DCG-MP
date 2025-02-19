@@ -1,8 +1,9 @@
-const admin = require('firebase-admin');
-const dotenv = require('dotenv');
+import admin from 'firebase-admin';
+import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Cargar las variables de entorno
 
+// Inicializar Firebase Admin con las credenciales del servicio
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -14,6 +15,6 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.firestore();
+const db = admin.firestore(); // Obtener la referencia de Firestore
 
-module.exports = { db };
+export { db }; // Exportar el objeto db
