@@ -20,20 +20,26 @@ export default async function handler(req, res) {
       req.on('error', err => reject(err));
     });
 
-    console.log('Webhook received:', rawBody);
     const event = JSON.parse(rawBody);
+    console.log('Evento recibido:', JSON.stringify(event, null, 2));
 
     if (!event || !event.id) {
       console.error('Invalid event data:', event);
       return res.status(400).json({ message: 'Invalid event data' });
     }
 
-    console.log('Event ID:', event.id);
-    const paymentStatus = event.data.status; // Estado del pago (approved, rejected, pending)
+    // Asegurar que sea un evento de pago
+    if (event.type !== 'payment') {
+      console.log('Evento ignorado:', event.type);
+      return res.status(200).json({ message: `Evento ${event.type} ignorado` });
+    }
+
+    // Obtener el estado de pago de forma segura
+    const paymentStatus = event?.data?.status || 'unknown';
     const collectionName = getCollectionName(paymentStatus);
 
-    if (!collectionName) {
-      console.error('Unknown payment status:', paymentStatus);
+    if (!collectionName || paymentStatus === 'unknown') {
+      console.error('Unknown payment status:', paymentStatus, 'Evento recibido:', event);
       return res.status(400).json({ message: 'Unknown payment status' });
     }
 
@@ -41,13 +47,13 @@ export default async function handler(req, res) {
     await db.collection(collectionName).doc(event.id).set({
       id: event.id,
       status: paymentStatus,
-      amount: event.data.transaction_amount || 0,
-      currency: event.data.currency_id || 'ARS',
-      email: event.data.payer?.email || '',
+      amount: event?.data?.transaction_amount || 0,
+      currency: event?.data?.currency_id || 'ARS',
+      email: event?.data?.payer?.email || '',
       date: new Date(),
     });
 
-    console.log(`Payment registered in ${collectionName}:`, event.id);
+    console.log(`Payment registrado en ${collectionName}:`, event.id);
     return res.status(200).json({ message: `Payment saved in ${collectionName}` });
 
   } catch (error) {
