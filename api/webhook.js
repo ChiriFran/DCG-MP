@@ -1,4 +1,4 @@
-import { db } from './firebaseAdmin';
+const { db } = require('./firebaseAdmin'); // Importar el objeto db de firebaseAdmin
 
 export const config = {
   api: {
@@ -20,20 +20,16 @@ export default async function handler(req, res) {
       req.on('error', err => reject(err));
     });
 
-    // Log para ver el cuerpo completo recibido
-    console.log('Evento recibido completo:', rawBody);
-
-    // El cuerpo del evento está en formato JSON
+    console.log('Webhook received:', rawBody);
     const event = JSON.parse(rawBody);
 
     if (!event || !event.id) {
-      console.error('Invalid event data:', event); // Log de error
+      console.error('Invalid event data:', event);
       return res.status(400).json({ message: 'Invalid event data' });
     }
 
-    console.log('Evento completo:', JSON.stringify(event, null, 2)); // Log detallado del evento
-
-    const paymentStatus = event.data?.status; // Asegurarse de que `status` esté dentro de `data`
+    console.log('Event ID:', event.id);
+    const paymentStatus = event.data.status; // Estado del pago (approved, rejected, pending)
     const collectionName = getCollectionName(paymentStatus);
 
     if (!collectionName) {
@@ -45,17 +41,17 @@ export default async function handler(req, res) {
     await db.collection(collectionName).doc(event.id).set({
       id: event.id,
       status: paymentStatus,
-      amount: event.data?.transaction_amount || 0,
-      currency: event.data?.currency_id || 'ARS',
-      email: event.data?.payer?.email || '',
+      amount: event.data.transaction_amount || 0,
+      currency: event.data.currency_id || 'ARS',
+      email: event.data.payer?.email || '',
       date: new Date(),
     });
 
-    console.log(`Pago registrado en ${collectionName}:`, event.id);
-    return res.status(200).json({ message: `Pago guardado en ${collectionName}` });
+    console.log(`Payment registered in ${collectionName}:`, event.id);
+    return res.status(200).json({ message: `Payment saved in ${collectionName}` });
 
   } catch (error) {
-    console.error('Error procesando el webhook:', error);
+    console.error('Error processing webhook:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 }

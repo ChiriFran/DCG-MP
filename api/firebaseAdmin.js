@@ -1,21 +1,19 @@
-// firebaseAdmin.js
+const admin = require('firebase-admin');
+const dotenv = require('dotenv');
 
-import admin from 'firebase-admin';
+dotenv.config();
 
-// Verificamos si Firebase Admin ya está inicializado
 if (!admin.apps.length) {
-  // Inicialización de Firebase con las credenciales de variables de entorno
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Reemplaza saltos de línea
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     }),
+    databaseURL: process.env.FIREBASE_DATABASE_URL,
   });
-} else {
-  admin.app(); // Si ya está inicializado, utilizamos la instancia existente
 }
 
 const db = admin.firestore();
 
-export { db };
+module.exports = { db };
