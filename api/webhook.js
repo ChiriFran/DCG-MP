@@ -1,76 +1,67 @@
-import axios from 'axios';
-import admin from 'firebase-admin';
+import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
 
-admin.initializeApp();
-const db = admin.firestore();
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método no permitido" });
+  }
 
-export const handler = async (req, res) => {
   try {
-    const { payment_id } = req.body; // ID de pago recibido en el webhook
-    const response = await axios.get(`https://api.mercadopago.com/v1/payments/${payment_id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}`,
-      },
+    // Cambiar esto de req.json() a req.body
+    const body = req.body; // ✅ Utiliza req.body
+
+    const { action, data } = body; // 🔹 Extrae la acción y los datos del webhook
+
+    if (!data || !data.id) {
+      return res.status(400).json({ error: "ID de pago no proporcionado" });
+    }
+
+    const paymentId = data.id;
+    const paymentStatus = action; // Puede ser "payment.created", "payment.updated", etc.
+
+    // Mostrar el estado del pago recibido para depuración
+    console.log("Estado del pago:", paymentStatus);
+
+    // 📌 Determinar el estado del pedido en base a la acción
+    let estadoPedido;
+    let coleccion;
+
+    // Añadir soporte para payment.created
+    if (paymentStatus === "payment.created") {
+      estadoPedido = "pago creado";
+      coleccion = "pedidosPendientes"; // O lo que corresponda
+    } else if (paymentStatus.includes("payment.approved")) {
+      estadoPedido = "pago completado";
+      coleccion = "pedidosExitosos"; // Este es el destino correcto
+    } else if (paymentStatus.includes("payment.rejected")) {
+      estadoPedido = "pago rechazado";
+      coleccion = "pedidosRechazados";
+    } else if (paymentStatus.includes("payment.pending")) {
+      estadoPedido = "pago pendiente";
+      coleccion = "pedidosPendientes";
+    } else {
+      return res.status(200).json({ message: "Webhook recibido, sin cambios" });
+    }
+
+    // Validar datos del comprador
+    const comprador = data.user_id || "desconocido"; // Si no existe user_id, asigna "desconocido"
+    const precio = data.transaction_amount || 0; // Si no existe, asigna 0
+    const email = (data.payer && data.payer.email) || "desconocido"; // Verificar si payer existe antes de acceder al email
+
+    // 📌 Registrar el pago con detalles adicionales
+    await db.collection(coleccion).doc(`${paymentId}`).set({
+      estado: estadoPedido,
+      fecha: new Date().toISOString(), // La hora de Buenos Aires ya está ajustada
+      comprador: comprador,
+      precio: precio,
+      email: email, // Se agrega el email
+      descripcion: data.description || "Sin descripción", // Descripción de la compra (si existe)
     });
 
-    if (response.status === 200) {
-      const paymentData = response.data;
+    console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
 
-      // Estado del pago
-      const paymentStatus = paymentData.status; // Puede ser 'approved', 'rejected', 'pending'
-      const paymentMethod = paymentData.payment_method_id; // Método de pago ('account_money', 'credit_card', etc.)
-
-      let coleccion = '';
-      let estadoPedido = '';
-
-      // Comprobar estado del pago y asignar la colección correspondiente
-      if (paymentStatus === 'approved') {
-        // Pago aprobado
-        if (paymentMethod === 'account_money') {
-          estadoPedido = 'pago completado con dinero en cuenta';
-          coleccion = 'pedidosExitosos'; // Guardar en pedidosExitosos si fue con dinero en cuenta
-        } else {
-          estadoPedido = 'pago completado';
-          coleccion = 'pedidosExitosos'; // Guardar en pedidosExitosos para otros métodos de pago
-        }
-      } else if (paymentStatus === 'rejected') {
-        // Pago rechazado
-        estadoPedido = 'pago rechazado';
-        coleccion = 'pedidosRechazados'; // Guardar en pedidosRechazados si fue rechazado
-      } else if (paymentStatus === 'pending') {
-        // Pago pendiente
-        estadoPedido = 'pago pendiente';
-        coleccion = 'pedidosPendientes'; // Guardar en pedidosPendientes si está pendiente
-      } else {
-        // Si no se reconoce el estado del pago
-        return res.status(400).json({ error: 'Estado de pago desconocido' });
-      }
-
-      // Datos del comprador (nombre y email)
-      const comprador = paymentData.payer || {};
-      const emailComprador = comprador.email || 'email desconocido';
-
-      // Guardar en la colección correcta en Firestore
-      await db.collection(coleccion).doc(`${payment_id}`).set({
-        estado: estadoPedido,
-        fecha: new Date().toISOString(),
-        comprador: {
-          nombre: comprador.name || 'nombre desconocido',
-          email: emailComprador,
-        },
-        precio: paymentData.transaction_amount || 0,
-      });
-
-      console.log(`Pedido ${payment_id} guardado en ${coleccion}`);
-
-      // Enviar respuesta exitosa
-      return res.status(200).json({ message: 'Pedido procesado correctamente' });
-    } else {
-      // Si la respuesta de Mercado Pago no es exitosa
-      return res.status(400).json({ error: 'Error al obtener la información del pago' });
-    }
+    return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
-    console.error('Error procesando webhook:', error);
-    return res.status(500).json({ error: 'Error procesando webhook' });
+    console.error("Error procesando webhook:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
-};
+}
