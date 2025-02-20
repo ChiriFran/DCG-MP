@@ -2,30 +2,31 @@ import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correct
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    console.error("Método no permitido");
     return res.status(405).json({ error: "Método no permitido" });
   }
 
   try {
     // Cambiar esto de req.json() a req.body
     const body = req.body; // ✅ Utiliza req.body
-    console.log("Webhook recibido:", body); // Log del cuerpo recibido
 
     const { action, data } = body; // 🔹 Extrae la acción y los datos del webhook
+
     if (!data || !data.id) {
-      console.error("ID de pago no proporcionado");
       return res.status(400).json({ error: "ID de pago no proporcionado" });
     }
 
     const paymentId = data.id;
     const paymentStatus = action; // Puede ser "payment.created", "payment.updated", etc.
-    console.log("ID de pago:", paymentId); // Log del paymentId
 
     // 📌 Determinar el estado del pedido en base a la acción
     let estadoPedido;
     let coleccion;
 
-    if (paymentStatus.includes("payment.approved")) {
+    // Añadir soporte para payment.created
+    if (paymentStatus === "payment.created") {
+      estadoPedido = "pago creado";
+      coleccion = "pedidosPendientes"; // O lo que corresponda
+    } else if (paymentStatus.includes("payment.approved")) {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
     } else if (paymentStatus.includes("payment.rejected")) {
@@ -35,21 +36,16 @@ export default async function handler(req, res) {
       estadoPedido = "pago pendiente";
       coleccion = "pedidosPendientes";
     } else {
-      console.error("Acción no válida:", paymentStatus);
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
     // 📌 Guardar el estado del pedido en Firebase
-    const docRef = await db.collection(coleccion).add({
+    await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
-      paymentId: paymentId, // Para hacer seguimiento con el ID de pago
     });
 
-    // Log del ID de documento generado
-    console.log(`Pedido ${paymentId} guardado en la colección ${coleccion}`);
-    console.log(`Documento ID: ${docRef.id}`); // Ver el ID del documento generado por Firebase
-
+    console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
