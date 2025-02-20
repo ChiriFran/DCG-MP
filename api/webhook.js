@@ -36,13 +36,15 @@ export default async function handler(req, res) {
     }
 
     // 📌 Guardar el estado del pedido en Firebase
-    await db.collection(coleccion).doc(`${paymentId}`).set({
+    const docRef = await db.collection(coleccion).add({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
+      paymentId: paymentId, // Para hacer seguimiento con el ID de pago
     });
-    
-    console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
-    ;
+
+    // Agregar log para verificar si el documento se guarda correctamente
+    console.log(`Pedido ${paymentId} guardado en la colección ${coleccion}`);
+    console.log(`Documento ID: ${docRef.id}`); // Ver el ID del documento generado por Firebase
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
