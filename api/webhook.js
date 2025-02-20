@@ -27,8 +27,24 @@ export default async function handler(req, res) {
       estadoPedido = "pago creado";
       coleccion = "pedidosPendientes"; // O lo que corresponda
     } else if (paymentStatus.includes("payment.approved")) {
-      estadoPedido = "pago completado";
-      coleccion = "pedidosExitosos";
+      // Verificar si el pago es con dinero en cuenta
+      const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: {
+          Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}`,
+        },
+      });
+
+      const paymentData = response.data;
+      const paymentMethod = paymentData.payment_method_id;
+
+      // Verificar si el pago fue con dinero en cuenta
+      if (paymentMethod === 'account_money') {
+        estadoPedido = "pago completado con dinero en cuenta";
+        coleccion = "pedidosExitosos";
+      } else {
+        estadoPedido = "pago completado";
+        coleccion = "pedidosExitosos";
+      }
     } else if (paymentStatus.includes("payment.rejected")) {
       estadoPedido = "pago rechazado";
       coleccion = "pedidosRechazados";
