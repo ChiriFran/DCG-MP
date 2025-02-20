@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     // Validar datos del comprador
     const comprador = data.user_id || "desconocido"; // Si no existe user_id, asigna "desconocido"
     const precio = data.transaction_amount || 0; // Si no existe, asigna 0
-    const email = data.payer.email || "desconocido"; // Si no existe el email, asigna "desconocido"
+    const email = (data.payer && data.payer.email) || "desconocido"; // Verificar si payer existe antes de acceder al email
 
     // 📌 Registrar el pago con detalles adicionales
     await db.collection(coleccion).doc(`${paymentId}`).set({
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
-    
+
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
