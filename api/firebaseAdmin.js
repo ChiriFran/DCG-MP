@@ -1,19 +1,20 @@
-import admin from 'firebase-admin';
-import dotenv from 'dotenv';
+import admin from "firebase-admin";
 
-dotenv.config(); // Cargar las variables de entorno
-
-// Inicializar Firebase Admin con las credenciales del servicio
+// Inicializar Firebase solo si no está inicializado
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-  });
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
+    });
+  } catch (error) {
+    console.error("Error inicializando Firebase:", error);
+  }
 }
 
-const db = admin.firestore(); // Obtener la referencia de Firestore
+const db = admin.firestore();
 
-export { db }; // Exportar el objeto db
+export { db };
