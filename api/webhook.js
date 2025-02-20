@@ -58,13 +58,14 @@ export default async function handler(req, res) {
     const comprador = paymentData.payer?.name || "desconocido";
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
-    const descripcion = paymentData.description || "Sin descripción";
 
     // 📌 Extraer los productos comprados
     const productosComprados =
       paymentData.additional_info?.items?.map((item) => item.title) || [];
 
     console.log("Productos comprados:", productosComprados);
+
+    //PARA CADA PRODUCTO COMPRADO ACCEDER A STOCK Y AGREGAR +1
 
     // 📌 Guardar la orden en Firebase con los productos
     await db.collection(coleccion).doc(`${paymentId}`).set({
@@ -73,7 +74,6 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      descripcion,
       productos: productosComprados, // ✅ Guardamos los nombres de los productos
     });
 
