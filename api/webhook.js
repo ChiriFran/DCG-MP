@@ -42,17 +42,23 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
+    // Validar datos del comprador
+    const comprador = data.user_id || "desconocido"; // Si no existe user_id, asigna "desconocido"
+    const precio = data.transaction_amount || 0; // Si no existe, asigna 0
+    const email = data.payer.email || "desconocido"; // Si no existe el email, asigna "desconocido"
+
     // 📌 Registrar el pago con detalles adicionales
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(), // La hora de Buenos Aires ya está ajustada
-      comprador: data.user_id, // Información del comprador (ajustar según el webhook)
-      precio: data.transaction_amount, // Monto de la compra
+      comprador: comprador,
+      precio: precio,
+      email: email, // Se agrega el email
       descripcion: data.description || "Sin descripción", // Descripción de la compra (si existe)
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
-
+    
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
