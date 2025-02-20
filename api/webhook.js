@@ -1,11 +1,12 @@
-const axios = require('axios');
-const admin = require('firebase-admin');
+import axios from 'axios';
+import admin from 'firebase-admin';
+
 admin.initializeApp();
 const db = admin.firestore();
 
-exports.handler = async (req, res) => {
+export const handler = async (req, res) => {
   try {
-    const { payment_id } = req.body; // El ID de pago que llega con el webhook
+    const { payment_id } = req.body; // ID de pago recibido en el webhook
     const response = await axios.get(`https://api.mercadopago.com/v1/payments/${payment_id}`, {
       headers: {
         Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}`,
@@ -15,32 +16,33 @@ exports.handler = async (req, res) => {
     if (response.status === 200) {
       const paymentData = response.data;
 
-      // Obtener estado y método de pago
-      const paymentStatus = paymentData.status; // 'approved', 'rejected', 'pending'
-      const paymentMethod = paymentData.payment_method_id; // 'account_money', 'credit_card', etc.
+      // Estado del pago
+      const paymentStatus = paymentData.status; // Puede ser 'approved', 'rejected', 'pending'
+      const paymentMethod = paymentData.payment_method_id; // Método de pago ('account_money', 'credit_card', etc.)
 
       let coleccion = '';
       let estadoPedido = '';
 
-      // Verificar el estado del pago y método
+      // Comprobar estado del pago y asignar la colección correspondiente
       if (paymentStatus === 'approved') {
         // Pago aprobado
         if (paymentMethod === 'account_money') {
           estadoPedido = 'pago completado con dinero en cuenta';
-          coleccion = 'pedidosExitosos'; // Se guarda en pedidosExitosos si el pago es con dinero en cuenta
+          coleccion = 'pedidosExitosos'; // Guardar en pedidosExitosos si fue con dinero en cuenta
         } else {
           estadoPedido = 'pago completado';
-          coleccion = 'pedidosExitosos'; // Si no es dinero en cuenta, también va a pedidosExitosos
+          coleccion = 'pedidosExitosos'; // Guardar en pedidosExitosos para otros métodos de pago
         }
       } else if (paymentStatus === 'rejected') {
         // Pago rechazado
         estadoPedido = 'pago rechazado';
-        coleccion = 'pedidosRechazados';
+        coleccion = 'pedidosRechazados'; // Guardar en pedidosRechazados si fue rechazado
       } else if (paymentStatus === 'pending') {
         // Pago pendiente
         estadoPedido = 'pago pendiente';
-        coleccion = 'pedidosPendientes';
+        coleccion = 'pedidosPendientes'; // Guardar en pedidosPendientes si está pendiente
       } else {
+        // Si no se reconoce el estado del pago
         return res.status(400).json({ error: 'Estado de pago desconocido' });
       }
 
@@ -48,7 +50,7 @@ exports.handler = async (req, res) => {
       const comprador = paymentData.payer || {};
       const emailComprador = comprador.email || 'email desconocido';
 
-      // Guardar el estado del pedido en Firebase
+      // Guardar en la colección correcta en Firestore
       await db.collection(coleccion).doc(`${payment_id}`).set({
         estado: estadoPedido,
         fecha: new Date().toISOString(),
@@ -61,13 +63,14 @@ exports.handler = async (req, res) => {
 
       console.log(`Pedido ${payment_id} guardado en ${coleccion}`);
 
-      return res.status(200).json({ message: `Pedido ${estadoPedido} guardado correctamente` });
+      // Enviar respuesta exitosa
+      return res.status(200).json({ message: 'Pedido procesado correctamente' });
     } else {
-      console.error('Error obteniendo detalles del pago:', response.statusText);
-      return res.status(500).json({ error: 'Error obteniendo detalles del pago' });
+      // Si la respuesta de Mercado Pago no es exitosa
+      return res.status(400).json({ error: 'Error al obtener la información del pago' });
     }
   } catch (error) {
-    console.error('Error procesando el webhook:', error);
-    return res.status(500).json({ error: 'Error procesando el webhook' });
+    console.error('Error procesando webhook:', error);
+    return res.status(500).json({ error: 'Error procesando webhook' });
   }
 };
