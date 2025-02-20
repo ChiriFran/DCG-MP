@@ -35,12 +35,12 @@ export default async function handler(req, res) {
       });
 
       const paymentData = response.data;
-      const paymentMethod = paymentData.payment_method_id;
+      const paymentMethod = paymentData.payment_method_id; // Verifica el método de pago
 
       // Verificar si el pago fue con dinero en cuenta
       if (paymentMethod === 'account_money') {
         estadoPedido = "pago completado con dinero en cuenta";
-        coleccion = "pedidosExitosos";
+        coleccion = "pedidosExitosos"; // Guardarlo en pedidosExitosos
       } else {
         estadoPedido = "pago completado";
         coleccion = "pedidosExitosos";
