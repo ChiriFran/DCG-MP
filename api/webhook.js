@@ -40,6 +40,9 @@ export default async function handler(req, res) {
       estado: estadoPedido,
       fecha: new Date().toISOString(),
     });
+    
+    console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
+    ;
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
