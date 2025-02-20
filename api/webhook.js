@@ -1,4 +1,7 @@
 import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
+import axios from "axios"; // Usaremos axios para hacer la consulta a la API de Mercado Pago
+
+const MERCADO_PAGO_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN; // Tu token de acceso
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -21,23 +24,30 @@ export default async function handler(req, res) {
     // Mostrar el estado del pago recibido para depuración
     console.log("Estado del pago:", paymentStatus);
 
-    // 📌 Determinar el estado del pedido en base a la acción
+    // 📌 Consultar el estado real del pago en la API de Mercado Pago
+    const paymentResponse = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      headers: {
+        Authorization: `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`,
+      },
+    });
+
+    const paymentData = paymentResponse.data;
+    const statusPago = paymentData.status; // status puede ser "approved", "pending", "rejected", etc.
+
+    // 📌 Determinar el estado del pedido en base al estado real del pago
     let estadoPedido;
     let coleccion;
 
-    // Añadir soporte para payment.created
-    if (paymentStatus === "payment.created") {
-      estadoPedido = "pago creado";
-      coleccion = "pedidosPendientes"; // O lo que corresponda
-    } else if (paymentStatus.includes("payment.approved")) {
+    // 📌 Solo crear pedidos pendientes si el estado es "pending"
+    if (statusPago === "approved") {
       estadoPedido = "pago completado";
-      coleccion = "pedidosExitosos"; // Este es el destino correcto
-    } else if (paymentStatus.includes("payment.rejected")) {
+      coleccion = "pedidosExitosos"; // Guardar en la colección de pagos exitosos
+    } else if (statusPago === "rejected") {
       estadoPedido = "pago rechazado";
-      coleccion = "pedidosRechazados";
-    } else if (paymentStatus.includes("payment.pending")) {
+      coleccion = "pedidosRechazados"; // Guardar en la colección de pagos rechazados
+    } else if (statusPago === "pending") {
       estadoPedido = "pago pendiente";
-      coleccion = "pedidosPendientes";
+      coleccion = "pedidosPendientes"; // Solo guardamos en pendientes si el pago está pendiente
     } else {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
