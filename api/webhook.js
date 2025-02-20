@@ -39,19 +39,10 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 📌 Obtener los datos del comprador
-    const comprador = data.payer; // Información del comprador (según Mercado Pago)
-    const precioTotal = data.transaction_amount; // Precio total de la compra (según Mercado Pago)
-
-    // 📌 Guardar el estado del pedido en Firebase con más datos
+    // 📌 Guardar el estado del pedido en Firebase
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
-      comprador: {
-        nombre: comprador.name,
-        email: comprador.email,
-      },
-      precioTotal: precioTotal, // Precio total de la compra
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
