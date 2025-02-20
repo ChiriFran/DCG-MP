@@ -1,4 +1,4 @@
-import { db } from "./firebaseAdmin.js"; // Asegúrate de que la importación incluya la extensión `.js`
+import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -6,29 +6,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = await req.json();
-    const { action, data } = body;
+    // Cambiar esto de req.json() a req.body
+    const body = req.body; // ✅ Utiliza req.body
+
+    const { action, data } = body; // 🔹 Extrae la acción y los datos del webhook
 
     if (!data || !data.id) {
       return res.status(400).json({ error: "ID de pago no proporcionado" });
     }
 
     const paymentId = data.id;
-    let estadoPedido, coleccion;
+    const paymentStatus = action; // Puede ser "payment.created", "payment.updated", etc.
 
-    if (action.includes("payment.approved")) {
+    // 📌 Determinar el estado del pedido en base a la acción
+    let estadoPedido;
+    let coleccion;
+
+    if (paymentStatus.includes("payment.approved")) {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
-    } else if (action.includes("payment.rejected")) {
+    } else if (paymentStatus.includes("payment.rejected")) {
       estadoPedido = "pago rechazado";
       coleccion = "pedidosRechazados";
-    } else if (action.includes("payment.pending")) {
+    } else if (paymentStatus.includes("payment.pending")) {
       estadoPedido = "pago pendiente";
       coleccion = "pedidosPendientes";
     } else {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
+    // 📌 Guardar el estado del pedido en Firebase
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
