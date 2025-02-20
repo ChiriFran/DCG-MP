@@ -6,7 +6,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Cambiar esto de req.json() a req.body
     const body = req.body; // ✅ Utiliza req.body
+
     const { action, data } = body; // 🔹 Extrae la acción y los datos del webhook
 
     if (!data || !data.id) {
@@ -20,7 +22,11 @@ export default async function handler(req, res) {
     let estadoPedido;
     let coleccion;
 
-    if (paymentStatus.includes("payment.approved")) {
+    // Añadir soporte para payment.created
+    if (paymentStatus === "payment.created") {
+      estadoPedido = "pago creado";
+      coleccion = "pedidosPendientes"; // O lo que corresponda
+    } else if (paymentStatus.includes("payment.approved")) {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
     } else if (paymentStatus.includes("payment.rejected")) {
@@ -33,10 +39,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 📌 Agregar más datos al pedido
+    // 📌 Obtener los datos del comprador
     const comprador = data.payer; // Información del comprador (según Mercado Pago)
-    const detallesCompra = data.items; // Detalles de la compra (productos, cantidades, precios)
-    const metodoPago = data.payment_method_id; // Método de pago (según Mercado Pago)
+    const precioTotal = data.transaction_amount; // Precio total de la compra (según Mercado Pago)
 
     // 📌 Guardar el estado del pedido en Firebase con más datos
     await db.collection(coleccion).doc(`${paymentId}`).set({
@@ -45,19 +50,11 @@ export default async function handler(req, res) {
       comprador: {
         nombre: comprador.name,
         email: comprador.email,
-        telefono: comprador.phone,
       },
-      detallesCompra: detallesCompra.map(item => ({
-        producto: item.title,
-        cantidad: item.quantity,
-        precio: item.unit_price,
-      })),
-      metodoPago: metodoPago,
-      fechaCompra: data.date_created, // Fecha de la compra (si está disponible)
+      precioTotal: precioTotal, // Precio total de la compra
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
-
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
