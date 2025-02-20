@@ -1,14 +1,4 @@
-import admin from "firebase-admin";
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
-
-const db = admin.firestore();
+import { db } from "./firebaseAdmin"; // Asegúrate de que la ruta es correcta
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -16,57 +6,43 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { type, data } = req.body;
+    const body = await req.json(); // ✅ Solución para JSON.parse()
 
-    if (!type || !data || !data.id) {
-      return res.status(400).json({ error: "Datos de webhook inválidos" });
+    const { action, data } = body; // 🔹 Extrae la acción y los datos del webhook
+
+    if (!data || !data.id) {
+      return res.status(400).json({ error: "ID de pago no proporcionado" });
     }
 
     const paymentId = data.id;
+    const paymentStatus = action; // Puede ser "payment.created", "payment.updated", etc.
 
-    console.log("Webhook recibido:", type, paymentId);
+    // 📌 Determinar el estado del pedido en base a la acción
+    let estadoPedido;
+    let coleccion;
 
-    // Llamada a la API de Mercado Pago para obtener más detalles del pago
-    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
-      },
+    if (paymentStatus.includes("payment.approved")) {
+      estadoPedido = "pago completado";
+      coleccion = "pedidosExitosos";
+    } else if (paymentStatus.includes("payment.rejected")) {
+      estadoPedido = "pago rechazado";
+      coleccion = "pedidosRechazados";
+    } else if (paymentStatus.includes("payment.pending")) {
+      estadoPedido = "pago pendiente";
+      coleccion = "pedidosPendientes";
+    } else {
+      return res.status(200).json({ message: "Webhook recibido, sin cambios" });
+    }
+
+    // 📌 Guardar el estado del pedido en Firebase
+    await db.collection(coleccion).doc(`${paymentId}`).set({
+      estado: estadoPedido,
+      fecha: new Date().toISOString(),
     });
 
-    if (!mpResponse.ok) {
-      throw new Error("Error al obtener el pago de Mercado Pago");
-    }
-
-    const paymentData = await mpResponse.json();
-    const status = paymentData.status;
-
-    console.log("Estado del pago:", status);
-
-    // Actualizar Firebase según el estado del pago
-    const pedidoRef = db.collection("pedidos").doc(paymentId);
-    
-    if (status === "approved") {
-      await pedidoRef.update({
-        estado: "pago completado",
-        fechaPago: new Date(),
-      });
-
-      await db.collection("pedidosExitosos").doc(paymentId).set({
-        estado: "pago completado",
-        fechaHora: new Date(),
-      });
-    } else if (status === "rejected") {
-      await pedidoRef.update({ estado: "pago rechazado" });
-
-      await db.collection("pedidosRechazados").doc(paymentId).set({
-        estado: "pago rechazado",
-        fechaHora: new Date(),
-      });
-    }
-
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
-    console.error("Error en el webhook:", error);
+    console.error("Error procesando webhook:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 }
