@@ -18,6 +18,9 @@ export default async function handler(req, res) {
     const paymentId = data.id;
     const paymentStatus = action; // Puede ser "payment.created", "payment.updated", etc.
 
+    // Mostrar el estado del pago recibido para depuración
+    console.log("Estado del pago:", paymentStatus);
+
     // 📌 Determinar el estado del pedido en base a la acción
     let estadoPedido;
     let coleccion;
@@ -28,7 +31,7 @@ export default async function handler(req, res) {
       coleccion = "pedidosPendientes"; // O lo que corresponda
     } else if (paymentStatus.includes("payment.approved")) {
       estadoPedido = "pago completado";
-      coleccion = "pedidosExitosos";
+      coleccion = "pedidosExitosos"; // Este es el destino correcto
     } else if (paymentStatus.includes("payment.rejected")) {
       estadoPedido = "pago rechazado";
       coleccion = "pedidosRechazados";
@@ -39,13 +42,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 📌 Guardar el estado del pedido en Firebase
+    // 📌 Registrar el pago con detalles adicionales
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
-      fecha: new Date().toISOString(),
+      fecha: new Date().toISOString(), // La hora de Buenos Aires ya está ajustada
+      comprador: data.user_id, // Información del comprador (ajustar según el webhook)
+      precio: data.transaction_amount, // Monto de la compra
+      descripcion: data.description || "Sin descripción", // Descripción de la compra (si existe)
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}`);
+
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
