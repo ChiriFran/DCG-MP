@@ -2,6 +2,10 @@
   "version": 2,
   "builds": [
     {
+      "src": "api/firebaseAdmin.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/create_preference.js",
       "use": "@vercel/node"
     },

@@ -1,6 +1,5 @@
 import admin from "firebase-admin";
 
-// Inicializar Firebase solo si no está inicializado
 if (!admin.apps.length) {
   try {
     admin.initializeApp({
@@ -16,5 +15,4 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-
 export { db };
