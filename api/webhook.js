@@ -65,8 +65,6 @@ export default async function handler(req, res) {
 
     console.log("Productos comprados:", productosComprados);
 
-    //PARA CADA PRODUCTO COMPRADO ACCEDER A STOCK Y AGREGAR +1
-
     // 📌 Guardar la orden en Firebase con los productos
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
@@ -78,6 +76,25 @@ export default async function handler(req, res) {
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
+
+    // 📌 ACTUALIZAR STOCK
+    if (estadoPedido === "pago completado") {
+      for (const producto of productosComprados) {
+        const stockRef = db.collection("stock").doc(producto);
+        const stockDoc = await stockRef.get();
+
+        if (stockDoc.exists) {
+          const stockData = stockDoc.data();
+          const nuevaCantidad = (stockData.cantidad || 0) + 1;
+
+          await stockRef.update({ cantidad: nuevaCantidad });
+
+          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
+        } else {
+          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
+        }
+      }
+    }
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
