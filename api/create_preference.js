@@ -19,11 +19,12 @@ export default async function handler(req, res) {
 
       // Crear el cuerpo de la preferencia
       const body = {
-        items: items.map(({ title, quantity, unit_price }) => ({
+        items: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
           title,
           quantity: Number(quantity),
           unit_price: Number(unit_price),
-          currency_id: "ARS"
+          currency_id: "ARS",
+          description: talleSeleccionado ? `Talle: ${talleSeleccionado}` : "Talle único",
         })),
         payer: {
           name: shipping.name,

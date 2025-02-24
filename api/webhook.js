@@ -60,8 +60,11 @@ export default async function handler(req, res) {
     const precio = paymentData.transaction_amount || 0;
 
     // 📌 Extraer los productos comprados
-    const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item.title) || [];
+    const productosComprados = paymentData.additional_info?.items?.map((item) => ({
+      title: item.title,
+      talleSeleccionado: item.description || null, // Asumiendo que el talle se pasa en la descripción
+      quantity: item.quantity,
+    })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -80,18 +83,28 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto);
+        const stockRef = db.collection("stock").doc(producto.title);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
-          const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
-          await stockRef.update({ cantidad: nuevaCantidad });
+          if (producto.talleSeleccionado) {
+            // Si el producto tiene talle, actualiza el stock por talle
+            const talleField = `talle${producto.talleSeleccionado.toUpperCase()}`; // Ej: talleS, talleM
+            const currentStock = stockData[talleField] || 0;
+            await stockRef.update({ [talleField]: currentStock + producto.quantity });
 
-          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
+            console.log(`Stock de ${talleField} actualizado: ${producto.title} ahora tiene ${currentStock + producto.quantity} unidades.`);
+          } else {
+            // Si no tiene talle, solo se actualiza el stock general
+            const nuevaCantidad = (stockData.cantidad || 0) + producto.quantity;
+            await stockRef.update({ cantidad: nuevaCantidad });
+
+            console.log(`Stock general actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades.`);
+          }
         } else {
-          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
         }
       }
     }
