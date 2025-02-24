@@ -59,17 +59,9 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados y el talle correspondiente
+    // 📌 Extraer los productos comprados
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => {
-        // Extraemos el talle directamente desde la descripción si está incluido
-        const talle = item.description ? item.description.match(/talle(S|M|L|XL|XXL)/) : null;
-        return {
-          title: item.title,
-          quantity: item.quantity,
-          talle: talle ? talle[0] : null, // Se asigna el talle encontrado o null si no se encuentra
-        };
-      }) || [];
+      paymentData.additional_info?.items?.map((item) => item.title) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -88,29 +80,18 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto.title); // Referencia al producto en la colección 'stock'
+        const stockRef = db.collection("stock").doc(producto);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
+          const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
-          // 📌 Actualizar la cantidad total
-          const nuevaCantidadTotal = (stockData.cantidad || 0) + producto.quantity;
-          await stockRef.update({ cantidad: nuevaCantidadTotal });
+          await stockRef.update({ cantidad: nuevaCantidad });
 
-          // 📌 Actualizar la cantidad del talle correspondiente
-          const talle = producto.talle;  // El talle ya debería estar en el formato adecuado (talleS, talleM, etc.)
-          if (talle && stockData[talle] !== undefined) {
-            const nuevaCantidadTalle = (stockData[talle] || 0) + producto.quantity;
-            await stockRef.update({ [talle]: nuevaCantidadTalle });
-            console.log(`Stock del talle ${talle} actualizado: ${producto.title} ahora tiene ${nuevaCantidadTalle} unidades.`);
-          } else {
-            console.warn(`Talle ${talle} no encontrado para ${producto.title}`);
-          }
-
-          console.log(`Stock total actualizado: ${producto.title} ahora tiene ${nuevaCantidadTotal} unidades.`);
+          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
         } else {
-          console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
         }
       }
     }
