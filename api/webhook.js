@@ -59,9 +59,11 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados
-    const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item.title) || [];
+    // 📌 Extraer los productos comprados, incluyendo el talle desde la descripción
+    const productosComprados = paymentData.additional_info?.items?.map((item) => ({
+      title: item.title,
+      talleSeleccionado: item.description, // Asignamos el talle desde description
+    })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -72,7 +74,10 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los nombres de los productos
+      productos: productosComprados.map((producto) => ({
+        title: producto.title,
+        talleSeleccionado: producto.talleSeleccionado, // Guardamos el talle también
+      })),
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
