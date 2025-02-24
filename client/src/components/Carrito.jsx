@@ -67,18 +67,23 @@ const Carrito = () => {
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
-      productos: carrito,
+      productos: carrito.map((prod) => ({
+        ...prod, // Copia todos los detalles del producto
+        talle: prod.talle, // Asegúrate de incluir el talle del producto
+      })),
       total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
       status: "pending", // Estado inicial del pedido
       createdAt: new Date(), // Agrega la fecha de creación
       paymentStatus: "pending", // Estatus de pago (pending por ahora)
     };
 
+    console.log("Pedido antes de guardar en Firebase:", pedido); // Log para verificar el pedido
+
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
 
-      console.log("Guardando el orderId:", doc.id);
+      console.log("Pedido guardado en Firebase con ID:", doc.id);
       localStorage.setItem("orderId", doc.id);
 
       return doc.id; // Regresar el ID del pedido guardado
@@ -88,6 +93,7 @@ const Carrito = () => {
       return false;
     }
   };
+
 
   const handleBuy = async (e) => {
     e.preventDefault();
