@@ -1,38 +1,35 @@
-import { createContext, useState, useEffect } from "react";
-
-export const CartContext = createContext();
-
-const carritoInicial = JSON.parse(localStorage.getItem("carrito")) || [];
-
 export const CartProvider = ({ children }) => {
   const [carrito, setCarrito] = useState(carritoInicial);
 
   const agregarAlCarrito = (item, cantidad, talle) => {
-    const itemAgregado = { ...item, cantidad, talle };  // Agregar talle al objeto del producto
+    if (!talle) {
+      console.error("El talle es requerido y no fue proporcionado.");
+      return;
+    }
 
-    console.log("Producto agregado:", itemAgregado);  // Verifica que el talle esté en el producto
+    const itemAgregado = { ...item, cantidad, talle };
+
+    console.log("Producto agregado al carrito:", itemAgregado);
 
     const nuevoCarrito = [...carrito];
     const index = nuevoCarrito.findIndex(
-      (producto) => producto.id === itemAgregado.id && producto.talle === itemAgregado.talle  // Verificar si el mismo producto y talle ya está en el carrito
+      (producto) => producto.id === itemAgregado.id && producto.talle === itemAgregado.talle
     );
 
     if (index !== -1) {
       nuevoCarrito[index].cantidad += cantidad;  // Si ya existe, se aumenta la cantidad
     } else {
-      nuevoCarrito.push(itemAgregado);  // Si no existe, se agrega el producto al carrito
+      nuevoCarrito.push(itemAgregado);  // Si no existe, se agrega el producto
     }
 
     setCarrito(nuevoCarrito);
   };
 
   const eliminarDelCarrito = (itemId, talle, cantidadAEliminar) => {
-    console.log("Eliminando del carrito - Producto:", itemId, "Talle:", talle);  // Verifica el talle al eliminar
-
     setCarrito((prevCarrito) => {
       const updatedCart = prevCarrito
         .map((item) => {
-          if (item.id === itemId && item.talle === talle) {  // Filtrar por producto y talle
+          if (item.id === itemId && item.talle === talle) {
             if (item.cantidad <= cantidadAEliminar) {
               return null;
             } else {
@@ -42,7 +39,7 @@ export const CartProvider = ({ children }) => {
             return item;
           }
         })
-        .filter((item) => item !== null); // Filtrar los productos nulos (eliminados)
+        .filter((item) => item !== null);
 
       return updatedCart;
     });
@@ -61,7 +58,6 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    console.log("Guardando carrito en localStorage:", carrito);  // Verifica que el talle esté en los datos
     localStorage.setItem("carrito", JSON.stringify(carrito));
   }, [carrito]);
 

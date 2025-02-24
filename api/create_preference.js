@@ -1,7 +1,6 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
-  // Agrega las cabeceras CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -17,16 +16,18 @@ export default async function handler(req, res) {
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
       const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
-      // Crear el cuerpo de la preferencia con el talle de los productos
       const body = {
         items: items.map(({ title, quantity, unit_price, talle }) => {
-          console.log(`Producto: ${title}, Talle: ${talle}`);  // Verifica el talle aquí
+          if (!talle) {
+            console.error(`Falta el talle para el producto: ${title}`);
+          }
+
           return {
             title,
             quantity: Number(quantity),
             unit_price: Number(unit_price),
             currency_id: "ARS",
-            description: talle ? `Talle: ${talle}` : "",  // Incluir el talle en la descripción si existe
+            description: talle ? `Talle: ${talle}` : "Sin talle especificado",  // Se incluye el talle correctamente
           };
         }),
         payer: {
