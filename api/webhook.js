@@ -59,12 +59,9 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados con sus talles
+    // 📌 Extraer los productos comprados
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => ({
-        nombre: item.title,       // Nombre del producto
-        talle: item.description,  // Talle seleccionado
-      })) || [];
+      paymentData.additional_info?.items?.map((item) => item.title) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -75,7 +72,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los productos con sus talles
+      productos: productosComprados, // ✅ Guardamos los nombres de los productos
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -83,33 +80,18 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const { nombre, talle } = producto;
-
-        // 📌 Verificar si el talle es válido
-        const tallesValidos = ["S", "M", "L", "XL", "XXL"];
-        if (!tallesValidos.includes(talle)) {
-          console.warn(`Talle inválido: ${talle} para producto ${nombre}`);
-          continue;
-        }
-
-        const stockRef = db.collection("stock").doc(nombre);
+        const stockRef = db.collection("stock").doc(producto);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
-          const talleKey = `talle${talle}`; // 📌 Convertir a clave de Firebase (ej: talleM)
+          const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
-          if (stockData[talleKey] !== undefined) {
-            const nuevaCantidad = (stockData[talleKey] || 0) + 1;
+          await stockRef.update({ cantidad: nuevaCantidad });
 
-            await stockRef.update({ [talleKey]: nuevaCantidad });
-
-            console.log(`Stock actualizado: ${nombre} - ${talle} ahora tiene ${nuevaCantidad} unidades.`);
-          } else {
-            console.warn(`El producto ${nombre} no tiene el campo ${talleKey} en Firebase.`);
-          }
+          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
         } else {
-          console.warn(`Producto ${nombre} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
         }
       }
     }
