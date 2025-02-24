@@ -1,7 +1,6 @@
 import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
 import axios from "axios"; // Para realizar consultas a la API de Mercado Pago
 
-// Función que maneja el webhook de Mercado Pago
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
@@ -60,16 +59,9 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados con talles
+    // 📌 Extraer los productos comprados
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => {
-        const talle = item.attributes?.find((attr) => attr.id === "SIZE")?.value_name || "No especificado";
-        return {
-          title: item.title.split(" - Talle: ")[0], // Nombre del producto sin el talle
-          talle: talle !== "No especificado" ? talle : null, // Si no se especifica, ponemos null
-          cantidad: Number(item.quantity) || 1, // Convertimos a número
-        };
-      }) || [];
+      paymentData.additional_info?.items?.map((item) => item.title) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -80,7 +72,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los productos con talles
+      productos: productosComprados, // ✅ Guardamos los nombres de los productos
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -88,32 +80,18 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto.title);
+        const stockRef = db.collection("stock").doc(producto);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
+          const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
-          // Aseguramos que la cantidad total sea un número
-          const nuevaCantidad = (Number(stockData.cantidad) || 0) + producto.cantidad;
-
-          // Actualizamos la cantidad total del producto
           await stockRef.update({ cantidad: nuevaCantidad });
 
-          console.log(`Stock total actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades en total.`);
-
-          // Si el producto tiene talle, actualizamos el stock por talle
-          if (producto.talle) {
-            const talleCampo = `talle${producto.talle.toUpperCase()}`;
-            const nuevoStockTalle = (Number(stockData[talleCampo]) || 0) + producto.cantidad;
-
-            // Actualizamos el stock del talle específico
-            await stockRef.update({ [talleCampo]: nuevoStockTalle });
-
-            console.log(`Stock del talle ${producto.talle} actualizado: ${nuevoStockTalle}`);
-          }
+          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
         } else {
-          console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
         }
       }
     }

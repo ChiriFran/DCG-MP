@@ -27,6 +27,7 @@ const Carrito = () => {
     comments: "",
   });
 
+
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
@@ -43,24 +44,14 @@ const Carrito = () => {
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
-      const items = carrito.map((prod) => {
-        const item = {
-          title: prod.title,
-          unit_price: prod.price,
-          quantity: prod.cantidad,
-          description: prod.description || prod.title,
-        };
+      const items = carrito.map((prod) => ({
+        title: prod.title,
+        unit_price: prod.price,
+        quantity: prod.cantidad,
+      }));
 
-        // Agregar el talle al título y descripción
-        if (prod.talle) {
-          item.title += ` - Talle: ${prod.talle}`;
-          item.description += ` - Talle: ${prod.talle}`;
-        }
-
-        return item;
-      });
-
-      const apiUrl = import.meta.env.VITE_API_URL; // URL del backend
+      // URL base del backend desde las variables de entorno
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -70,8 +61,8 @@ const Carrito = () => {
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error al crear la preferencia en Mercado Pago:", error);
-      alert("Hubo un problema al generar la preferencia. Intenta de nuevo.");
+      console.error("Error when creating the preference in Mercado Pago:", error);
+      alert("There was a problem generating the preference. Please try again.");
     }
   };
 
@@ -134,6 +125,9 @@ const Carrito = () => {
       setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
+
+
+
 
   return (
     <div className="carritoContainer">

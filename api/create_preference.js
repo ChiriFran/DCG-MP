@@ -1,7 +1,7 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
-  // Agregar cabeceras CORS
+  // Agrega las cabeceras CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -10,37 +10,27 @@ export default async function handler(req, res) {
     try {
       const { items, shipping, orderId } = req.body;
 
-      // Validaciones básicas
       if (!items || items.length === 0 || !shipping || !shipping.name || !shipping.address) {
         return res.status(400).json({ error: "Missing required data" });
       }
 
-      // Validación de los ítems: asegurar que cada ítem tenga los campos correctos
-      const validItems = items.map(({ title, quantity, unit_price, size }) => ({
-        title,
-        quantity: Number(quantity),
-        unit_price: Number(unit_price),
-        description: size ? `Talle: ${size}` : undefined, // Descripción con talle si existe
-      }));
-
-      // Validación de que no haya items inválidos
-      if (validItems.some(item => !item.title || !item.quantity || !item.unit_price)) {
-        return res.status(400).json({ error: "Some items are missing required fields" });
-      }
-
-      // Obtener token de acceso a Mercado Pago
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
       const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
       // Crear el cuerpo de la preferencia
       const body = {
-        items: validItems,
+        items: items.map(({ title, quantity, unit_price }) => ({
+          title,
+          quantity: Number(quantity),
+          unit_price: Number(unit_price),
+          currency_id: "ARS"
+        })),
         payer: {
           name: shipping.name,
           email: shipping.email,
           phone: {
             area_code: shipping.phoneArea,
-            number: shipping.phone,
+            number: shipping.phone
           },
           address: {
             street_name: shipping.address,
@@ -50,17 +40,17 @@ export default async function handler(req, res) {
             apartment: shipping.apartment || "",
             city: shipping.city,
             state_name: shipping.province,
-            country: "AR",
-          },
+            country: "AR"
+          }
         },
         shipments: {
           mode: "not_specified",
-          cost: 5000,
+          cost: 1,
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
-            zip_code: shipping.zipCode,
-          },
+            zip_code: shipping.zipCode
+          }
         },
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
@@ -69,14 +59,13 @@ export default async function handler(req, res) {
         },
         statement_descriptor: "DCGSTORE",
         external_reference: orderId,
-        auto_return: "approved",
+        auto_return: "approved"
       };
 
-      // Crear la preferencia en Mercado Pago
       const preference = new Preference(client);
       const result = await preference.create({ body });
 
-      console.log("Preferencia creada con éxito:", result);
+      console.log(result);
       res.status(200).json({ id: result.id });
     } catch (error) {
       console.error("Error al crear la preferencia:", error);
