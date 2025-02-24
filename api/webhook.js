@@ -61,11 +61,14 @@ export default async function handler(req, res) {
 
     // 📌 Extraer los productos comprados con talles
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => ({
-        title: item.title.split(" - Talle: ")[0], // Nombre del producto sin el talle
-        talle: item.attributes?.find((attr) => attr.id === "SIZE")?.value_name || null,
-        cantidad: item.quantity || 1, // Cantidad comprada
-      })) || [];
+      paymentData.additional_info?.items?.map((item) => {
+        const talle = item.attributes?.find((attr) => attr.id === "SIZE")?.value_name || "No especificado";
+        return {
+          title: item.title.split(" - Talle: ")[0], // Nombre del producto sin el talle
+          talle: talle !== "No especificado" ? talle : null, // Si no se especifica, ponemos null
+          cantidad: Number(item.quantity) || 1, // Convertimos a número
+        };
+      }) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -90,24 +93,26 @@ export default async function handler(req, res) {
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
           
-          // Actualizar el stock total
-          const nuevaCantidad = (stockData.cantidad || 0) + producto.cantidad;
+          // Aseguramos que la cantidad total sea un número
+          const nuevaCantidad = (Number(stockData.cantidad) || 0) + producto.cantidad;
 
           // Determinar el campo del talle si existe
           const tallaCampo = producto.talle ? `talle${producto.talle.toUpperCase()}` : null;
 
-          // Actualizar el stock total
+          // Crear el objeto de actualización con la cantidad total
           const updateData = { cantidad: nuevaCantidad };
 
-          // Si el producto tiene un talle, se actualiza también el stock por talle
+          // Si el producto tiene un talle, sumamos la cantidad al stock por talle
           if (tallaCampo && stockData.hasOwnProperty(tallaCampo)) {
-            updateData[tallaCampo] = (stockData[tallaCampo] || 0) + producto.cantidad;
+            const nuevaCantidadTalle = (Number(stockData[tallaCampo]) || 0) + producto.cantidad;
+            updateData[tallaCampo] = nuevaCantidadTalle;
           }
 
+          // Actualizamos la base de datos de Firebase con los nuevos valores
           await stockRef.update(updateData);
 
           console.log(
-            `Stock actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades.`
+            `Stock actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades en total.`
           );
           if (tallaCampo) {
             console.log(`Stock por talle (${producto.talle}) actualizado: ${updateData[tallaCampo]}`);
