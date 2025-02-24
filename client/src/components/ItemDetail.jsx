@@ -21,7 +21,9 @@ const ItemDetail = ({ item }) => {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
-    agregarAlCarrito(item, cantidad, talleSeleccionado || "Unique sizes available");
+
+    agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
+
     setCantidad(1);
     setTalleSeleccionado("");
   };

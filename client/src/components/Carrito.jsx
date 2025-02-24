@@ -70,12 +70,18 @@ const Carrito = () => {
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
-      productos: carrito,
-      total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
-      status: "pending", // Estado inicial del pedido
-      createdAt: new Date(), // Agrega la fecha de creación
-      paymentStatus: "pending", // Estatus de pago (pending por ahora)
-      paymentConfirmationCode: null, // Almacenará el código de confirmación de Mercado Pago
+      productos: carrito.map((prod) => ({
+        id: prod.id,
+        title: prod.title,
+        price: prod.price,
+        cantidad: prod.cantidad,
+        talle: prod.category === "T-shirts" ? prod.talleSeleccionado : null, // 👈 Solo si es una remera
+      })),
+      total: precioTotal(1),
+      status: "pending",
+      createdAt: new Date(),
+      paymentStatus: "pending",
+      paymentConfirmationCode: null,
     };
 
     try {
@@ -85,13 +91,15 @@ const Carrito = () => {
       console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
 
-      return doc.id; // Regresar el ID del pedido guardado
+      return doc.id;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
       return false;
     }
   };
+
+
 
   const handleBuy = async (e) => {
     e.preventDefault();
