@@ -83,7 +83,6 @@ const Carrito = () => {
       status: "pending",
       createdAt: new Date(),
       paymentStatus: "pending",
-      paymentConfirmationCode: null,
     };
   
     console.log("Pedido enviado a Firebase:", pedido); // 👀 Última verificación antes de guardar
