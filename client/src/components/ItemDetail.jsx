@@ -24,7 +24,7 @@ const ItemDetail = ({ item }) => {
     agregarAlCarrito(item, cantidad, talleSeleccionado || "Unique sizes available");
     setCantidad(1);
     setTalleSeleccionado("");
-  };  
+  };
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;
@@ -38,18 +38,8 @@ const ItemDetail = ({ item }) => {
   }, 0);
 
   const handleTalleSeleccionado = (talle) => {
-    const talleMap = {
-      S: "talleS",
-      M: "talleM",
-      L: "talleL",
-      XL: "talleXL",
-      XXL: "talleXXL"
-    };
-
-    // Asignar el valor correcto para el talle
-    setTalleSeleccionado(talleMap[talle] || "");
+    setTalleSeleccionado(talle);
   };
-
 
   return (
     <div className="itemDetailContainer">
