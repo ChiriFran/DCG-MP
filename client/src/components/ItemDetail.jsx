@@ -22,11 +22,20 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
+    const productoConTalle = {
+      ...item,
+      cantidad,
+      talleSeleccionado: item.category === "T-shirts" ? talleSeleccionado : null,
+    };
+
+    console.log("Producto agregado al carrito:", productoConTalle); // 👀 Verifica si el talle está aquí
+
+    agregarAlCarrito(productoConTalle, cantidad);
 
     setCantidad(1);
     setTalleSeleccionado("");
   };
+
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;

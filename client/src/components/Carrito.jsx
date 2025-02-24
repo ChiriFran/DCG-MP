@@ -68,6 +68,8 @@ const Carrito = () => {
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
+    console.log("Carrito antes de guardar en Firebase:", carrito); // 👀 Verifica si aquí está el talle
+  
     const pedido = {
       cliente: shippingData,
       productos: carrito.map((prod) => ({
@@ -75,7 +77,7 @@ const Carrito = () => {
         title: prod.title,
         price: prod.price,
         cantidad: prod.cantidad,
-        talle: prod.category === "T-shirts" ? prod.talleSeleccionado : null, // 👈 Solo si es una remera
+        talle: prod.category === "T-shirts" ? prod.talleSeleccionado : null, // 👈 Verifica esto
       })),
       total: precioTotal(1),
       status: "pending",
@@ -83,14 +85,14 @@ const Carrito = () => {
       paymentStatus: "pending",
       paymentConfirmationCode: null,
     };
-
+  
+    console.log("Pedido enviado a Firebase:", pedido); // 👀 Última verificación antes de guardar
+  
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
-
       console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
-
       return doc.id;
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
@@ -98,6 +100,7 @@ const Carrito = () => {
       return false;
     }
   };
+  
 
 
 
