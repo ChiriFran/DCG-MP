@@ -59,9 +59,13 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados
+    // 📌 Extraer los productos comprados con talles
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item.title) || [];
+      paymentData.additional_info?.items?.map((item) => ({
+        title: item.title.split(" - Talle: ")[0], // Nombre del producto sin el talle
+        talle: item.attributes?.find((attr) => attr.id === "SIZE")?.value_name || null,
+        cantidad: item.quantity || 1, // Cantidad comprada
+      })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -72,7 +76,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los nombres de los productos
+      productos: productosComprados, // ✅ Guardamos los productos con talles
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -80,18 +84,30 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto);
+        const stockRef = db.collection("stock").doc(producto.title);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
-          const nuevaCantidad = (stockData.cantidad || 0) + 1;
+          const nuevaCantidad = (stockData.cantidad || 0) + producto.cantidad;
+          const tallaCampo = producto.talle ? `talle${producto.talle.toUpperCase()}` : null;
 
-          await stockRef.update({ cantidad: nuevaCantidad });
+          const updateData = { cantidad: nuevaCantidad };
 
-          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
+          if (tallaCampo && stockData.hasOwnProperty(tallaCampo)) {
+            updateData[tallaCampo] = (stockData[tallaCampo] || 0) + producto.cantidad;
+          }
+
+          await stockRef.update(updateData);
+
+          console.log(
+            `Stock actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades.`
+          );
+          if (tallaCampo) {
+            console.log(`Stock por talle (${producto.talle}) actualizado: ${updateData[tallaCampo]}`);
+          }
         } else {
-          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
         }
       }
     }

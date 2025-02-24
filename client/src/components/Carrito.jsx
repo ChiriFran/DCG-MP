@@ -44,14 +44,31 @@ const Carrito = () => {
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
-      const items = carrito.map((prod) => ({
-        title: prod.title,
-        unit_price: prod.price,
-        quantity: prod.cantidad,
-      }));
+      const items = carrito.map((prod) => {
+        const item = {
+          title: prod.title,
+          unit_price: prod.price,
+          quantity: prod.cantidad,
+          description: prod.description || prod.title,
+        };
 
-      // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+        // Si el producto es una remera, agregar talle en diferentes campos
+        if (prod.category === "remeras" && prod.talle) {
+          item.title += ` - Talle: ${prod.talle}`;
+          item.description += ` - Talle: ${prod.talle}`;
+          item.attributes = [
+            {
+              id: "SIZE",
+              name: "Talle",
+              value_name: prod.talle,
+            },
+          ];
+        }
+
+        return item;
+      });
+
+      const apiUrl = import.meta.env.VITE_API_URL; // URL del backend
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
@@ -61,8 +78,8 @@ const Carrito = () => {
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error when creating the preference in Mercado Pago:", error);
-      alert("There was a problem generating the preference. Please try again.");
+      console.error("Error al crear la preferencia en Mercado Pago:", error);
+      alert("Hubo un problema al generar la preferencia. Intenta de nuevo.");
     }
   };
 
