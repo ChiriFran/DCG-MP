@@ -50,7 +50,9 @@ const Carrito = () => {
         quantity: prod.cantidad,
         talle: prod.talle, // Añadimos el talle al objeto de cada producto
       }));
-
+      
+      // URL base del backend desde las variables de entorno
+      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
       });
