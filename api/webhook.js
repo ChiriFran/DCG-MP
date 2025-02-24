@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     console.log("Estado del pago recibido:", paymentStatus);
 
-    // 📌 Obtener los detalles completos del pago desde la API de Mercado Pago
+    // 📌 Obtener los detalles completos del pago desde Mercado Pago
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -30,9 +30,7 @@ export default async function handler(req, res) {
     );
 
     if (response.status !== 200) {
-      return res
-        .status(400)
-        .json({ error: "No se pudo obtener el estado del pago de Mercado Pago" });
+      return res.status(400).json({ error: "No se pudo obtener el estado del pago de Mercado Pago" });
     }
 
     const paymentData = response.data; // Datos completos del pago
@@ -40,7 +38,7 @@ export default async function handler(req, res) {
     let estadoPedido;
     let coleccion;
 
-    // 📌 Determinar el estado del pedido y en qué colección guardarlo
+    // 📌 Determinar estado del pedido y la colección en Firebase
     if (paymentData.status === "approved") {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
@@ -54,15 +52,15 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 📌 Recoger la información del comprador
+    // 📌 Recoger información del comprador
     const comprador = paymentData.payer?.name || "desconocido";
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados
+    // 📌 Extraer productos comprados
     const productosComprados = paymentData.additional_info?.items?.map((item) => ({
       title: item.title,
-      talleSeleccionado: item.description || null, // Asumiendo que el talle se pasa en la descripción
+      talleSeleccionado: item.description || null, // Suponiendo que el talle se pasa en la descripción
       quantity: item.quantity,
     })) || [];
 
@@ -75,7 +73,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los nombres de los productos
+      productos: productosComprados,
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -88,21 +86,20 @@ export default async function handler(req, res) {
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
+          const nuevaCantidad = (stockData.cantidad || 0) + producto.quantity;
+
+          // Siempre actualizamos la cantidad general
+          const updateData = { cantidad: nuevaCantidad };
 
           if (producto.talleSeleccionado) {
-            // Si el producto tiene talle, actualiza el stock por talle
+            // Si el producto tiene talle, actualizamos también el talle específico
             const talleField = `talle${producto.talleSeleccionado.toUpperCase()}`; // Ej: talleS, talleM
-            const currentStock = stockData[talleField] || 0;
-            await stockRef.update({ [talleField]: currentStock + producto.quantity });
-
-            console.log(`Stock de ${talleField} actualizado: ${producto.title} ahora tiene ${currentStock + producto.quantity} unidades.`);
-          } else {
-            // Si no tiene talle, solo se actualiza el stock general
-            const nuevaCantidad = (stockData.cantidad || 0) + producto.quantity;
-            await stockRef.update({ cantidad: nuevaCantidad });
-
-            console.log(`Stock general actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades.`);
+            updateData[talleField] = (stockData[talleField] || 0) + producto.quantity;
           }
+
+          await stockRef.update(updateData);
+
+          console.log(`Stock actualizado: ${producto.title}, cantidad total: ${nuevaCantidad}, talle: ${producto.talleSeleccionado || "N/A"}`);
         } else {
           console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
         }
