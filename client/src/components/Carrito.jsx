@@ -48,20 +48,21 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
-        talle: prod.talle, // Añadimos el talle al objeto de cada producto
       }));
-      
+
       // URL base del backend desde las variables de entorno
       const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
+        shipping: shippingData,
       });
 
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error al crear la preferencia:", error);
-      alert("Hubo un problema al generar la preferencia. Intenta nuevamente.");
+      console.error("Error when creating the preference in Mercado Pago:", error);
+      alert("There was a problem generating the preference. Please try again.");
     }
   };
 
@@ -69,23 +70,19 @@ const Carrito = () => {
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
-      productos: carrito.map((prod) => ({
-        ...prod, // Copia todos los detalles del producto
-        talle: prod.talle, // Asegúrate de incluir el talle del producto
-      })),
-      total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
+      productos: carrito,
+      total: precioTotal(1000), // Puedes agregar aquí el valor del envío si corresponde
       status: "pending", // Estado inicial del pedido
       createdAt: new Date(), // Agrega la fecha de creación
       paymentStatus: "pending", // Estatus de pago (pending por ahora)
+      paymentConfirmationCode: null, // Almacenará el código de confirmación de Mercado Pago
     };
-
-    console.log("Pedido antes de guardar en Firebase:", pedido); // Log para verificar el pedido
 
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
 
-      console.log("Pedido guardado en Firebase con ID:", doc.id);
+      console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
 
       return doc.id; // Regresar el ID del pedido guardado
@@ -95,7 +92,6 @@ const Carrito = () => {
       return false;
     }
   };
-
 
   const handleBuy = async (e) => {
     e.preventDefault();
