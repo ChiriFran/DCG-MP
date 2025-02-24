@@ -1,5 +1,3 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
-
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -17,15 +15,21 @@ export default async function handler(req, res) {
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
       const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
+      // Verificar qué items se están recibiendo
+      console.log("Items recibidos:", items);
+
       // Crear el cuerpo de la preferencia con el talle de los productos
       const body = {
-        items: items.map(({ title, quantity, unit_price, talle }) => ({
-          title,
-          quantity: Number(quantity),
-          unit_price: Number(unit_price),
-          currency_id: "ARS",
-          description: talle ? `Talle: ${talle}` : "", // Incluir el talle en la descripción si existe
-        })),
+        items: items.map(({ title, quantity, unit_price, talle }) => {
+          console.log(`Producto: ${title}, Talle: ${talle}`); // Verificar el talle de cada producto
+          return {
+            title,
+            quantity: Number(quantity),
+            unit_price: Number(unit_price),
+            currency_id: "ARS",
+            description: talle ? `Talle: ${talle}` : "", // Incluir el talle en la descripción si existe
+          };
+        }),
         payer: {
           name: shipping.name,
           email: shipping.email,
@@ -62,6 +66,8 @@ export default async function handler(req, res) {
         external_reference: orderId,
         auto_return: "approved",
       };
+
+      console.log("Cuerpo de la preferencia:", body); // Verificar todo el cuerpo de la preferencia
 
       const preference = new Preference(client);
       const result = await preference.create({ body });
