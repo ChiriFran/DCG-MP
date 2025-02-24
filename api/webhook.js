@@ -38,7 +38,6 @@ export default async function handler(req, res) {
     let estadoPedido;
     let coleccion;
 
-    // 📌 Determinar estado del pedido y la colección en Firebase
     if (paymentData.status === "approved") {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
@@ -60,13 +59,13 @@ export default async function handler(req, res) {
     // 📌 Extraer productos comprados
     const productosComprados = paymentData.additional_info?.items?.map((item) => ({
       title: item.title,
-      talleSeleccionado: item.description || null,
+      talleSeleccionado: item.description && item.description.trim() !== "" ? item.description : null, // 🔹 Ahora no pone "talle único" si hay talle real
       quantity: item.quantity,
     })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
-    // 📌 Guardar la orden en Firebase con los productos
+    // 📌 Guardar la orden en Firebase con los productos correctos
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
