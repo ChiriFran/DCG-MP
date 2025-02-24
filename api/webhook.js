@@ -59,9 +59,17 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados
+    // 📌 Extraer los productos comprados y el talle correspondiente
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item) || [];
+      paymentData.additional_info?.items?.map((item) => {
+        // Extraemos el talle directamente desde la descripción si está incluido
+        const talle = item.description ? item.description.match(/talle(S|M|L|XL|XXL)/) : null;
+        return {
+          title: item.title,
+          quantity: item.quantity,
+          talle: talle ? talle[0] : null, // Se asigna el talle encontrado o null si no se encuentra
+        };
+      }) || [];
 
     console.log("Productos comprados:", productosComprados);
 
@@ -72,11 +80,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados.map(item => ({
-        title: item.title,
-        quantity: item.quantity,
-        talle: item.description, // Suponiendo que el talle está en description
-      })), // ✅ Guardamos los nombres y detalles de los productos
+      productos: productosComprados, // ✅ Guardamos los nombres de los productos
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -84,26 +88,27 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto.title);
+        const stockRef = db.collection("stock").doc(producto.title); // Referencia al producto en la colección 'stock'
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
+          const nuevaCantidadTotal = (stockData.cantidad || 0) + producto.quantity;
 
-          // Actualizar el stock total
-          const nuevaCantidad = (stockData.cantidad || 0) + producto.quantity;
+          // Actualizamos el stock total
+          await stockRef.update({ cantidad: nuevaCantidadTotal });
 
-          // Usamos directamente el talle recibido (ya en formato adecuado)
-          const talle = producto.description; // El talle es description
-          const nuevoStockTalle = (stockData[talle] || 0) + producto.quantity;
+          // Si el talle existe, actualizar el stock de ese talle específico
+          const talle = producto.talle;
+          if (talle && stockData[talle] !== undefined) {
+            const nuevaCantidadTalle = (stockData[talle] || 0) + producto.quantity;
+            await stockRef.update({ [talle]: nuevaCantidadTalle });
+            console.log(`Stock de ${talle} actualizado: ${producto.title} ahora tiene ${nuevaCantidadTalle} unidades.`);
+          } else {
+            console.warn(`Talle ${talle} no encontrado para ${producto.title}`);
+          }
 
-          // Actualizamos tanto el stock total como el stock por talle
-          await stockRef.update({
-            cantidad: nuevaCantidad,
-            [talle]: nuevoStockTalle,
-          });
-
-          console.log(`Stock actualizado: ${producto.title} - Total: ${nuevaCantidad}, ${talle}: ${nuevoStockTalle}`);
+          console.log(`Stock total actualizado: ${producto.title} ahora tiene ${nuevaCantidadTotal} unidades.`);
         } else {
           console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
         }
