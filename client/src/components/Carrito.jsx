@@ -75,7 +75,6 @@ const Carrito = () => {
       total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
       status: "pending", // Estado inicial del pedido
       createdAt: new Date(), // Agrega la fecha de creación
-      paymentStatus: "pending", // Estatus de pago (pending por ahora)
     };
 
     try {
