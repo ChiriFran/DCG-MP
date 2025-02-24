@@ -27,7 +27,6 @@ const Carrito = () => {
     comments: "",
   });
 
-
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
@@ -52,17 +51,10 @@ const Carrito = () => {
           description: prod.description || prod.title,
         };
 
-        // Si el producto es una remera, agregar talle en diferentes campos
-        if (prod.category === "remeras" && prod.talle) {
+        // Agregar el talle al título y descripción
+        if (prod.talle) {
           item.title += ` - Talle: ${prod.talle}`;
           item.description += ` - Talle: ${prod.talle}`;
-          item.attributes = [
-            {
-              id: "SIZE",
-              name: "Talle",
-              value_name: prod.talle,
-            },
-          ];
         }
 
         return item;
@@ -142,9 +134,6 @@ const Carrito = () => {
       setIsProcessing(""); // Resetear el estado si hay un error
     }
   };
-
-
-
 
   return (
     <div className="carritoContainer">

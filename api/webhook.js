@@ -1,6 +1,7 @@
 import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
 import axios from "axios"; // Para realizar consultas a la API de Mercado Pago
 
+// Función que maneja el webhook de Mercado Pago
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
@@ -92,30 +93,24 @@ export default async function handler(req, res) {
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
-          
+
           // Aseguramos que la cantidad total sea un número
           const nuevaCantidad = (Number(stockData.cantidad) || 0) + producto.cantidad;
 
-          // Determinar el campo del talle si existe
-          const tallaCampo = producto.talle ? `talle${producto.talle.toUpperCase()}` : null;
+          // Actualizamos la cantidad total del producto
+          await stockRef.update({ cantidad: nuevaCantidad });
 
-          // Crear el objeto de actualización con la cantidad total
-          const updateData = { cantidad: nuevaCantidad };
+          console.log(`Stock total actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades en total.`);
 
-          // Si el producto tiene un talle, sumamos la cantidad al stock por talle
-          if (tallaCampo && stockData.hasOwnProperty(tallaCampo)) {
-            const nuevaCantidadTalle = (Number(stockData[tallaCampo]) || 0) + producto.cantidad;
-            updateData[tallaCampo] = nuevaCantidadTalle;
-          }
+          // Si el producto tiene talle, actualizamos el stock por talle
+          if (producto.talle) {
+            const talleCampo = `talle${producto.talle.toUpperCase()}`;
+            const nuevoStockTalle = (Number(stockData[talleCampo]) || 0) + producto.cantidad;
 
-          // Actualizamos la base de datos de Firebase con los nuevos valores
-          await stockRef.update(updateData);
+            // Actualizamos el stock del talle específico
+            await stockRef.update({ [talleCampo]: nuevoStockTalle });
 
-          console.log(
-            `Stock actualizado: ${producto.title} ahora tiene ${nuevaCantidad} unidades en total.`
-          );
-          if (tallaCampo) {
-            console.log(`Stock por talle (${producto.talle}) actualizado: ${updateData[tallaCampo]}`);
+            console.log(`Stock del talle ${producto.talle} actualizado: ${nuevoStockTalle}`);
           }
         } else {
           console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
