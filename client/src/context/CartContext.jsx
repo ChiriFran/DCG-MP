@@ -1,39 +1,31 @@
-import { createContext, useEffect, useState } from "react";
-
-export const CartContext = createContext();
-
-const carritoInicial = JSON.parse(localStorage.getItem("carrito")) || [];
-
 export const CartProvider = ({ children }) => {
   const [carrito, setCarrito] = useState(carritoInicial);
 
-  const agregarAlCarrito = (item, cantidad) => {
-    const itemAgregado = { ...item, cantidad };
+  const agregarAlCarrito = (item, cantidad, talle) => {
+    const itemAgregado = { ...item, cantidad, talle };  // Agregar talle al objeto del producto
 
     const nuevoCarrito = [...carrito];
     const index = nuevoCarrito.findIndex(
-      (producto) => producto.id === itemAgregado.id
+      (producto) => producto.id === itemAgregado.id && producto.talle === itemAgregado.talle  // Verificar si el mismo producto y talle ya está en el carrito
     );
 
     if (index !== -1) {
-      nuevoCarrito[index].cantidad += cantidad;
+      nuevoCarrito[index].cantidad += cantidad;  // Si ya existe, se aumenta la cantidad
     } else {
-      nuevoCarrito.push(itemAgregado);
+      nuevoCarrito.push(itemAgregado);  // Si no existe, se agrega el producto al carrito
     }
 
     setCarrito(nuevoCarrito);
   };
 
-  const eliminarDelCarrito = (itemId, cantidadAEliminar) => {
+  const eliminarDelCarrito = (itemId, talle, cantidadAEliminar) => {
     setCarrito((prevCarrito) => {
       const updatedCart = prevCarrito
         .map((item) => {
-          if (item.id === itemId) {
+          if (item.id === itemId && item.talle === talle) {  // Filtrar por producto y talle
             if (item.cantidad <= cantidadAEliminar) {
-              // Si la cantidad a eliminar es mayor o igual a la cantidad en el carrito, eliminar el producto
               return null;
             } else {
-              // Si la cantidad a eliminar es menor que la cantidad en el carrito, reducir la cantidad
               return { ...item, cantidad: item.cantidad - cantidadAEliminar };
             }
           } else {
