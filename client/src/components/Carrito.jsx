@@ -48,6 +48,7 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
+        talle: prod.talleSeleccionado
       }));
 
       // URL base del backend desde las variables de entorno
@@ -68,40 +69,29 @@ const Carrito = () => {
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
-    console.log("Carrito antes de guardar en Firebase:", carrito); // 👀 Verifica si aquí está el talle
-  
     const pedido = {
       cliente: shippingData,
-      productos: carrito.map((prod) => ({
-        id: prod.id,
-        title: prod.title,
-        price: prod.price,
-        cantidad: prod.cantidad,
-        talle: prod.category === "T-shirts" ? prod.talleSeleccionado : null, // 👈 Verifica esto
-      })),
-      total: precioTotal(1),
-      status: "pending",
-      createdAt: new Date(),
-      paymentStatus: "pending",
+      productos: carrito,
+      total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
+      status: "pending", // Estado inicial del pedido
+      createdAt: new Date(), // Agrega la fecha de creación
+      paymentStatus: "pending", // Estatus de pago (pending por ahora)
     };
-  
-    console.log("Pedido enviado a Firebase:", pedido); // 👀 Última verificación antes de guardar
-  
+
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
+
       console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
-      return doc.id;
+
+      return doc.id; // Regresar el ID del pedido guardado
     } catch (error) {
       console.error("Error saving the order in Firebase:", error);
       alert("There was a problem saving the order. Please try again.");
       return false;
     }
   };
-  
-
-
 
   const handleBuy = async (e) => {
     e.preventDefault();

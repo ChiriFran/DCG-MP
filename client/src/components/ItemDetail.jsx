@@ -22,15 +22,13 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    const productoConTalle = {
+    console.log("Producto agregado al carrito:", {
       ...item,
       cantidad,
       talleSeleccionado: item.category === "T-shirts" ? talleSeleccionado : null,
-    };
+    }); // 👀 Verifica en consola que se está pasando el talle
 
-    console.log("Producto agregado al carrito:", productoConTalle); // 👀 Verifica si el talle está aquí
-
-    agregarAlCarrito(productoConTalle, cantidad);
+    agregarAlCarrito(item, cantidad, talleSeleccionado); // ✅ Pasar el talle como argumento
 
     setCantidad(1);
     setTalleSeleccionado("");
