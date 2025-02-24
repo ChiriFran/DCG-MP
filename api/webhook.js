@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     const productosComprados =
       paymentData.additional_info?.items?.map((item) => ({
         nombre: item.title,       // Nombre del producto
-        talle: item.description,  // Talle seleccionado
+        talle: item.talleSeleccionado,  // Talle seleccionado
         cantidad: item.quantity || 1, // Cantidad comprada de ese talle
       })) || [];
 
