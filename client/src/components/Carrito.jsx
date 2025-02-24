@@ -72,7 +72,6 @@ const Carrito = () => {
       status: "pending", // Estado inicial del pedido
       createdAt: new Date(), // Agrega la fecha de creación
       paymentStatus: "pending", // Estatus de pago (pending por ahora)
-      paymentConfirmationCode: null, // Almacenará el código de confirmación de Mercado Pago
     };
 
     try {

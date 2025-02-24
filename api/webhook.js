@@ -98,11 +98,11 @@ export default async function handler(req, res) {
           const nuevaCantidadTotal = (stockData.cantidad || 0) + producto.quantity;
           await stockRef.update({ cantidad: nuevaCantidadTotal });
 
-          // 📌 Actualizar la cantidad del talle correspondiente
-          const talle = producto.talle;  // Asumimos que el talle viene de la preferencia (talleS, talleM, etc.)
+          // 📌 Actualizar la cantidad del talle correspondiente (talleS, talleM, etc.)
+          const talle = producto.talle;  // Asegúrate de que el talle recibido sea "talleS", "talleM", etc.
           if (talle && stockData[talle] !== undefined) {
             const nuevaCantidadTalle = (stockData[talle] || 0) + producto.quantity;
-            await stockRef.update({ [talle]: nuevaCantidadTalle }); // Actualiza el campo del talle
+            await stockRef.update({ [talle]: nuevaCantidadTalle }); // Actualiza el campo del talle específico
             console.log(`Stock del talle ${talle} actualizado: ${producto.title} ahora tiene ${nuevaCantidadTalle} unidades.`);
           } else {
             console.warn(`Talle ${talle} no encontrado para ${producto.title}`);
@@ -114,6 +114,7 @@ export default async function handler(req, res) {
         }
       }
     }
+
 
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
