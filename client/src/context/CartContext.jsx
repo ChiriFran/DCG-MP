@@ -1,8 +1,16 @@
+import { createContext, useState, useEffect } from "react";
+
+export const CartContext = createContext();
+
+const carritoInicial = JSON.parse(localStorage.getItem("carrito")) || [];
+
 export const CartProvider = ({ children }) => {
   const [carrito, setCarrito] = useState(carritoInicial);
 
   const agregarAlCarrito = (item, cantidad, talle) => {
     const itemAgregado = { ...item, cantidad, talle };  // Agregar talle al objeto del producto
+
+    console.log("Producto agregado:", itemAgregado);  // Verifica que el talle esté en el producto
 
     const nuevoCarrito = [...carrito];
     const index = nuevoCarrito.findIndex(
@@ -19,6 +27,8 @@ export const CartProvider = ({ children }) => {
   };
 
   const eliminarDelCarrito = (itemId, talle, cantidadAEliminar) => {
+    console.log("Eliminando del carrito - Producto:", itemId, "Talle:", talle);  // Verifica el talle al eliminar
+
     setCarrito((prevCarrito) => {
       const updatedCart = prevCarrito
         .map((item) => {
@@ -51,6 +61,7 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log("Guardando carrito en localStorage:", carrito);  // Verifica que el talle esté en los datos
     localStorage.setItem("carrito", JSON.stringify(carrito));
   }, [carrito]);
 
