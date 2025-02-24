@@ -1,45 +1,46 @@
+import { createContext, useEffect, useState } from "react";
+
+export const CartContext = createContext();
+
+const carritoInicial = JSON.parse(localStorage.getItem("carrito")) || [];
+
 export const CartProvider = ({ children }) => {
   const [carrito, setCarrito] = useState(carritoInicial);
 
-  const agregarAlCarrito = (item, cantidad, talle) => {
-    if (!talle) {
-      console.error("El talle es requerido y no fue proporcionado.");
-      return;
-    }
-
-    const itemAgregado = { ...item, cantidad, talle };
-
-    console.log("Producto agregado al carrito:", itemAgregado);
+  const agregarAlCarrito = (item, cantidad) => {
+    const itemAgregado = { ...item, cantidad };
 
     const nuevoCarrito = [...carrito];
     const index = nuevoCarrito.findIndex(
-      (producto) => producto.id === itemAgregado.id && producto.talle === itemAgregado.talle
+      (producto) => producto.id === itemAgregado.id
     );
 
     if (index !== -1) {
-      nuevoCarrito[index].cantidad += cantidad;  // Si ya existe, se aumenta la cantidad
+      nuevoCarrito[index].cantidad += cantidad;
     } else {
-      nuevoCarrito.push(itemAgregado);  // Si no existe, se agrega el producto
+      nuevoCarrito.push(itemAgregado);
     }
 
     setCarrito(nuevoCarrito);
   };
 
-  const eliminarDelCarrito = (itemId, talle, cantidadAEliminar) => {
+  const eliminarDelCarrito = (itemId, cantidadAEliminar) => {
     setCarrito((prevCarrito) => {
       const updatedCart = prevCarrito
         .map((item) => {
-          if (item.id === itemId && item.talle === talle) {
+          if (item.id === itemId) {
             if (item.cantidad <= cantidadAEliminar) {
+              // Si la cantidad a eliminar es mayor o igual a la cantidad en el carrito, eliminar el producto
               return null;
             } else {
+              // Si la cantidad a eliminar es menor que la cantidad en el carrito, reducir la cantidad
               return { ...item, cantidad: item.cantidad - cantidadAEliminar };
             }
           } else {
             return item;
           }
         })
-        .filter((item) => item !== null);
+        .filter((item) => item !== null); // Filtrar los productos nulos (eliminados)
 
       return updatedCart;
     });
