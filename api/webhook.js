@@ -89,11 +89,17 @@ export default async function handler(req, res) {
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
+          
+          // Actualizar el stock total
           const nuevaCantidad = (stockData.cantidad || 0) + producto.cantidad;
+
+          // Determinar el campo del talle si existe
           const tallaCampo = producto.talle ? `talle${producto.talle.toUpperCase()}` : null;
 
+          // Actualizar el stock total
           const updateData = { cantidad: nuevaCantidad };
 
+          // Si el producto tiene un talle, se actualiza también el stock por talle
           if (tallaCampo && stockData.hasOwnProperty(tallaCampo)) {
             updateData[tallaCampo] = (stockData[tallaCampo] || 0) + producto.cantidad;
           }
