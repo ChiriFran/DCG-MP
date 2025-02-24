@@ -1,5 +1,5 @@
-import { db } from "./firebaseAdmin.js";
-import axios from "axios";
+import { db } from "./firebaseAdmin.js"; // Asegúrate de que la ruta es correcta
+import axios from "axios"; // Para realizar consultas a la API de Mercado Pago
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     console.log("Estado del pago recibido:", paymentStatus);
 
-    // 📌 Obtener detalles del pago desde Mercado Pago
+    // 📌 Obtener los detalles completos del pago desde la API de Mercado Pago
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -30,14 +30,17 @@ export default async function handler(req, res) {
     );
 
     if (response.status !== 200) {
-      return res.status(400).json({ error: "No se pudo obtener el estado del pago de Mercado Pago" });
+      return res
+        .status(400)
+        .json({ error: "No se pudo obtener el estado del pago de Mercado Pago" });
     }
 
-    const paymentData = response.data;
+    const paymentData = response.data; // Datos completos del pago
 
     let estadoPedido;
     let coleccion;
 
+    // 📌 Determinar el estado del pedido y en qué colección guardarlo
     if (paymentData.status === "approved") {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
@@ -51,28 +54,28 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 📌 Recoger información del comprador
+    // 📌 Recoger la información del comprador
     const comprador = paymentData.payer?.name || "desconocido";
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer productos comprados
-    const productosComprados = paymentData.additional_info?.items?.map((item) => ({
-      title: item.title,
-      talleSeleccionado: item.description && item.description.trim() !== "" ? item.description : null, // 🔹 Ahora no pone "talle único" si hay talle real
-      quantity: item.quantity,
-    })) || [];
+    // 📌 Extraer los productos comprados con sus talles
+    const productosComprados =
+      paymentData.additional_info?.items?.map((item) => ({
+        nombre: item.title,       // Nombre del producto
+        talle: item.description,  // Talle seleccionado
+      })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
-    // 📌 Guardar la orden en Firebase con los productos correctos
+    // 📌 Guardar la orden en Firebase con los productos
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
       precio,
-      productos: productosComprados,
+      productos: productosComprados, // ✅ Guardamos los productos con sus talles
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -80,43 +83,34 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto.title);
+        const { nombre, talle } = producto;
+
+        // 📌 Verificar si el talle es válido
+        const tallesValidos = ["S", "M", "L", "XL", "XXL"];
+        if (!tallesValidos.includes(talle)) {
+          console.warn(`Talle inválido: ${talle} para producto ${nombre}`);
+          continue;
+        }
+
+        const stockRef = db.collection("stock").doc(nombre);
         const stockDoc = await stockRef.get();
 
-        if (!stockDoc.exists) {
-          console.warn(`Producto ${producto.title} no encontrado en la colección 'stock'.`);
-          continue;
+        if (stockDoc.exists) {
+          const stockData = stockDoc.data();
+          const talleKey = `talle${talle}`; // 📌 Convertir a clave de Firebase (ej: talleM)
+
+          if (stockData[talleKey] !== undefined) {
+            const nuevaCantidad = (stockData[talleKey] || 0) + 1;
+
+            await stockRef.update({ [talleKey]: nuevaCantidad });
+
+            console.log(`Stock actualizado: ${nombre} - ${talle} ahora tiene ${nuevaCantidad} unidades.`);
+          } else {
+            console.warn(`El producto ${nombre} no tiene el campo ${talleKey} en Firebase.`);
+          }
+        } else {
+          console.warn(`Producto ${nombre} no encontrado en la colección 'stock'.`);
         }
-
-        const stockData = stockDoc.data();
-        const nuevaCantidad = (Number(stockData.cantidad) || 0) - producto.quantity;
-
-        // 📌 Consultar la categoría del producto para ver si tiene talles
-        const productoRef = db.collection("productos").doc(producto.title);
-        const productoDoc = await productoRef.get();
-
-        if (!productoDoc.exists) {
-          console.warn(`No se encontró el producto ${producto.title} en la colección 'productos'.`);
-          continue;
-        }
-
-        const productoData = productoDoc.data();
-        const categoria = productoData.categoria?.toLowerCase() || "";
-
-        console.log(`Categoría del producto ${producto.title}: ${categoria}`);
-
-        // 📌 Actualizar stock dependiendo de si tiene talle o no
-        const updateData = { cantidad: nuevaCantidad };
-
-        if (categoria === "T-shirts" && producto.talleSeleccionado) {
-          // Si es una remera y tiene talle, actualizar también el stock del talle
-          const talleField = `talle${producto.talleSeleccionado.toUpperCase()}`; // Ej: talleS, talleM
-          updateData[talleField] = (Number(stockData[talleField]) || 0) - producto.quantity;
-        }
-
-        await stockRef.update(updateData);
-
-        console.log(`Stock actualizado: ${producto.title}, cantidad total: ${nuevaCantidad}, talle: ${producto.talleSeleccionado || "N/A"}`);
       }
     }
 

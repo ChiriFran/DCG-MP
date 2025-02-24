@@ -24,7 +24,7 @@ export default async function handler(req, res) {
           quantity: Number(quantity),
           unit_price: Number(unit_price),
           currency_id: "ARS",
-          description: talleSeleccionado ? `Talle: ${talleSeleccionado}` : "Talle único",
+          description: talleSeleccionado,
         })),
         payer: {
           name: shipping.name,
