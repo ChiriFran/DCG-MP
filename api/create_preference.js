@@ -1,3 +1,5 @@
+import { MercadoPagoConfig, Preference } from "mercadopago";
+
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -17,23 +19,20 @@ export default async function handler(req, res) {
 
       // Crear el cuerpo de la preferencia
       const body = {
-        items: items.map(({ title, quantity, unit_price, talleSeleccionado }) => {
-          console.log(`Producto: ${title}, Talle: ${talleSeleccionado}`); // Verificar antes de enviar
-          return {
-            title,
-            quantity: Number(quantity),
-            unit_price: Number(unit_price),
-            currency_id: "ARS",
-            description: talleSeleccionado, // Aquí se envía el talle
-            category_id: talleSeleccionado, // Se incluye el talle como category_id
-          };
-        }),
+        items: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
+          title,
+          quantity: Number(quantity),
+          unit_price: Number(unit_price),
+          currency_id: "ARS",
+          category_id: talleSeleccionado, // Se incluye el talle como category_id
+          description: talleSeleccionado,
+        })),
         payer: {
           name: shipping.name,
           email: shipping.email,
           phone: {
             area_code: shipping.phoneArea,
-            number: shipping.phone,
+            number: shipping.phone
           },
           address: {
             street_name: shipping.address,
@@ -43,8 +42,8 @@ export default async function handler(req, res) {
             apartment: shipping.apartment || "",
             city: shipping.city,
             state_name: shipping.province,
-            country: "AR",
-          },
+            country: "AR"
+          }
         },
         shipments: {
           mode: "not_specified",
@@ -52,8 +51,8 @@ export default async function handler(req, res) {
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
-            zip_code: shipping.zipCode,
-          },
+            zip_code: shipping.zipCode
+          }
         },
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
@@ -62,11 +61,8 @@ export default async function handler(req, res) {
         },
         statement_descriptor: "DCGSTORE",
         external_reference: orderId,
-        auto_return: "approved",
+        auto_return: "approved"
       };
-
-      // Verificar el objeto completo antes de enviarlo
-      console.log("Cuerpo de la preferencia:", JSON.stringify(body, null, 2));
 
       const preference = new Preference(client);
       const result = await preference.create({ body });
