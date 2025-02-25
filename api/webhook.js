@@ -59,23 +59,24 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados con su talle
+    // 📌 Extraer los productos comprados con su talle y category_id
     const productosComprados =
       paymentData.additional_info?.items?.map((item) => ({
         nombre: item.title,
         talle: item.description || "Sin talle", // ✅ Se extrae el talle del campo description
+        category_id: item.category_id || "Sin categoría", // Se agrega category_id
       })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
-    // 📌 Guardar la orden en Firebase con los productos y talles
+    // 📌 Guardar la orden en Firebase con los productos, talles y category_id
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los productos con su talle
+      productos: productosComprados, // ✅ Guardamos los productos con talle y category_id
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);

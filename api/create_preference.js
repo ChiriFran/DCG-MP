@@ -1,5 +1,3 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
-
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,6 +25,7 @@ export default async function handler(req, res) {
             unit_price: Number(unit_price),
             currency_id: "ARS",
             description: talleSeleccionado, // Aquí se envía el talle
+            category_id: talleSeleccionado, // Se incluye el talle como category_id
           };
         }),
         payer: {
