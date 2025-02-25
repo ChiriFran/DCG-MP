@@ -45,11 +45,11 @@ const Carrito = () => {
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
-        title: prod.title,
+        title: `${prod.title} - Talle: ${prod.talleSeleccionado}`, // Agrega el talle al título
         unit_price: prod.price,
         quantity: prod.cantidad,
-        category_id: prod.talleSeleccionado, // Enviamos el talle aquí
-        description: `Talle: ${prod.talleSeleccionado}`, // También en la descripción
+        category_id: prod.talleSeleccionado, // Mantén el talle en category_id si lo necesitas
+        description: `Talle: ${prod.talleSeleccionado}`, // Descripción también con el talle
       }));
 
       console.log("Items enviados a Mercado Pago:", JSON.stringify(items, null, 2));
