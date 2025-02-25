@@ -59,42 +59,26 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Extraer los productos comprados
+    // 📌 Extraer los productos comprados con su talle
     const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item.title) || [];
+      paymentData.additional_info?.items?.map((item) => ({
+        nombre: item.title,
+        talle: item.description || "Sin talle", // ✅ Se extrae el talle del campo description
+      })) || [];
 
     console.log("Productos comprados:", productosComprados);
 
-    // 📌 Guardar la orden en Firebase con los productos
+    // 📌 Guardar la orden en Firebase con los productos y talles
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los nombres de los productos
+      productos: productosComprados, // ✅ Guardamos los productos con su talle
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
-
-    // 📌 ACTUALIZAR STOCK
-    if (estadoPedido === "pago completado") {
-      for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto);
-        const stockDoc = await stockRef.get();
-
-        if (stockDoc.exists) {
-          const stockData = stockDoc.data();
-          const nuevaCantidad = (stockData.cantidad || 0) + 1;
-
-          await stockRef.update({ cantidad: nuevaCantidad });
-
-          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
-        } else {
-          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
-        }
-      }
-    }
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {

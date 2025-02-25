@@ -48,22 +48,26 @@ const Carrito = () => {
         title: prod.title,
         unit_price: prod.price,
         quantity: prod.cantidad,
-        talle: prod.talleSeleccionado
+        category_id: prod.talleSeleccionado, // Enviamos el talle aquí
+        description: `Talle: ${prod.talleSeleccionado}`, // También en la descripción
       }));
 
-      // URL base del backend desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_URL; // Cambiado a VITE_ para acceso correcto
+      console.log("Items enviados a Mercado Pago:", JSON.stringify(items, null, 2));
+
+      const apiUrl = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
       });
 
+      console.log("Respuesta de Mercado Pago:", response.data);
+
       const { id } = response.data;
       return id;
     } catch (error) {
-      console.error("Error when creating the preference in Mercado Pago:", error);
-      alert("There was a problem generating the preference. Please try again.");
+      console.error("Error al crear la preferencia en Mercado Pago:", error);
+      alert("Hubo un problema al generar la preferencia. Por favor, inténtalo de nuevo.");
     }
   };
 
