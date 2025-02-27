@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     console.log("Estado del pago recibido:", paymentStatus);
 
-    // 📌 Obtener los detalles completos del pago desde la API de Mercado Pago
+    // 📌 Obtener los detalles del pago desde Mercado Pago
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -30,17 +30,15 @@ export default async function handler(req, res) {
     );
 
     if (response.status !== 200) {
-      return res
-        .status(400)
-        .json({ error: "No se pudo obtener el estado del pago de Mercado Pago" });
+      return res.status(400).json({ error: "No se pudo obtener el estado del pago" });
     }
 
-    const paymentData = response.data; // Datos completos del pago
+    const paymentData = response.data;
 
     let estadoPedido;
     let coleccion;
 
-    // 📌 Determinar el estado del pedido y en qué colección guardarlo
+    // 📌 Determinar estado del pedido y colección correspondiente
     if (paymentData.status === "approved") {
       estadoPedido = "pago completado";
       coleccion = "pedidosExitosos";
@@ -72,7 +70,7 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
-      productos: productosComprados, // ✅ Guardamos los nombres de los productos
+      productos: productosComprados,
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
@@ -80,35 +78,32 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        // 📌 Extraer nombre y talle del producto
-        const match = producto.match(/(.*?) - Talle: (\w+)/);
-        if (!match) {
-          console.warn(`Formato de producto incorrecto: ${producto}`);
-          continue;
-        }
+        // Separar el nombre del producto y el talle (si tiene)
+        const partes = producto.split(" - Talle: ");
+        const nombreProducto = partes[0]; // Nombre sin talle
+        const talle = partes[1] ? partes[1].trim() : null; // Talle (si existe)
 
-        const nombreProducto = match[1].trim(); // "Glitch T-Shirt"
-        const talle = match[2].trim(); // "M"
-
-        console.log(`Procesando stock para: ${nombreProducto}, Talle: ${talle}`);
-
-        // 📌 Referencia al documento del producto en stock
         const stockRef = db.collection("stock").doc(nombreProducto);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
           const nuevaCantidad = (stockData.cantidad || 0) + 1;
-          const nuevoTalleCantidad = (stockData[talle] || 0) + 1;
 
-          await stockRef.update({
-            cantidad: nuevaCantidad,
-            [talle]: nuevoTalleCantidad,
-          });
+          // Actualizar solo la cantidad general si no tiene talle
+          const updateData = { cantidad: nuevaCantidad };
 
-          console.log(
-            `Stock actualizado para ${nombreProducto}: Total = ${nuevaCantidad}, ${talle} = ${nuevoTalleCantidad}`
-          );
+          // Si el producto tiene talle, también actualizamos el stock del talle específico
+          if (talle && stockData[talle] !== undefined) {
+            updateData[talle] = (stockData[talle] || 0) + 1;
+          }
+
+          await stockRef.update(updateData);
+
+          console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidad} unidades.`);
+          if (talle) {
+            console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
+          }
         } else {
           console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
         }
