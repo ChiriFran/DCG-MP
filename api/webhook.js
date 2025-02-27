@@ -80,18 +80,37 @@ export default async function handler(req, res) {
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
-        const stockRef = db.collection("stock").doc(producto);
+        // 📌 Extraer nombre y talle del producto
+        const match = producto.match(/(.*?) - Talle: (\w+)/);
+        if (!match) {
+          console.warn(`Formato de producto incorrecto: ${producto}`);
+          continue;
+        }
+
+        const nombreProducto = match[1].trim(); // "Glitch T-Shirt"
+        const talle = match[2].trim(); // "M"
+
+        console.log(`Procesando stock para: ${nombreProducto}, Talle: ${talle}`);
+
+        // 📌 Referencia al documento del producto en stock
+        const stockRef = db.collection("stock").doc(nombreProducto);
         const stockDoc = await stockRef.get();
 
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
           const nuevaCantidad = (stockData.cantidad || 0) + 1;
+          const nuevoTalleCantidad = (stockData[talle] || 0) + 1;
 
-          await stockRef.update({ cantidad: nuevaCantidad });
+          await stockRef.update({
+            cantidad: nuevaCantidad,
+            [talle]: nuevoTalleCantidad,
+          });
 
-          console.log(`Stock actualizado: ${producto} ahora tiene ${nuevaCantidad} unidades.`);
+          console.log(
+            `Stock actualizado para ${nombreProducto}: Total = ${nuevaCantidad}, ${talle} = ${nuevoTalleCantidad}`
+          );
         } else {
-          console.warn(`Producto ${producto} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
         }
       }
     }
