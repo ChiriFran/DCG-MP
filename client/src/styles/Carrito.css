@@ -221,7 +221,7 @@
   resize: none;
 }
 
-.redireccionMarkContainer{
+.redireccionMarkContainer {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -231,7 +231,7 @@
 
 }
 
-.redireccionMarkContainer p{
+.redireccionMarkContainer p {
   font-size: 0.7rem;
   letter-spacing: 1px;
   line-height: 2;
@@ -328,10 +328,10 @@
     margin-top: 2rem;
   }
 
-  
-.formEnvioGroup input {
-  margin-bottom: 1rem;
-}
+
+  .formEnvioGroup input {
+    margin-bottom: 1rem;
+  }
 
   .formEnvioGroupComments textarea {
     min-height: 100px;

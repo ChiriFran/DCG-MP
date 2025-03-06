@@ -211,6 +211,28 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
+                  <label>Address street</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={shippingData.address}
+                    onChange={handleShippingChange}
+                    placeholder="Main St"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Adress Number</label>
+                  <input
+                    type="text"
+                    name="streetNumber"
+                    value={shippingData.streetNumber}
+                    onChange={handleShippingChange}
+                    placeholder="123"
+                    required
+                  />
+                </div>
+                <div className="formEnvioGroup">
                   <label>Zip Code</label>
                   <input
                     type="text"
@@ -220,30 +242,6 @@ const Carrito = () => {
                     placeholder="10001"
                     required
                   />
-                </div>
-                <div className="half-container">
-                  <div className="formEnvioGroup half">
-                    <label>Address street</label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={shippingData.address}
-                      onChange={handleShippingChange}
-                      placeholder="Main St"
-                      required
-                    />
-                  </div>
-                  <div className="formEnvioGroup half">
-                    <label>Adress Number</label>
-                    <input
-                      type="text"
-                      name="streetNumber"
-                      value={shippingData.streetNumber}
-                      onChange={handleShippingChange}
-                      placeholder="123"
-                      required
-                    />
-                  </div>
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
@@ -268,6 +266,17 @@ const Carrito = () => {
                       required
                     />
                   </div>
+                </div>
+                <div className="formEnvioGroup">
+                  <label>Adress Type</label>
+                  <input
+                    type="adressType"
+                    name="text"
+                    value={shippingData.adressType}
+                    onChange={handleShippingChange}
+                    placeholder="House ' Apartment"
+                    required
+                  />
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
