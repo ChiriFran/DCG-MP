@@ -24,6 +24,7 @@ const Carrito = () => {
     phoneArea: "",
     phone: "",
     email: "",
+    adressType: "",
     comments: "",
   });
 
