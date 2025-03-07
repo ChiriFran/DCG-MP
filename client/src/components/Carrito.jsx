@@ -274,7 +274,7 @@ const Carrito = () => {
                     name="text"
                     value={shippingData.adressType}
                     onChange={handleShippingChange}
-                    placeholder="House ' Apartment"
+                    placeholder="House - Apartment"
                     required
                   />
                 </div>
