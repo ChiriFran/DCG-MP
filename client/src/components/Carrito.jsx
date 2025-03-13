@@ -101,8 +101,15 @@ const Carrito = () => {
     e.preventDefault();
 
     if (!shippingData.adressType) {
-      alert("Debes seleccionar un tipo de dirección.");
+      alert("Por favor, selecciona un tipo de dirección.\nPlease select an address type.");
       return;
+    }
+
+    if (shippingData.adressType === "departamento") {
+      if (!shippingData.floor || !shippingData.apartment) {
+        alert("Por favor, completa el número de piso y la letra/número de departamento.\nPlease complete the floor number and the apartment letter/number.");
+        return;
+      }
     }
 
     if (isProcessing) return; // Evita clics repetidos
@@ -284,7 +291,6 @@ const Carrito = () => {
                         onChange={(e) =>
                           setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
                         }
-                        required
                       />
                       House / Casa
                     </label>
@@ -298,12 +304,12 @@ const Carrito = () => {
                         onChange={(e) =>
                           setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
                         }
-                        required
                       />
                       Apartment / Departamento
                     </label>
                   </div>
                 </div>
+
                 <div className="half-container">
                   <div className="formEnvioGroup half">
                     <label>House Floor</label>
