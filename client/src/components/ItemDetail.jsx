@@ -48,7 +48,7 @@ const ItemDetail = ({ item }) => {
   useEffect(() => {
     // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
     if (cantidadVendida >= stockDisponible) {
-      setMensajeAdvertencia("lLo sentimos, no hay stock para este producto.");
+      setMensajeAdvertencia("No hay stock disponible para este producto.");
     } else {
       setMensajeAdvertencia("");
     }
@@ -65,6 +65,12 @@ const ItemDetail = ({ item }) => {
   const handleAgregarAlCarrito = () => {
     if (item.category === "T-shirts" && !talleSeleccionado) {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
+      return;
+    }
+    
+    // Validar que la cantidad sea mayor que 0
+    if (cantidad <= 0) {
+      alert("Por favor, selecciona una cantidad válida.");
       return;
     }
 
