@@ -100,6 +100,11 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
+    if (!shippingData.adressType) {
+      alert("Debes seleccionar un tipo de dirección.");
+      return;
+    }
+
     if (isProcessing) return; // Evita clics repetidos
 
     setIsProcessing("Processing..."); // Mostrar que se está procesando
@@ -279,6 +284,7 @@ const Carrito = () => {
                         onChange={(e) =>
                           setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
                         }
+                        required
                       />
                       House / Casa
                     </label>
@@ -292,12 +298,12 @@ const Carrito = () => {
                         onChange={(e) =>
                           setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
                         }
+                        required
                       />
                       Apartment / Departamento
                     </label>
                   </div>
                 </div>
-
                 <div className="half-container">
                   <div className="formEnvioGroup half">
                     <label>House Floor</label>
