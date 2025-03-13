@@ -1,19 +1,65 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import ItemCount from "./ItemCount";
 import "../styles/ItemDetail.css";
 import { CartContext } from "../context/CartContext";
+import { doc, getDoc } from "firebase/firestore"; // Usar el SDK modular
+import { db } from "../firebase/config"; // Asegúrate de que tu archivo de configuración esté bien configurado
 
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
+  const [stockDisponible, setStockDisponible] = useState(0);
+  const [cantidadVendida, setCantidadVendida] = useState(0);
+  const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
+
+  useEffect(() => {
+    // Verificar el stock disponible en Firebase cuando se carga el producto
+    const consultarStock = async () => {
+      try {
+        // Consulta el producto en la colección de productos usando SDK modular
+        const productoRef = doc(db, "productos", item.id); // Cambié la forma de acceder al documento
+        const productoSnapshot = await getDoc(productoRef);
+        const productoData = productoSnapshot.data();
+
+        // Verifica el stock del producto
+        const stockProducto = productoData?.stock || 0;
+        setStockDisponible(stockProducto);
+
+        // Consulta la cantidad vendida en la colección "stock"
+        const stockRef = doc(db, "stock", item.title); // Buscar por nombre del producto
+        const stockSnapshot = await getDoc(stockRef);
+        const stockData = stockSnapshot.data();
+
+        let cantidadVendidaProducto = 0;
+        if (stockData && stockData.cantidad) {
+          cantidadVendidaProducto = stockData.cantidad;
+        }
+        setCantidadVendida(cantidadVendidaProducto);
+
+      } catch (error) {
+        console.error("Error al consultar el stock:", error);
+      }
+    };
+
+    consultarStock();
+  }, [item.id, item.title]);
+
+  useEffect(() => {
+    // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
+    if (cantidadVendida >= stockDisponible) {
+      setMensajeAdvertencia("lLo sentimos, no hay stock para este producto.");
+    } else {
+      setMensajeAdvertencia("");
+    }
+  }, [cantidadVendida, stockDisponible]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, item.stock));
+    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible - cantidadVendida));
   };
 
   const handleAgregarAlCarrito = () => {
@@ -22,18 +68,22 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
+    if (cantidad + cantidadVendida > stockDisponible) {
+      alert("No hay suficiente stock disponible.");
+      return;
+    }
+
     console.log("Producto agregado al carrito:", {
       ...item,
       cantidad,
       talleSeleccionado: item.category === "T-shirts" ? talleSeleccionado : null,
-    }); // 👀 Verifica en consola que se está pasando el talle
+    });
 
     agregarAlCarrito(item, cantidad, talleSeleccionado); // ✅ Pasar el talle como argumento
 
     setCantidad(1);
     setTalleSeleccionado("");
   };
-
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;
@@ -60,7 +110,6 @@ const ItemDetail = ({ item }) => {
           <h3>Size</h3>
           <div id="size-selector">
             {item.category === "T-shirts" ? (
-              // Mostrar todos los talles disponibles
               ["S", "M", "L", "XL", "XXL"].map((talle) => (
                 <button
                   key={talle}
@@ -71,13 +120,16 @@ const ItemDetail = ({ item }) => {
                 </button>
               ))
             ) : (
-              // Mostrar un solo botón deshabilitado para talla única
               <button className="size-button single-size" disabled>
                 Unique sizes available
               </button>
             )}
           </div>
         </div>
+
+        {mensajeAdvertencia && (
+          <p className="mensajeAdvertencia">{mensajeAdvertencia}</p>
+        )}
 
         <div className="botonesComprarEliminar">
           <ItemCount
@@ -96,7 +148,6 @@ const ItemDetail = ({ item }) => {
         </p>
 
         <p className="itemDetailDescription">{item.description}</p>
-
 
         <div className="itemDetailDescriptionList">
           <ul>
