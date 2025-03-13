@@ -221,6 +221,40 @@
   resize: none;
 }
 
+.radio-group {
+  display: flex;
+  width: 100%;
+  padding: 8px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px;
+  background-color: rgba(174, 174, 174, 0.046);
+  color: #9d9d9d;
+  border: 1px solid #ffffff31;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+  font-size: 0.9rem;
+}
+
+.custom-radio input {
+  display: none;
+  /* Ocultar input real */
+}
+
+.custom-radio.selected {
+  background: rgba(0, 255, 0, 0.206);
+  border-color: white;
+  color: #f3f3f3;
+}
+
+
 .redireccionMarkContainer {
   display: flex;
   flex-flow: column;

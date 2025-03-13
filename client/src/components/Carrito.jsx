@@ -268,17 +268,36 @@ const Carrito = () => {
                     />
                   </div>
                 </div>
-                <div className="formEnvioGroup">
-                  <label>Adress Type</label>
-                  <input
-                    type="adressType"
-                    name="text"
-                    value={shippingData.adressType}
-                    onChange={handleShippingChange}
-                    placeholder="House - Apartment"
-                    required
-                  />
+                <div className="half-container">
+                  <div className="radio-group">
+                    <label className={`custom-radio ${shippingData.adressType === "casa" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="adressType"
+                        value="casa"
+                        checked={shippingData.adressType === "casa"}
+                        onChange={(e) =>
+                          setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
+                        }
+                      />
+                      House / Casa
+                    </label>
+
+                    <label className={`custom-radio ${shippingData.adressType === "departamento" ? "selected" : ""}`}>
+                      <input
+                        type="radio"
+                        name="adressType"
+                        value="departamento"
+                        checked={shippingData.adressType === "departamento"}
+                        onChange={(e) =>
+                          setShippingData((prev) => ({ ...prev, adressType: e.target.value }))
+                        }
+                      />
+                      Apartment / Departamento
+                    </label>
+                  </div>
                 </div>
+
                 <div className="half-container">
                   <div className="formEnvioGroup half">
                     <label>House Floor</label>
