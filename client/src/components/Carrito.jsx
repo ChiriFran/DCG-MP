@@ -36,10 +36,16 @@ const Carrito = () => {
   // Maneja los cambios en los campos de envío
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
-    setShippingData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+    if (name === "floor") {
+      if (!/^[A-Za-z]*$/.test(value)) return; // Solo letras
+    }
+
+    if (name === "apartment") {
+      if (!/^\d*$/.test(value)) return; // Solo números
+    }
+
+    setShippingData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Crea la preferencia en el backend
@@ -108,6 +114,16 @@ const Carrito = () => {
     if (shippingData.adressType === "departamento") {
       if (!shippingData.floor || !shippingData.apartment) {
         alert("Por favor, completa el número de piso y la letra/número de departamento.\nPlease complete the floor number and the apartment letter/number.");
+        return;
+      }
+
+      if (!/^[A-Za-z]+$/.test(shippingData.floor)) {
+        alert("El número de piso solo debe contener letras.\nThe floor number should only contain letters.");
+        return;
+      }
+
+      if (!/^\d+$/.test(shippingData.apartment)) {
+        alert("El apartamento solo debe contener números.\nThe apartment should only contain numbers.");
         return;
       }
     }
@@ -317,20 +333,34 @@ const Carrito = () => {
                       type="text"
                       name="floor"
                       value={shippingData.floor}
-                      onChange={handleShippingChange}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d*$/.test(value)) { // Acepta solo números
+                          setShippingData((prev) => ({ ...prev, floor: value }));
+                        }
+                      }}
                       placeholder="4"
+                      className={shippingData.floor && /^\d+$/.test(shippingData.floor) ? "valid" : "invalid"}
                     />
                   </div>
+
                   <div className="formEnvioGroup half">
                     <label>Apartment</label>
                     <input
                       type="text"
                       name="apartment"
                       value={shippingData.apartment}
-                      onChange={handleShippingChange}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^[A-Za-z]*$/.test(value)) { // Acepta solo letras
+                          setShippingData((prev) => ({ ...prev, apartment: value }));
+                        }
+                      }}
                       placeholder="B"
+                      className={shippingData.apartment && /^[A-Za-z]+$/.test(shippingData.apartment) ? "valid" : "invalid"}
                     />
                   </div>
+
                 </div>
                 <div className="formEnvio">
                   <label>Comments (Optional)</label>

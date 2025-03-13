@@ -254,6 +254,16 @@
   color: #f3f3f3;
 }
 
+/* ✅ Estilo cuando el dato es válido */
+.valid {
+  background: rgba(0, 255, 0, 0.206);
+}
+
+/* ❌ Estilo cuando el dato es incorrecto */
+.invalid {
+  border-color: rgba(255, 0, 0, 0.486);
+
+}
 
 .redireccionMarkContainer {
   display: flex;
