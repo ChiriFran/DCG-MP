@@ -366,28 +366,31 @@ const Carrito = () => {
                   <label className="mediosDeEnvioTitle">Shipping option</label>
                   <div className="mediosDeEnvio">
                     <label>
+                      CABA<br />$4000
                       <input
                         type="radio"
                         name="shippingOption"
                         value="CABA"
                         onChange={handleShippingOptionChange}
-                      /> CABA
+                      />
                     </label>
                     <label>
+                      GBA<br />$5000
                       <input
                         type="radio"
                         name="shippingOption"
                         value="GBA"
                         onChange={handleShippingOptionChange}
-                      /> GBA
+                      />
                     </label>
                     <label>
+                      Resto del país<br />$10000
                       <input
                         type="radio"
                         name="shippingOption"
                         value="Resto del país"
                         onChange={handleShippingOptionChange}
-                      /> Resto del país
+                      />
                     </label>
                   </div>
                 </div>

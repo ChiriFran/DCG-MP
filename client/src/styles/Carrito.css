@@ -293,6 +293,7 @@
   flex-flow: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 
@@ -300,18 +301,21 @@
   appearance: none; /* Oculta el radio predeterminado */
   -webkit-appearance: none;
   -moz-appearance: none;
-  width: 20px; /* Tamaño del cuadrado */
-  height: 20px;
+  width: 30px; /* Tamaño del cuadrado */
+  height: 30px;
   background-color: rgba(174, 174, 174, 0.046);
   border: 1px solid #ffffff31;
   display: inline-block;
   position: relative;
   cursor: pointer;
-  border-radius: 4px; /* Opcional: redondea un poco las esquinas */
+  margin-top: 0.5rem;
+  transition: background 0.3s, border-color 0.3s;
+
 }
 
 input[type="radio"]:checked {
-  background-color: white; /* Fondo blanco cuando está seleccionado */
+  background: rgba(0, 255, 0, 0.365);
+  border: 1px solid white;
 }
 
 input[type="radio"]::before {
@@ -319,7 +323,7 @@ input[type="radio"]::before {
   position: absolute;
   width: 10px; /* Tamaño del "check" */
   height: 10px;
-  background-color: white; /* Color del check */
+  background: rgba(0, 255, 0, 0);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
