@@ -126,6 +126,23 @@ const Carrito = () => {
       }
     }
 
+    // Validación de código postal según ubicación
+    const zipCode = shippingData.zipCode.trim();
+    const zipCodeNumber = parseInt(zipCode, 10);
+
+    let region = "Resto del país";
+
+    if (/^(10|11|12|13|14|15)\d{2}$/.test(zipCode)) {
+      region = "CABA";
+    } else if (/^(16|17|18|19|2[0-9]|3[0-9])\d{2}$/.test(zipCode)) {
+      region = "GBA";
+    }
+
+    if (region !== shippingOption) {
+      alert(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
+      return;
+    }
+
     if (isProcessing) return;
 
     setIsProcessing("Processing...");
@@ -152,6 +169,7 @@ const Carrito = () => {
       setIsProcessing("");
     }
   };
+
 
 
 
