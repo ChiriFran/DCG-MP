@@ -30,9 +30,9 @@ const Carrito = () => {
   const [shippingOption, setShippingOption] = useState(""); // Nueva opción de envío
 
   const shippingCosts = {
-    CABA: 4000,
-    GBA: 7000,
-    "Resto del país": 10000,
+    CABA: 1,
+    GBA: 2,
+    "Resto del país": 3,
   };
 
   const handleShippingChange = (e) => {
