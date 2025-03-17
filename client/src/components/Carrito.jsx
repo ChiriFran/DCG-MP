@@ -410,8 +410,7 @@ const Carrito = () => {
                     </label>
                   </div>
                   <div className="redireccionMarkContainer">
-                  <p>Al seleccionar envío, se aplicará el costo.</p>
-                  <p>When selecting shipping, the cost will be applied.</p>
+                  <p>Al seleccionar envío, se aplicará el costo. / When selecting shipping, the cost will be applied.</p>
                 </div>
                 </div>
                 <div className="formEnvio">
@@ -424,8 +423,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="redireccionMarkContainer">
-                  <p>Al finalizar el pago seras redirigido nuevamente para confirmar la compra, pro favor espera.</p>
-                  <p>At checkout you will be redirected to confirm your purchase, please wait. </p>
+                  <p>Al finalizar el pago seras redirigido rapidamente. / At the end of the payment you will be redirected quickly.</p>
                 </div>
                 {message && <div className="message">{message}</div>} {/* Mostrar el mensaje en pantalla */}
                 <button

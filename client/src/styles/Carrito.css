@@ -255,7 +255,7 @@
 
 /* ✅ Estilo cuando el dato es válido */
 .valid {
-  background: rgba(0, 255, 0, 0.206);
+  background: rgba(0, 255, 0, 0.365);
 }
 
 /* ❌ Estilo cuando el dato es incorrecto */
@@ -272,7 +272,6 @@
   width: 100%;
   padding: 6px;
   margin-top: 0.2rem;
-  margin-bottom: 1rem;
 }
 
 .mediosDeEnvio{
@@ -338,9 +337,8 @@ input[type="radio"]:checked::before {
 .redireccionMarkContainer {
   display: flex;
   flex-flow: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
   gap: 1rem;
   width: 100%;
   margin: 0.5rem 0;
