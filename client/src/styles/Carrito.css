@@ -102,7 +102,7 @@
 }
 
 .precioFinal::after {
-  content: 'shipping cost calculated at checkout - Gastos de envío calculados al pagar';
+  content: 'Gastos de Envio aplicados al seleccionar - Shipping costs applied when selecting';
   position: absolute;
   top: 5px;
   left: 0;
@@ -340,6 +340,8 @@ input[type="radio"]:checked::before {
   flex-flow: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  gap: 1rem;
   width: 100%;
   margin: 0.5rem 0;
 
@@ -349,7 +351,6 @@ input[type="radio"]:checked::before {
   font-size: 0.7rem;
   letter-spacing: 1px;
   line-height: 2;
-  text-decoration: underline;
 }
 
 .message{
@@ -413,6 +414,12 @@ input[type="radio"]:checked::before {
 
   .precioFinal {
     text-align: center;
+    margin: 3rem 0;
+    padding: 2rem 0 2rem 0;
+  }
+
+  .precioFinal::after {
+    top: 100%;
   }
 
   .productImage {

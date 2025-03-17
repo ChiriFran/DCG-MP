@@ -409,6 +409,10 @@ const Carrito = () => {
                       />
                     </label>
                   </div>
+                  <div className="redireccionMarkContainer">
+                  <p>Al seleccionar envío, se aplicará el costo.</p>
+                  <p>When selecting shipping, the cost will be applied.</p>
+                </div>
                 </div>
                 <div className="formEnvio">
                   <label>Comments (Optional)</label>
