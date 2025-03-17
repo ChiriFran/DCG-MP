@@ -102,15 +102,15 @@
 }
 
 .precioFinal::after {
-  content: 'Taxes and shipping calculated at checkout';
+  content: 'shipping calculated at checkout - Gastos de envío calculados al pagar';
   position: absolute;
   top: 5px;
   left: 0;
   width: 100%;
   height: 100%;
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: rgba(224, 224, 224, 0.32);
+  color: rgba(224, 224, 224, 0.633);
 }
 
 .finalizarCompraContainer {
