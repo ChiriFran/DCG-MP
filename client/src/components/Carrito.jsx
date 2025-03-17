@@ -448,6 +448,8 @@ const Carrito = () => {
       </div>
 
       {carrito.length === 0 && <ItemListContainerDestacados />}
+      {message && <div className="message">{message}</div>} {/* Mostrar el mensaje en pantalla */}
+
     </div>
   );
 };
