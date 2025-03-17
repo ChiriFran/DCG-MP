@@ -111,13 +111,13 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (!shippingOption) {
-      setMessage("Por favor, selecciona una opción de envío.");
+    if (!shippingData.adressType) {
+      setMessage("Por favor, indica el tipo de domicilio.");
       return;
     }
 
-    if (!shippingData.adressType) {
-      setMessage("Por favor, selecciona un tipo de dirección.");
+    if (!shippingOption) {
+      setMessage("Por favor, completa el costo de envio.");
       return;
     }
 
@@ -171,7 +171,7 @@ const Carrito = () => {
       setIsProcessing("");
     }
   };
-  
+
   return (
     <div className="carritoContainer">
       <div className="carritoCard">
@@ -423,6 +423,7 @@ const Carrito = () => {
                   <p>Al finalizar el pago seras redirigido nuevamente para confirmar la compra, pro favor espera.</p>
                   <p>At checkout you will be redirected to confirm your purchase, please wait. </p>
                 </div>
+                {message && <div className="message">{message}</div>} {/* Mostrar el mensaje en pantalla */}
                 <button
                   type="submit"
                   className="mercadoPagoBtn"
@@ -446,8 +447,6 @@ const Carrito = () => {
       </div>
 
       {carrito.length === 0 && <ItemListContainerDestacados />}
-      {message && <div className="message">{message}</div>} {/* Mostrar el mensaje en pantalla */}
-
     </div>
   );
 };
