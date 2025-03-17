@@ -109,60 +109,47 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
+    if (!shippingOption) {
+      alert("Por favor, selecciona una opción de envío.");
+      return;
+    }
+
     if (!shippingData.adressType) {
-      alert("Por favor, selecciona un tipo de dirección.\nPlease select an address type.");
+      alert("Por favor, selecciona un tipo de dirección.");
       return;
     }
 
     if (shippingData.adressType === "departamento") {
       if (!shippingData.floor || !shippingData.apartment) {
-        alert("Por favor, completa el número de piso y la letra/número de departamento.\nPlease complete the floor number and the apartment letter/number.");
-        return;
-      }
-
-      if (!/^[A-Za-z]+$/.test(shippingData.floor)) {
-        alert("El número de piso solo debe contener letras.\nThe floor number should only contain letters.");
-        return;
-      }
-
-      if (!/^\d+$/.test(shippingData.apartment)) {
-        alert("El apartamento solo debe contener números.\nThe apartment should only contain numbers.");
-        return;
-      }
-
-      if (!shippingOption) {
-        alert("Por favor, selecciona una opción de envío."); //valida el precio de envio
+        alert("Completa el número de piso y departamento.");
         return;
       }
     }
 
-    if (isProcessing) return; // Evita clics repetidos
+    if (isProcessing) return;
 
-    setIsProcessing("Processing..."); // Mostrar que se está procesando
+    setIsProcessing("Processing...");
 
-    const id = await createPreference(); // Crear la preferencia en Mercado Pago
+    const id = await createPreference();
     if (id) {
       setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago..."); // Actualizar mensaje
+      setIsProcessing("Redirecting to Mercado Pago...");
 
-      const orderId = await saveOrderToFirebase(); // Guardar el pedido en Firebase y obtener el ID
-
+      const orderId = await saveOrderToFirebase();
       if (orderId) {
-        // Esperar 1 segundos antes de redirigir
         setTimeout(() => {
           const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
-          window.open(checkoutUrl, "_blank"); // Redirigir al checkout en nueva pestaña
-
-          vaciarCarrito(); // Vaciar el carrito después de redirigir
-          setIsProcessing(""); // Resetear el estado después del flujo
+          window.open(checkoutUrl, "_blank");
+          vaciarCarrito();
+          setIsProcessing("");
         }, 200);
       } else {
-        alert("The order could not be saved. Please try again.");
-        setIsProcessing(""); // Resetear el estado si hay un error
+        alert("Error guardando el pedido.");
+        setIsProcessing("");
       }
     } else {
-      alert("It was not possible to create the preference in Mercado Pago. Please try again.");
-      setIsProcessing(""); // Resetear el estado si hay un error
+      alert("Error creando la preferencia en Mercado Pago.");
+      setIsProcessing("");
     }
   };
 
@@ -308,7 +295,7 @@ const Carrito = () => {
                   </div>
                 </div>
                 <div className="formEnvioGroup">
-                <label>Housing options</label>
+                  <label>Housing options</label>
                   <div className="radio-group">
                     <label className={`custom-radio ${shippingData.adressType === "casa" ? "selected" : ""}`}>
                       <input
@@ -375,25 +362,35 @@ const Carrito = () => {
 
                 </div>
 
-                <div className="formEnvioGroup mediosDeEnvio">
-                  <label>Shipping Option</label>
-                  <div className="radio-group">
-                    {["CABA", "GBA", "Resto del país"].map((option) => (
-                      <label key={option} className={`custom-radio ${shippingOption === option ? "selected" : ""}`}>
-                        <input
-                          type="radio"
-                          name="shippingOption"
-                          value={option}
-                          checked={shippingOption === option}
-                          onChange={handleShippingOptionChange}
-                          required
-                        />
-                        {option} - ${shippingCosts[option]}
-                      </label>
-                    ))}
+                <div className="formEnvioGroup mediosDeEnvioContainer">
+                  <label className="mediosDeEnvioTitle">Shipping option</label>
+                  <div className="mediosDeEnvio">
+                    <label>
+                      <input
+                        type="radio"
+                        name="shippingOption"
+                        value="CABA"
+                        onChange={handleShippingOptionChange}
+                      /> CABA
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="shippingOption"
+                        value="GBA"
+                        onChange={handleShippingOptionChange}
+                      /> GBA
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="shippingOption"
+                        value="Resto del país"
+                        onChange={handleShippingOptionChange}
+                      /> Resto del país
+                    </label>
                   </div>
                 </div>
-
                 <div className="formEnvio">
                   <label>Comments (Optional)</label>
                   <textarea
