@@ -468,6 +468,14 @@ input[type="radio"]:checked::before {
     width: 100%;
   }
 
+  .radio-group{
+    flex-flow: column;
+  }
+
+  .mediosDeEnvioTitle{
+    margin-bottom: 2rem;
+  }
+
   .message{
     font-size: 1rem;
   }
