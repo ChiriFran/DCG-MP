@@ -391,7 +391,7 @@ const Carrito = () => {
                       />
                     </label>
                     <label>
-                      GBA<br />$5000
+                      GBA<br />$8000
                       <input
                         type="radio"
                         name="shippingOption"
@@ -400,7 +400,7 @@ const Carrito = () => {
                       />
                     </label>
                     <label>
-                      Resto del país<br />$10000
+                      Resto del país<br />$15000
                       <input
                         type="radio"
                         name="shippingOption"
