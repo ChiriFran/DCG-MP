@@ -30,9 +30,9 @@ const Carrito = () => {
   const [shippingOption, setShippingOption] = useState(""); // Nueva opción de envío
 
   const shippingCosts = {
-    CABA: 1,
-    GBA: 2,
-    "Resto del país": 3,
+    CABA: 1,             //PRECIO DE ENVIO PRUEBA 
+    GBA: 2,              //PRECIO DE ENVIO PRUEBA
+    "Resto del país": 3, //PRECIO DE ENVIO PRUEBA
   };
 
   const handleShippingChange = (e) => {
