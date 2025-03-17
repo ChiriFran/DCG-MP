@@ -224,9 +224,8 @@
 .radio-group {
   display: flex;
   width: 100%;
-  padding: 8px;
+  padding: 6px 0;
   gap: 10px;
-  margin-top: 10px;
 }
 
 .custom-radio {
@@ -234,7 +233,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 8px;
+  padding: 6px;
   background-color: rgba(174, 174, 174, 0.046);
   color: #9d9d9d;
   border: 1px solid #ffffff31;
@@ -263,6 +262,13 @@
 .invalid {
   border-color: rgba(255, 0, 0, 0.486);
 
+}
+
+.mediosDeEnvio{
+  width: 100%;
+  padding: 6px;
+  margin-top: 0.2rem;
+  margin-bottom: 1rem;
 }
 
 .redireccionMarkContainer {

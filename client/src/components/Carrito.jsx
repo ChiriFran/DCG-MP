@@ -27,26 +27,27 @@ const Carrito = () => {
     adressType: "",
     comments: "",
   });
+  const [shippingOption, setShippingOption] = useState(""); // Nueva opción de envío
 
+  const shippingCosts = {
+    CABA: 4000,
+    GBA: 7000,
+    "Resto del país": 10000,
+  };
+
+  const handleShippingChange = (e) => {
+    const { name, value } = e.target;
+    setShippingData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleShippingOptionChange = (e) => {
+    setShippingOption(e.target.value);
+  };
 
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
-  // Maneja los cambios en los campos de envío
-  const handleShippingChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "floor") {
-      if (!/^[A-Za-z]*$/.test(value)) return; // Solo letras
-    }
-
-    if (name === "apartment") {
-      if (!/^\d*$/.test(value)) return; // Solo números
-    }
-
-    setShippingData((prev) => ({ ...prev, [name]: value }));
-  };
 
   // Crea la preferencia en el backend
   const createPreference = async () => {
@@ -66,6 +67,7 @@ const Carrito = () => {
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
+        shippingCost: shippingCosts[shippingOption] || 0, // Se agrega el costo de envío
       });
 
       console.log("Respuesta de Mercado Pago:", response.data);
@@ -83,9 +85,10 @@ const Carrito = () => {
     const pedido = {
       cliente: shippingData,
       productos: carrito,
-      total: precioTotal(1), // Puedes agregar aquí el valor del envío si corresponde
-      status: "pending", // Estado inicial del pedido
-      createdAt: new Date(), // Agrega la fecha de creación
+      total: precioTotal() + (shippingCosts[shippingOption] || 0),
+      status: "pending",
+      createdAt: new Date(),
+      shippingOption,
     };
 
     try {
@@ -124,6 +127,11 @@ const Carrito = () => {
 
       if (!/^\d+$/.test(shippingData.apartment)) {
         alert("El apartamento solo debe contener números.\nThe apartment should only contain numbers.");
+        return;
+      }
+
+      if (!shippingOption) {
+        alert("Por favor, selecciona una opción de envío."); //valida el precio de envio
         return;
       }
     }
@@ -191,7 +199,10 @@ const Carrito = () => {
                 <h3 className="precioTotal">${prod.price * prod.cantidad}</h3>
               </div>
             ))}
-            <h2 className="precioFinal">Total: ${precioTotal()}</h2>
+
+            <h2 className="precioFinal">
+              Total: ${precioTotal() + (shippingCosts[shippingOption] || 0)}
+            </h2>
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
@@ -296,7 +307,8 @@ const Carrito = () => {
                     />
                   </div>
                 </div>
-                <div className="half-container">
+                <div className="formEnvioGroup">
+                <label>Housing options</label>
                   <div className="radio-group">
                     <label className={`custom-radio ${shippingData.adressType === "casa" ? "selected" : ""}`}>
                       <input
@@ -362,6 +374,26 @@ const Carrito = () => {
                   </div>
 
                 </div>
+
+                <div className="formEnvioGroup mediosDeEnvio">
+                  <label>Shipping Option</label>
+                  <div className="radio-group">
+                    {["CABA", "GBA", "Resto del país"].map((option) => (
+                      <label key={option} className={`custom-radio ${shippingOption === option ? "selected" : ""}`}>
+                        <input
+                          type="radio"
+                          name="shippingOption"
+                          value={option}
+                          checked={shippingOption === option}
+                          onChange={handleShippingOptionChange}
+                          required
+                        />
+                        {option} - ${shippingCosts[option]}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="formEnvio">
                   <label>Comments (Optional)</label>
                   <textarea
