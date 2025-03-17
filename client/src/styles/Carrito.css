@@ -102,7 +102,7 @@
 }
 
 .precioFinal::after {
-  content: 'shipping calculated at checkout - Gastos de envío calculados al pagar';
+  content: 'shipping cost calculated at checkout - Gastos de envío calculados al pagar';
   position: absolute;
   top: 5px;
   left: 0;

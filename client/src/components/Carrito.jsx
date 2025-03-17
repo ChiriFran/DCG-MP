@@ -363,7 +363,7 @@ const Carrito = () => {
                 </div>
 
                 <div className="formEnvioGroup mediosDeEnvioContainer">
-                  <label className="mediosDeEnvioTitle">Shipping option</label>
+                  <label className="mediosDeEnvioTitle">Shipping cost</label>
                   <div className="mediosDeEnvio">
                     <label>
                       CABA<br />$4000
