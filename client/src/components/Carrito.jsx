@@ -34,6 +34,8 @@ const Carrito = () => {
     GBA: 2,              //PRECIO DE ENVIO PRUEBA
     "Resto del país": 3, //PRECIO DE ENVIO PRUEBA
   };
+  const [message, setMessage] = useState(""); // Estado para mostrar los mensajes
+
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -110,18 +112,18 @@ const Carrito = () => {
     e.preventDefault();
 
     if (!shippingOption) {
-      alert("Por favor, selecciona una opción de envío.");
+      setMessage("Por favor, selecciona una opción de envío.");
       return;
     }
 
     if (!shippingData.adressType) {
-      alert("Por favor, selecciona un tipo de dirección.");
+      setMessage("Por favor, selecciona un tipo de dirección.");
       return;
     }
 
     if (shippingData.adressType === "departamento") {
       if (!shippingData.floor || !shippingData.apartment) {
-        alert("Completa el número de piso y departamento.");
+        setMessage("Completa el número de piso y departamento.");
         return;
       }
     }
@@ -139,7 +141,7 @@ const Carrito = () => {
     }
 
     if (region !== shippingOption) {
-      alert(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
+      setMessage(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
       return;
     }
 
@@ -161,19 +163,15 @@ const Carrito = () => {
           setIsProcessing("");
         }, 200);
       } else {
-        alert("Error guardando el pedido.");
+        setMessage("Error guardando el pedido.");
         setIsProcessing("");
       }
     } else {
-      alert("Error creando la preferencia en Mercado Pago.");
+      setMessage("Error creando la preferencia en Mercado Pago.");
       setIsProcessing("");
     }
   };
-
-
-
-
-
+  
   return (
     <div className="carritoContainer">
       <div className="carritoCard">
