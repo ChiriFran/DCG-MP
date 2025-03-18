@@ -80,7 +80,6 @@ export default async function handler(req, res) {
       envio: direccionEnvio, // 🔹 Agregar datos de envío
     });
 
-
     console.log("Dirección de envío:", direccionEnvio);
 
     // 📌 Guardar la orden en Firebase con los productos y dirección de envío
