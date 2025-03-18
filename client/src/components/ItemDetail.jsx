@@ -2,50 +2,41 @@ import { useContext, useState, useEffect } from "react";
 import ItemCount from "./ItemCount";
 import "../styles/ItemDetail.css";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc } from "firebase/firestore"; // Usar el SDK modular
-import { db } from "../firebase/config"; // Asegúrate de que tu archivo de configuración esté bien configurado
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
-  const [stockDisponible, setStockDisponible] = useState({});  // Estado para el stock por talle
-  const [cantidadVendida, setCantidadVendida] = useState({});  // Estado para la cantidad vendida por talle
+  const [stockDisponible, setStockDisponible] = useState(0);
+  const [cantidadVendida, setCantidadVendida] = useState(0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
 
   useEffect(() => {
-    // Consultar el stock y la cantidad vendida por talle
     const consultarStock = async () => {
       try {
-        // Obtener el stock disponible del producto
-        const productoRef = doc(db, "productos", item.id); // Obtener el documento del producto
+        const productoRef = doc(db, "productos", item.id);
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        // Configurar el stock disponible por talle solo si es una remera
         if (item.category === "T-shirts") {
-          setStockDisponible({
-            S: productoData?.stockS || 0,
-            M: productoData?.stockM || 0,
-            L: productoData?.stockL || 0,
-            XL: productoData?.stockXL || 0,
-            XXL: productoData?.stockXXL || 0,
-          });
+          // Si es una remera, manejar stock por talle
+          setStockDisponible(productoData?.stockPorTalle || {});
+        } else {
+          // Si no es una remera, manejar stock general
+          setStockDisponible(productoData?.stock || 0);
         }
 
-        // Obtener la cantidad vendida por talle desde la colección 'stock'
-        const stockRef = doc(db, "stock", item.title); // Buscar en la colección 'stock' por nombre del producto
+        const stockRef = doc(db, "stock", item.title);
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
 
-        // Configurar la cantidad vendida por talle
-        setCantidadVendida({
-          S: stockData?.S || 0,
-          M: stockData?.M || 0,
-          L: stockData?.L || 0,
-          XL: stockData?.XL || 0,
-          XXL: stockData?.XXL || 0,
-        });
+        let cantidadVendidaProducto = 0;
+        if (stockData && stockData.cantidad) {
+          cantidadVendidaProducto = stockData.cantidad;
+        }
+        setCantidadVendida(cantidadVendidaProducto);
 
       } catch (error) {
         console.error("Error al consultar el stock:", error);
@@ -56,20 +47,31 @@ const ItemDetail = ({ item }) => {
   }, [item.id, item.title]);
 
   useEffect(() => {
-    // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
-    if (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
-      setMensajeAdvertencia("No hay stock disponible para este talle.");
+    let stockActual = 0;
+
+    if (item.category === "T-shirts") {
+      stockActual = talleSeleccionado ? (stockDisponible[talleSeleccionado] || 0) : 0;
+    } else {
+      stockActual = stockDisponible;
+    }
+
+    if (cantidadVendida >= stockActual) {
+      setMensajeAdvertencia("No hay stock disponible para este producto.");
     } else {
       setMensajeAdvertencia("");
     }
-  }, [cantidadVendida, stockDisponible, talleSeleccionado, item.category]);
+  }, [cantidadVendida, stockDisponible, talleSeleccionado]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] - cantidadVendida[talleSeleccionado]));
+    let stockActual = item.category === "T-shirts"
+      ? (talleSeleccionado ? (stockDisponible[talleSeleccionado] || 0) : 0)
+      : stockDisponible;
+
+    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockActual - cantidadVendida));
   };
 
   const handleAgregarAlCarrito = () => {
@@ -78,25 +80,21 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    // Validar que la cantidad sea mayor que 0
     if (cantidad <= 0) {
       alert("Por favor, selecciona una cantidad válida.");
       return;
     }
 
-    if (item.category === "T-shirts" && cantidad + cantidadVendida[talleSeleccionado] > stockDisponible[talleSeleccionado]) {
-      alert("No hay suficiente stock disponible para este talle.");
+    let stockActual = item.category === "T-shirts"
+      ? (stockDisponible[talleSeleccionado] || 0)
+      : stockDisponible;
+
+    if (cantidad + cantidadVendida > stockActual) {
+      alert("No hay suficiente stock disponible.");
       return;
     }
 
-    console.log("Producto agregado al carrito:", {
-      ...item,
-      cantidad,
-      talleSeleccionado: item.category === "T-shirts" ? talleSeleccionado : null,
-    });
-
-    agregarAlCarrito(item, cantidad, talleSeleccionado); // ✅ Pasar el talle como argumento
-
+    agregarAlCarrito(item, cantidad, talleSeleccionado);
     setCantidad(1);
     setTalleSeleccionado("");
   };
@@ -114,6 +112,7 @@ const ItemDetail = ({ item }) => {
 
   const handleTalleSeleccionado = (talle) => {
     setTalleSeleccionado(talle);
+    setCantidad(1); // Reiniciar cantidad al cambiar de talle
   };
 
   return (
