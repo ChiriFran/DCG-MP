@@ -9,19 +9,20 @@ const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
-  const [stockDisponible, setStockDisponible] = useState(item.category === "T-shirts" ? {} : 0);
+  const [stockTotal, setStockTotal] = useState(item.category === "T-shirts" ? {} : 0);
   const [cantidadVendida, setCantidadVendida] = useState(item.category === "T-shirts" ? {} : 0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
 
   useEffect(() => {
     const consultarStock = async () => {
       try {
+        // Obtener el stock total desde la colección "productos"
         const productoRef = doc(db, "productos", item.id);
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
         if (item.category === "T-shirts") {
-          setStockDisponible({
+          setStockTotal({
             S: productoData?.stockS || 0,
             M: productoData?.stockM || 0,
             L: productoData?.stockL || 0,
@@ -29,9 +30,10 @@ const ItemDetail = ({ item }) => {
             XXL: productoData?.stockXXL || 0,
           });
         } else {
-          setStockDisponible(productoData?.stock || 0);
+          setStockTotal(productoData?.stock || 0);
         }
 
+        // Obtener la cantidad vendida desde la colección "stock"
         const stockRef = doc(db, "stock", item.title);
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
@@ -47,7 +49,6 @@ const ItemDetail = ({ item }) => {
         } else {
           setCantidadVendida(stockData?.cantidad || 0);
         }
-
       } catch (error) {
         console.error("Error al consultar el stock:", error);
       }
@@ -58,19 +59,19 @@ const ItemDetail = ({ item }) => {
 
   useEffect(() => {
     if (item.category === "T-shirts") {
-      if (talleSeleccionado && cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
+      if (talleSeleccionado && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado]) {
         setMensajeAdvertencia("No hay stock disponible para este talle.");
       } else {
         setMensajeAdvertencia("");
       }
     } else {
-      if (cantidadVendida >= stockDisponible) {
+      if (cantidadVendida >= stockTotal) {
         setMensajeAdvertencia("No hay stock disponible para este producto.");
       } else {
         setMensajeAdvertencia("");
       }
     }
-  }, [cantidadVendida, stockDisponible, talleSeleccionado, item.category]);
+  }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
@@ -78,9 +79,11 @@ const ItemDetail = ({ item }) => {
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] - cantidadVendida[talleSeleccionado]));
+      setCantidad((prevCantidad) =>
+        Math.min(prevCantidad + 1, stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado])
+      );
     } else {
-      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible - cantidadVendida));
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockTotal - cantidadVendida));
     }
   };
 
@@ -96,12 +99,12 @@ const ItemDetail = ({ item }) => {
     }
 
     if (item.category === "T-shirts") {
-      if (cantidad + cantidadVendida[talleSeleccionado] > stockDisponible[talleSeleccionado]) {
+      if (cantidad + cantidadVendida[talleSeleccionado] > stockTotal[talleSeleccionado]) {
         alert("No hay suficiente stock disponible para este talle.");
         return;
       }
     } else {
-      if (cantidad + cantidadVendida > stockDisponible) {
+      if (cantidad + cantidadVendida > stockTotal) {
         alert("No hay suficiente stock disponible.");
         return;
       }
