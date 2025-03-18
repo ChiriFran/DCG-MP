@@ -49,8 +49,6 @@ const Carrito = () => {
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
-
-
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
@@ -68,7 +66,7 @@ const Carrito = () => {
 
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
-        shipping: shippingData,
+        shipping: shippingData, // Agregamos los datos de envío
         shippingCost: shippingCosts[shippingOption] || 0, // Se agrega el costo de envío
       });
 
@@ -81,6 +79,7 @@ const Carrito = () => {
       alert("Hubo un problema al generar la preferencia. Por favor, inténtalo de nuevo.");
     }
   };
+
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
@@ -410,8 +409,8 @@ const Carrito = () => {
                     </label>
                   </div>
                   <div className="redireccionMarkContainer">
-                  <p>Al seleccionar envío, se aplicará el costo. / When selecting shipping, the cost will be applied.</p>
-                </div>
+                    <p>Al seleccionar envío, se aplicará el costo. / When selecting shipping, the cost will be applied.</p>
+                  </div>
                 </div>
                 <div className="formEnvio">
                   <label>Comments (Optional)</label>

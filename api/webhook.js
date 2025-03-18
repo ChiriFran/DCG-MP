@@ -63,7 +63,16 @@ export default async function handler(req, res) {
 
     console.log("Productos comprados:", productosComprados);
 
-    // 📌 Guardar la orden en Firebase con los productos
+    // 📌 Extraer datos de envío
+    const shippingData = paymentData.additional_info?.shipments || {};
+    const direccion = shippingData.receiver_address?.street_name || "No especificada";
+    const numero = shippingData.receiver_address?.street_number || "No especificado";
+    const codigoPostal = shippingData.receiver_address?.zip_code || "No especificado";
+    const ciudad = shippingData.receiver_address?.city?.name || "No especificada";
+    const provincia = shippingData.receiver_address?.state?.name || "No especificada";
+    const pais = shippingData.receiver_address?.country?.name || "No especificado";
+
+    // 📌 Guardar la orden en Firebase con los productos y datos de envío
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
@@ -71,9 +80,25 @@ export default async function handler(req, res) {
       email,
       precio,
       productos: productosComprados,
+      envio: {
+        direccion,
+        numero,
+        codigoPostal,
+        ciudad,
+        provincia,
+        pais,
+      },
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
+    console.log(`Datos de envío registrados:`, {
+      direccion,
+      numero,
+      codigoPostal,
+      ciudad,
+      provincia,
+      pais,
+    });
 
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
