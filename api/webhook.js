@@ -55,38 +55,15 @@ export default async function handler(req, res) {
     // 📌 Recoger la información del comprador
     const comprador = paymentData.payer?.name || "desconocido";
     const email = paymentData.payer?.email || "desconocido";
-    const telefono = paymentData.payer?.phone ? `${paymentData.payer.phone.area_code} ${paymentData.payer.phone.number}` : "desconocido";
-
-    // 📌 Extraer la dirección de envío (si está disponible)
-    const envio = paymentData.shipments?.receiver_address || {};
-    const direccionEnvio = {
-      calle: envio.street_name || "desconocido",
-      numero: envio.street_number || "desconocido",
-      codigoPostal: envio.zip_code || "desconocido",
-      ciudad: envio.city?.name || "desconocido",
-      provincia: envio.state?.name || "desconocido",
-      pais: envio.country?.name || "desconocido",
-    };
-
-    // 📌 Extraer el precio total de la transacción
     const precio = paymentData.transaction_amount || 0;
 
-    // 📌 Guardar la orden en Firebase con la dirección de envío y precio
-    await db.collection(coleccion).doc(`${paymentId}`).set({
-      estado: estadoPedido,
-      fecha: new Date().toISOString(),
-      comprador,
-      email,
-      telefono,
-      precio, // 🔹 Ahora sí está definido
-      productos: productosComprados,
-      envio: direccionEnvio,
-    });
+    // 📌 Extraer los productos comprados
+    const productosComprados =
+      paymentData.additional_info?.items?.map((item) => item.title) || [];
 
+    console.log("Productos comprados:", productosComprados);
 
-    console.log("Dirección de envío:", direccionEnvio);
-
-    // 📌 Guardar la orden en Firebase con los productos y dirección de envío
+    // 📌 Guardar la orden en Firebase con los productos
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
@@ -94,11 +71,9 @@ export default async function handler(req, res) {
       email,
       precio,
       productos: productosComprados,
-      envio: direccionEnvio, // Agregamos la dirección de envío
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion} con productos:`, productosComprados);
-    console.log(`Dirección de envío guardada para pedido ${paymentId}`);
 
     // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
