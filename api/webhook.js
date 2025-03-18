@@ -68,17 +68,21 @@ export default async function handler(req, res) {
       pais: envio.country?.name || "desconocido",
     };
 
-    // 📌 Guardar la orden en Firebase con la dirección de envío
+    // 📌 Extraer el precio total de la transacción
+    const precio = paymentData.transaction_amount || 0;
+
+    // 📌 Guardar la orden en Firebase con la dirección de envío y precio
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
       telefono,
-      precio,
+      precio, // 🔹 Ahora sí está definido
       productos: productosComprados,
-      envio: direccionEnvio, // 🔹 Agregar datos de envío
+      envio: direccionEnvio,
     });
+
 
     console.log("Dirección de envío:", direccionEnvio);
 
