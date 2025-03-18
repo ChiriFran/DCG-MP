@@ -2,8 +2,8 @@ import { useContext, useState, useEffect } from "react";
 import ItemCount from "./ItemCount";
 import "../styles/ItemDetail.css";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc } from "firebase/firestore"; 
-import { db } from "../firebase/config"; 
+import { doc, getDoc } from "firebase/firestore"; // Usar el SDK modular
+import { db } from "../firebase/config"; // Asegúrate de que tu archivo de configuración esté bien configurado
 
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
@@ -67,7 +67,6 @@ const ItemDetail = ({ item }) => {
       const stockTalle = stockDisponible[talleSeleccionado] || 0;
       const cantidadTalleVendida = cantidadVendida[talleSeleccionado] || 0;
 
-      // Verificamos que la cantidad no exceda el stock disponible
       if (cantidad + cantidadTalleVendida > stockTalle) {
         alert("No hay suficiente stock disponible para este talle.");
         return;
@@ -89,7 +88,6 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    // Verificamos el stock disponible antes de agregar al carrito
     if (cantidad + (cantidadVendida[talleSeleccionado] || 0) > (stockDisponible[talleSeleccionado] || 0)) {
       alert("No hay suficiente stock disponible.");
       return;
@@ -193,6 +191,17 @@ const ItemDetail = ({ item }) => {
             </ul>
           </div>
 
+          <div className="sizeChartContainerDesktop">
+            <p className="sizeTitle">Size Chart</p>
+            <ul>
+              <li>
+                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+              </li>
+              <li>
+                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
