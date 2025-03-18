@@ -117,7 +117,7 @@ const Carrito = () => {
     }
 
     if (!shippingOption) {
-      setMessage("Por favor, completa el costo de envio.");
+      setMessage("Por favor, confirma el costo de envio.");
       return;
     }
 
