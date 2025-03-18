@@ -9,35 +9,31 @@ const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
-  const [stockDisponible, setStockDisponible] = useState({});
-  const [cantidadVendida, setCantidadVendida] = useState({});
+  const [stockDisponible, setStockDisponible] = useState(0);
+  const [cantidadVendida, setCantidadVendida] = useState(0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
 
   useEffect(() => {
     // Verificar el stock disponible en Firebase cuando se carga el producto
     const consultarStock = async () => {
       try {
+        // Consulta el producto en la colección de productos usando SDK modular
         const productoRef = doc(db, "productos", item.id); // Cambié la forma de acceder al documento
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        // Verificar el stock por talle (solo para productos "T-shirt")
-        if (item.category === "T-shirts") {
-          const stockPorTalle = productoData?.stock || {};
-          setStockDisponible(stockPorTalle);
-        } else {
-          const stockTotal = productoData?.stock || 0;
-          setStockDisponible({ total: stockTotal });
-        }
+        // Verifica el stock del producto
+        const stockProducto = productoData?.stock || 0;
+        setStockDisponible(stockProducto);
 
-        // Consultar la cantidad vendida en la colección "stock"
+        // Consulta la cantidad vendida en la colección "stock"
         const stockRef = doc(db, "stock", item.title); // Buscar por nombre del producto
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
 
-        let cantidadVendidaProducto = {};
-        if (stockData) {
-          cantidadVendidaProducto = stockData.talles || {}; // Guardar la cantidad vendida por talle
+        let cantidadVendidaProducto = 0;
+        if (stockData && stockData.cantidad) {
+          cantidadVendidaProducto = stockData.cantidad;
         }
         setCantidadVendida(cantidadVendidaProducto);
 
@@ -47,33 +43,23 @@ const ItemDetail = ({ item }) => {
     };
 
     consultarStock();
-  }, [item.id, item.title, item.category]);
+  }, [item.id, item.title]);
 
   useEffect(() => {
-    // Verificar si la cantidad excede el stock disponible por talle
-    if (talleSeleccionado && cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
-      setMensajeAdvertencia(`No hay stock disponible para el talle ${talleSeleccionado}.`);
+    // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
+    if (cantidadVendida >= stockDisponible) {
+      setMensajeAdvertencia("No hay stock disponible para este producto.");
     } else {
       setMensajeAdvertencia("");
     }
-  }, [cantidadVendida, stockDisponible, talleSeleccionado]);
+  }, [cantidadVendida, stockDisponible]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    if (talleSeleccionado) {
-      const stockTalle = stockDisponible[talleSeleccionado] || 0;
-      const cantidadTalleVendida = cantidadVendida[talleSeleccionado] || 0;
-
-      if (cantidad + cantidadTalleVendida > stockTalle) {
-        alert("No hay suficiente stock disponible para este talle.");
-        return;
-      }
-    }
-
-    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] - cantidadVendida[talleSeleccionado]));
+    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible - cantidadVendida));
   };
 
   const handleAgregarAlCarrito = () => {
@@ -88,7 +74,7 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    if (cantidad + (cantidadVendida[talleSeleccionado] || 0) > (stockDisponible[talleSeleccionado] || 0)) {
+    if (cantidad + cantidadVendida > stockDisponible) {
       alert("No hay suficiente stock disponible.");
       return;
     }
