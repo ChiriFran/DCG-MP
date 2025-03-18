@@ -22,19 +22,45 @@ const ItemDetail = ({ item }) => {
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        // Verifica el stock del producto
-        const stockProducto = productoData?.stock || 0;
-        setStockDisponible(stockProducto);
+        // Verifica el stock del producto por talle
+        const stockS = productoData?.stockS || 0;
+        const stockM = productoData?.stockM || 0;
+        const stockL = productoData?.stockL || 0;
+        const stockXL = productoData?.stockXL || 0;
+        const stockXXL = productoData?.stockXXL || 0;
+
+        // Configura el stock según el talle seleccionado
+        setStockDisponible({
+          S: stockS,
+          M: stockM,
+          L: stockL,
+          XL: stockXL,
+          XXL: stockXXL,
+        });
 
         // Consulta la cantidad vendida en la colección "stock"
         const stockRef = doc(db, "stock", item.title); // Buscar por nombre del producto
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
 
-        let cantidadVendidaProducto = 0;
-        if (stockData && stockData.cantidad) {
-          cantidadVendidaProducto = stockData.cantidad;
+        // Inicializa las cantidades vendidas por talle
+        let cantidadVendidaProducto = {
+          S: 0,
+          M: 0,
+          L: 0,
+          XL: 0,
+          XXL: 0,
+        };
+
+        // Si hay datos de cantidad vendida, actualiza los valores correspondientes
+        if (stockData) {
+          cantidadVendidaProducto.S = stockData.stockS || 0;
+          cantidadVendidaProducto.M = stockData.stockM || 0;
+          cantidadVendidaProducto.L = stockData.stockL || 0;
+          cantidadVendidaProducto.XL = stockData.stockXL || 0;
+          cantidadVendidaProducto.XXL = stockData.stockXXL || 0;
         }
+
         setCantidadVendida(cantidadVendidaProducto);
 
       } catch (error) {
@@ -47,19 +73,19 @@ const ItemDetail = ({ item }) => {
 
   useEffect(() => {
     // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
-    if (cantidadVendida >= stockDisponible) {
-      setMensajeAdvertencia("No hay stock disponible para este producto.");
+    if (cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
+      setMensajeAdvertencia("No hay stock disponible para este talle.");
     } else {
       setMensajeAdvertencia("");
     }
-  }, [cantidadVendida, stockDisponible]);
+  }, [cantidadVendida, stockDisponible, talleSeleccionado]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible - cantidadVendida));
+    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] - cantidadVendida[talleSeleccionado]));
   };
 
   const handleAgregarAlCarrito = () => {
@@ -67,15 +93,15 @@ const ItemDetail = ({ item }) => {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
-    
+
     // Validar que la cantidad sea mayor que 0
     if (cantidad <= 0) {
       alert("Por favor, selecciona una cantidad válida.");
       return;
     }
 
-    if (cantidad + cantidadVendida > stockDisponible) {
-      alert("No hay suficiente stock disponible.");
+    if (cantidad + cantidadVendida[talleSeleccionado] > stockDisponible[talleSeleccionado]) {
+      alert("No hay suficiente stock disponible para el talle seleccionado.");
       return;
     }
 
@@ -166,18 +192,6 @@ const ItemDetail = ({ item }) => {
           </ul>
 
           <div className="sizeChartContainer">
-            <p className="sizeTitle">Size Chart</p>
-            <ul>
-              <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
-              </li>
-              <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
-              </li>
-            </ul>
-          </div>
-
-          <div className="sizeChartContainerDesktop">
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
