@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
-      const { items, shipping, orderId } = req.body;
+      const { items, shipping, shippingCost, orderId } = req.body;
 
       if (!items || items.length === 0 || !shipping || !shipping.name || !shipping.address) {
         return res.status(400).json({ error: "Missing required data" });
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
           email: shipping.email,
           phone: {
             area_code: shipping.phoneArea,
-            number: shipping.phone
+            number: shipping.phone,
           },
           address: {
             street_name: shipping.address,
@@ -42,17 +42,17 @@ export default async function handler(req, res) {
             apartment: shipping.apartment || "",
             city: shipping.city,
             state_name: shipping.province,
-            country: "AR"
-          }
+            country: "AR",
+          },
         },
         shipments: {
           mode: "not_specified",
-          cost: 1,
+          cost: Number(shippingCost) || 0, // 🔹 Ahora usa el costo de envío dinamico
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
-            zip_code: shipping.zipCode
-          }
+            zip_code: shipping.zipCode,
+          },
         },
         back_urls: {
           success: "https://dcgstore.vercel.app/#/BuySuccess",
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
         },
         statement_descriptor: "DCGSTORE",
         external_reference: orderId,
-        auto_return: "approved"
+        auto_return: "approved",
       };
 
       const preference = new Preference(client);
