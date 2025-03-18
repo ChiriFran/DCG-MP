@@ -23,7 +23,14 @@ const ItemDetail = ({ item }) => {
 
         // Verificar el stock por talle (solo para productos "T-shirt")
         if (item.category === "T-shirts") {
-          const stockPorTalle = productoData?.stock || {};
+          // Cargar el stock por talle de los campos específicos
+          const stockPorTalle = {
+            S: productoData?.stockS || 0,
+            M: productoData?.stockM || 0,
+            L: productoData?.stockL || 0,
+            XL: productoData?.stockXL || 0,
+            XXL: productoData?.stockXXL || 0,
+          };
           setStockDisponible(stockPorTalle);
         } else {
           const stockTotal = productoData?.stock || 0;
@@ -180,18 +187,6 @@ const ItemDetail = ({ item }) => {
           </ul>
 
           <div className="sizeChartContainer">
-            <p className="sizeTitle">Size Chart</p>
-            <ul>
-              <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
-              </li>
-              <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
-              </li>
-            </ul>
-          </div>
-
-          <div className="sizeChartContainerDesktop">
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
