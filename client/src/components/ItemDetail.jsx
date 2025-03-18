@@ -22,14 +22,16 @@ const ItemDetail = ({ item }) => {
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        // Configurar el stock disponible por talle
-        setStockDisponible({
-          S: productoData?.stockS || 0,
-          M: productoData?.stockM || 0,
-          L: productoData?.stockL || 0,
-          XL: productoData?.stockXL || 0,
-          XXL: productoData?.stockXXL || 0,
-        });
+        // Configurar el stock disponible por talle solo si es una remera
+        if (item.category === "T-shirts") {
+          setStockDisponible({
+            S: productoData?.stockS || 0,
+            M: productoData?.stockM || 0,
+            L: productoData?.stockL || 0,
+            XL: productoData?.stockXL || 0,
+            XXL: productoData?.stockXXL || 0,
+          });
+        }
 
         // Obtener la cantidad vendida por talle desde la colección 'stock'
         const stockRef = doc(db, "stock", item.title); // Buscar en la colección 'stock' por nombre del producto
@@ -55,12 +57,12 @@ const ItemDetail = ({ item }) => {
 
   useEffect(() => {
     // Verificar si la cantidad excede el stock disponible y si el producto tiene stock
-    if (cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
+    if (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
       setMensajeAdvertencia("No hay stock disponible para este talle.");
     } else {
       setMensajeAdvertencia("");
     }
-  }, [cantidadVendida, stockDisponible, talleSeleccionado]);
+  }, [cantidadVendida, stockDisponible, talleSeleccionado, item.category]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
@@ -82,7 +84,7 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    if (cantidad + cantidadVendida[talleSeleccionado] > stockDisponible[talleSeleccionado]) {
+    if (item.category === "T-shirts" && cantidad + cantidadVendida[talleSeleccionado] > stockDisponible[talleSeleccionado]) {
       alert("No hay suficiente stock disponible para este talle.");
       return;
     }
