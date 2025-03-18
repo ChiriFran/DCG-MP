@@ -128,7 +128,8 @@ export default async function handler(req, res) {
 
               // Si el producto tiene talle, actualizamos el stock del talle específico
               if (talle && stockData[talle] !== undefined) {
-                updateData[talle] = (stockData[talle] || 0) + 1;  // Incrementar la cantidad del talle específico
+                // Incrementamos el stock (es decir, aumentamos la cantidad vendida)
+                updateData[talle] = (stockData[talle] || 0) + 1;
               } else if (!talle) {
                 // Si no tiene talle, solo actualizamos la cantidad general
                 updateData.cantidad = (stockData.cantidad || 0) + 1;
@@ -154,6 +155,7 @@ export default async function handler(req, res) {
         }
       }
     }
+
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);
