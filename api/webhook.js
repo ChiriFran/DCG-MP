@@ -106,7 +106,7 @@ export default async function handler(req, res) {
         // Separar el nombre del producto y el talle (si tiene)
         const partes = producto.split(" - Talle: ");
         const nombreProducto = partes[0]; // Nombre sin talle
-        const talle = partes[1] ? partes[1].trim() : null; // Talle (si existe)
+        const talle = partes[1] ? partes[1].trim().toUpperCase() : null; // Talle (si existe) en mayúsculas
 
         // Verificar si el producto pertenece a la categoría "T-shirts"
         const productoRef = db.collection("productos").doc(nombreProducto);
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
               // Solo actualizamos el stock si el producto y talle existen
               const updateData = {};
 
-              // Si el producto tiene talle, también actualizamos el stock del talle específico
+              // Si el producto tiene talle, actualizamos el stock del talle específico
               if (talle && stockData[talle] !== undefined) {
                 updateData[talle] = (stockData[talle] || 0) + 1;  // Incrementar la cantidad del talle específico
               } else if (!talle) {
@@ -154,10 +154,6 @@ export default async function handler(req, res) {
         }
       }
     }
-
-
-
-
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("Error procesando webhook:", error);

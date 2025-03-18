@@ -2,51 +2,42 @@ import { useContext, useState, useEffect } from "react";
 import ItemCount from "./ItemCount";
 import "../styles/ItemDetail.css";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc } from "firebase/firestore"; // Usar el SDK modular
-import { db } from "../firebase/config"; // Asegúrate de que tu archivo de configuración esté bien configurado
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
-  const [stockDisponible, setStockDisponible] = useState({});
-  const [cantidadVendida, setCantidadVendida] = useState({});
+  const [stockDisponible, setStockDisponible] = useState({ S: 0, M: 0, L: 0, XL: 0, XXL: 0 });
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
 
   useEffect(() => {
-    // Verificar el stock disponible en Firebase cuando se carga el producto
     const consultarStock = async () => {
       try {
-        const productoRef = doc(db, "productos", item.id); // Cambié la forma de acceder al documento
+        // Consulta el producto en la colección de productos usando SDK modular
+        const productoRef = doc(db, "productos", item.id);
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        // Verificar el stock por talle (solo para productos "T-shirt")
-        if (item.category === "T-shirts") {
-          // Cargar el stock por talle de los campos específicos
-          const stockPorTalle = {
-            S: productoData?.stockS || 0,
-            M: productoData?.stockM || 0,
-            L: productoData?.stockL || 0,
-            XL: productoData?.stockXL || 0,
-            XXL: productoData?.stockXXL || 0,
-          };
-          setStockDisponible(stockPorTalle);
-        } else {
-          const stockTotal = productoData?.stock || 0;
-          setStockDisponible({ total: stockTotal });
-        }
-
-        // Consultar la cantidad vendida en la colección "stock"
+        // Consulta el stock por talle en la colección "stock"
         const stockRef = doc(db, "stock", item.title); // Buscar por nombre del producto
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
 
-        let cantidadVendidaProducto = {};
-        if (stockData) {
-          cantidadVendidaProducto = stockData.talles || {}; // Guardar la cantidad vendida por talle
+        if (productoData && stockData) {
+          // Verifica los talles (S, M, L, XL, XXL)
+          const nuevosStock = { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+
+          // Inicializa el stock de cada talle desde la colección "stock"
+          ["S", "M", "L", "XL", "XXL"].forEach((talle) => {
+            if (stockData[talle]) {
+              nuevosStock[talle] = stockData[talle];
+            }
+          });
+
+          setStockDisponible(nuevosStock);
         }
-        setCantidadVendida(cantidadVendidaProducto);
 
       } catch (error) {
         console.error("Error al consultar el stock:", error);
@@ -54,33 +45,23 @@ const ItemDetail = ({ item }) => {
     };
 
     consultarStock();
-  }, [item.id, item.title, item.category]);
+  }, [item.id, item.title]);
 
   useEffect(() => {
-    // Verificar si la cantidad excede el stock disponible por talle
-    if (talleSeleccionado && cantidadVendida[talleSeleccionado] >= stockDisponible[talleSeleccionado]) {
-      setMensajeAdvertencia(`No hay stock disponible para el talle ${talleSeleccionado}.`);
+    // Verificar si la cantidad excede el stock disponible
+    if (cantidad > stockDisponible[talleSeleccionado] || cantidad <= 0) {
+      setMensajeAdvertencia("No hay suficiente stock disponible para este producto.");
     } else {
       setMensajeAdvertencia("");
     }
-  }, [cantidadVendida, stockDisponible, talleSeleccionado]);
+  }, [cantidad, talleSeleccionado, stockDisponible]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    if (talleSeleccionado) {
-      const stockTalle = stockDisponible[talleSeleccionado] || 0;
-      const cantidadTalleVendida = cantidadVendida[talleSeleccionado] || 0;
-
-      if (cantidad + cantidadTalleVendida > stockTalle) {
-        alert("No hay suficiente stock disponible para este talle.");
-        return;
-      }
-    }
-
-    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] - cantidadVendida[talleSeleccionado]));
+    setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible[talleSeleccionado] || 0));
   };
 
   const handleAgregarAlCarrito = () => {
@@ -95,7 +76,7 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    if (cantidad + (cantidadVendida[talleSeleccionado] || 0) > (stockDisponible[talleSeleccionado] || 0)) {
+    if (cantidad > stockDisponible[talleSeleccionado]) {
       alert("No hay suficiente stock disponible.");
       return;
     }
@@ -106,7 +87,21 @@ const ItemDetail = ({ item }) => {
       talleSeleccionado: item.category === "T-shirts" ? talleSeleccionado : null,
     });
 
-    agregarAlCarrito(item, cantidad, talleSeleccionado); // ✅ Pasar el talle como argumento
+    agregarAlCarrito(item, cantidad, talleSeleccionado);
+
+    // Actualizar el stock en la colección "stock"
+    const stockRef = doc(db, "stock", item.title);
+    const updateData = {
+      [talleSeleccionado]: (stockDisponible[talleSeleccionado] || 0) + cantidad,
+    };
+
+    updateDoc(stockRef, updateData)
+      .then(() => {
+        console.log("Stock actualizado en Firebase");
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el stock:", error);
+      });
 
     setCantidad(1);
     setTalleSeleccionado("");
