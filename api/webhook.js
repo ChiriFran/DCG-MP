@@ -108,45 +108,48 @@ export default async function handler(req, res) {
         const nombreProducto = partes[0]; // Nombre sin talle
         const talle = partes[1] ? partes[1].trim() : null; // Talle (si existe)
 
-        const stockRef = db.collection("stock").doc(nombreProducto);
-        const stockDoc = await stockRef.get();
+        // Verificar si el producto pertenece a la categoría "T-shirts"
+        const productoRef = db.collection("productos").doc(nombreProducto);
+        const productoDoc = await productoRef.get();
 
-        if (stockDoc.exists) {
-          const stockData = stockDoc.data();
+        if (productoDoc.exists) {
+          const productoData = productoDoc.data();
 
-          // Verificar si el producto pertenece a la categoría "T-Shirt"
-          if (stockData.categoria && stockData.categoria.toLowerCase() === "t-shirt") {
-            const nuevaCantidadGeneral = (stockData.cantidad || 0) + 1;
-            const updateData = { cantidad: nuevaCantidadGeneral };
+          // Verificar que el producto sea de la categoría "T-shirts"
+          if (productoData.category === "T-shirts") {
+            const stockRef = db.collection("stock").doc(nombreProducto);
+            const stockDoc = await stockRef.get();
 
-            // Si el producto tiene talle, actualizamos el stock de ese talle específico
-            if (talle && stockData[talle] !== undefined) {
-              updateData[talle] = (stockData[talle] || 0) + 1;
-            }
+            if (stockDoc.exists) {
+              const stockData = stockDoc.data();
+              const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
-            // Si el producto no tiene talle, y el talle no existe, lo creamos
-            if (talle && stockData[talle] === undefined) {
-              updateData[talle] = 1; // Inicializamos el stock del talle
-            }
+              // Actualizar solo la cantidad general si no tiene talle
+              const updateData = { cantidad: nuevaCantidad };
 
-            await stockRef.update(updateData);
+              // Si el producto tiene talle, también actualizamos el stock del talle específico
+              if (talle && stockData[talle] !== undefined) {
+                updateData[talle] = (stockData[talle] || 0) + 1;
+              }
 
-            console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidadGeneral} unidades.`);
-            if (talle) {
-              console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
+              await stockRef.update(updateData);
+
+              console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidad} unidades.`);
+              if (talle) {
+                console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
+              }
+            } else {
+              console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
             }
           } else {
-            // Si el producto no es de la categoría "T-Shirt", solo actualizamos la cantidad general
-            const nuevaCantidadGeneral = (stockData.cantidad || 0) + 1;
-            await stockRef.update({ cantidad: nuevaCantidadGeneral });
-
-            console.log(`Stock general actualizado para ${nombreProducto}: ${nuevaCantidadGeneral} unidades.`);
+            console.log(`Producto ${nombreProducto} no es una T-shirt, no se actualiza el stock por talle.`);
           }
         } else {
-          console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
+          console.warn(`Producto ${nombreProducto} no encontrado en la colección 'productos'.`);
         }
       }
     }
+
 
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
