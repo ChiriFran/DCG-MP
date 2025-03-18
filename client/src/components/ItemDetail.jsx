@@ -2,8 +2,8 @@ import { useContext, useState, useEffect } from "react";
 import ItemCount from "./ItemCount";
 import "../styles/ItemDetail.css";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { doc, getDoc } from "firebase/firestore"; 
+import { db } from "../firebase/config"; 
 
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
