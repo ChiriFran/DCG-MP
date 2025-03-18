@@ -128,7 +128,7 @@ export default async function handler(req, res) {
 
               // Si el producto tiene talle, también actualizamos el stock del talle específico
               if (talle && stockData[talle] !== undefined) {
-                updateData[talle] = (stockData[talle] || 0) + 1;
+                updateData[talle] = (stockData[talle] || 0) + 1;  // Incrementar la cantidad del talle específico
               } else if (!talle) {
                 // Si no tiene talle, solo actualizamos la cantidad general
                 updateData.cantidad = (stockData.cantidad || 0) + 1;
@@ -154,6 +154,7 @@ export default async function handler(req, res) {
         }
       }
     }
+
 
 
 
