@@ -114,39 +114,32 @@ export default async function handler(req, res) {
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
 
-          // Verificar si el producto pertenece a la categoría "T-Shirt"
-          if (stockData.categoria && stockData.categoria.toLowerCase() === "t-shirt") {
-            const nuevaCantidadGeneral = (stockData.cantidad || 0) + 1;
-            const updateData = { cantidad: nuevaCantidadGeneral };
+          // Actualizar la cantidad general del producto
+          const nuevaCantidadGeneral = (stockData.cantidad || 0) + 1;
+          const updateData = { cantidad: nuevaCantidadGeneral };
 
-            // Si el producto tiene talle, actualizamos el stock de ese talle específico
-            if (talle && stockData[talle] !== undefined) {
-              updateData[talle] = (stockData[talle] || 0) + 1;
-            }
+          // Si el producto tiene talle, actualizamos el stock de ese talle específico
+          if (talle && stockData[talle] !== undefined) {
+            updateData[talle] = (stockData[talle] || 0) + 1;
+          }
 
-            // Si el producto no tiene talle, y el talle no existe, lo creamos
-            if (talle && stockData[talle] === undefined) {
-              updateData[talle] = 1; // Inicializamos el stock del talle
-            }
+          // Si el producto no tiene talle, y el talle no existe, lo creamos
+          if (talle && stockData[talle] === undefined) {
+            updateData[talle] = 1; // Inicializamos el stock del talle
+          }
 
-            await stockRef.update(updateData);
+          await stockRef.update(updateData);
 
-            console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidadGeneral} unidades.`);
-            if (talle) {
-              console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
-            }
-          } else {
-            // Si el producto no es de la categoría "T-Shirt", solo actualizamos la cantidad general
-            const nuevaCantidadGeneral = (stockData.cantidad || 0) + 1;
-            await stockRef.update({ cantidad: nuevaCantidadGeneral });
-
-            console.log(`Stock general actualizado para ${nombreProducto}: ${nuevaCantidadGeneral} unidades.`);
+          console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidadGeneral} unidades.`);
+          if (talle) {
+            console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
           }
         } else {
           console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
         }
       }
     }
+
 
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
