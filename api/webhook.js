@@ -55,24 +55,31 @@ export default async function handler(req, res) {
     // 📌 Recoger la información del comprador
     const comprador = paymentData.payer?.name || "desconocido";
     const email = paymentData.payer?.email || "desconocido";
-    const precio = paymentData.transaction_amount || 0;
+    const telefono = paymentData.payer?.phone ? `${paymentData.payer.phone.area_code} ${paymentData.payer.phone.number}` : "desconocido";
 
-    // 📌 Extraer los productos comprados
-    const productosComprados =
-      paymentData.additional_info?.items?.map((item) => item.title) || [];
-
-    console.log("Productos comprados:", productosComprados);
-
-    // 📌 Extraer información de envío
-    const envio = paymentData.shipments || {};
+    // 📌 Extraer la dirección de envío (si está disponible)
+    const envio = paymentData.shipments?.receiver_address || {};
     const direccionEnvio = {
-      direccion: envio.receiver_address?.street_name || "No especificado",
-      numero: envio.receiver_address?.street_number || "No especificado",
-      codigoPostal: envio.receiver_address?.zip_code || "No especificado",
-      ciudad: envio.receiver_address?.city?.name || "No especificado",
-      provincia: envio.receiver_address?.state?.name || "No especificado",
-      pais: envio.receiver_address?.country?.name || "No especificado",
+      calle: envio.street_name || "desconocido",
+      numero: envio.street_number || "desconocido",
+      codigoPostal: envio.zip_code || "desconocido",
+      ciudad: envio.city?.name || "desconocido",
+      provincia: envio.state?.name || "desconocido",
+      pais: envio.country?.name || "desconocido",
     };
+
+    // 📌 Guardar la orden en Firebase con la dirección de envío
+    await db.collection(coleccion).doc(`${paymentId}`).set({
+      estado: estadoPedido,
+      fecha: new Date().toISOString(),
+      comprador,
+      email,
+      telefono,
+      precio,
+      productos: productosComprados,
+      envio: direccionEnvio, // 🔹 Agregar datos de envío
+    });
+
 
     console.log("Dirección de envío:", direccionEnvio);
 
