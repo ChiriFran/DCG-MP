@@ -54,7 +54,7 @@ const Carrito = () => {
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
-        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - unidades: ${prod.cantidad}`, // Agrega la cantidad al título
+        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - Unidades: ${prod.cantidad}`, // Agrega la cantidad al título
         unit_price: prod.price,
         quantity: prod.cantidad,
         category_id: prod.talleSeleccionado, // Mantén el talle en category_id si lo necesitas
