@@ -100,7 +100,7 @@ export default async function handler(req, res) {
       pais,
     });
 
-    // 📌 ACTUALIZAR STOCK Y AGREGAR CANTIDAD COMPRADA A pedidosExitosos
+    // 📌 ACTUALIZAR STOCK
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
         // Separar el nombre del producto y el talle (si tiene)
@@ -114,9 +114,6 @@ export default async function handler(req, res) {
         if (stockDoc.exists) {
           const stockData = stockDoc.data();
           const nuevaCantidad = (stockData.cantidad || 0) + 1;
-
-          // Obtener la cantidad comprada correctamente
-          const cantidadComprada = productosComprados.filter(p => p === producto).length;
 
           // Actualizar solo la cantidad general si no tiene talle
           const updateData = { cantidad: nuevaCantidad };
@@ -132,14 +129,6 @@ export default async function handler(req, res) {
           if (talle) {
             console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
           }
-
-          // 📌 Agregar cantidad comprada dentro del producto en pedidosExitosos
-          const pedidoRef = db.collection("pedidosExitosos").doc(idPedido);
-          await pedidoRef.update({
-            [`productos.${nombreProducto}.cantidadComprada`]: cantidadComprada
-          });
-
-          console.log(`Cantidad comprada agregada a pedidosExitosos: ${nombreProducto} - ${cantidadComprada} unidades.`);
         } else {
           console.warn(`Producto ${nombreProducto} no encontrado en la colección 'stock'.`);
         }

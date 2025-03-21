@@ -49,11 +49,12 @@ const Carrito = () => {
   // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
+
   // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
-        title: `${prod.title} - Talle: ${prod.talleSeleccionado}`, // Agrega el talle al título
+        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - u/ ${prod.cantidad}`, // Agrega la cantidad al título
         unit_price: prod.price,
         quantity: prod.cantidad,
         category_id: prod.talleSeleccionado, // Mantén el talle en category_id si lo necesitas
@@ -79,7 +80,6 @@ const Carrito = () => {
       alert("Hubo un problema al generar la preferencia. Por favor, inténtalo de nuevo.");
     }
   };
-
 
   // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
