@@ -46,7 +46,7 @@ const Eventos = () => {
         {upcomingEvent && (
           <div className="eventoCard">
             <div className="imgEventosContainer">
-              <a href="#">
+              <a href={upcomingEvent.buyLink} target="_blank" rel="noopener noreferrer">
                 <img src={upcomingEvent.image} alt="" />
               </a>
             </div>
@@ -58,7 +58,9 @@ const Eventos = () => {
         {pastEvents.map((evento) => (
           <div key={evento.id} className="pastEventoCard">
             <div className="pastImgEventos">
-              <img src={evento.image} alt="" />
+              <a href={evento.buyLink} target="_blank" rel="noopener noreferrer">
+                <img src={evento.image} alt="" />
+              </a>
             </div>
           </div>
         ))}
