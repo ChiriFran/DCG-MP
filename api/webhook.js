@@ -100,7 +100,7 @@ export default async function handler(req, res) {
       pais,
     });
 
-    // 📌 ACTUALIZAR STOCK
+    // 📌 ACTUALIZAR STOCK Y REGISTRAR CANTIDAD COMPRADA
     if (estadoPedido === "pago completado") {
       for (const producto of productosComprados) {
         // Separar el nombre del producto y el talle (si tiene)
@@ -115,8 +115,14 @@ export default async function handler(req, res) {
           const stockData = stockDoc.data();
           const nuevaCantidad = (stockData.cantidad || 0) + 1;
 
+          // Obtener la cantidad comprada desde los datos de la preferencia
+          const cantidadComprada = productosComprados.filter(p => p === producto).length;
+
           // Actualizar solo la cantidad general si no tiene talle
-          const updateData = { cantidad: nuevaCantidad };
+          const updateData = {
+            cantidad: nuevaCantidad,
+            cantidadComprada: (stockData.cantidadComprada || 0) + cantidadComprada // Se suma la cantidad comprada
+          };
 
           // Si el producto tiene talle, también actualizamos el stock del talle específico
           if (talle && stockData[talle] !== undefined) {
@@ -126,6 +132,7 @@ export default async function handler(req, res) {
           await stockRef.update(updateData);
 
           console.log(`Stock actualizado: ${nombreProducto} ahora tiene ${nuevaCantidad} unidades.`);
+          console.log(`Cantidad comprada registrada: ${nombreProducto} - ${cantidadComprada} unidades.`);
           if (talle) {
             console.log(`Talle ${talle} actualizado: ${updateData[talle]} unidades.`);
           }
@@ -134,6 +141,7 @@ export default async function handler(req, res) {
         }
       }
     }
+
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
