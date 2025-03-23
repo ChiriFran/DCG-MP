@@ -16,7 +16,6 @@ const ItemDetail = ({ item }) => {
   useEffect(() => {
     const consultarStock = async () => {
       try {
-        // Obtener el stock total desde la colección "productos"
         const productoRef = doc(db, "productos", item.id);
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
@@ -33,7 +32,6 @@ const ItemDetail = ({ item }) => {
           setStockTotal(productoData?.stock || 0);
         }
 
-        // Obtener la cantidad vendida desde la colección "stock"
         const stockRef = doc(db, "stock", item.title);
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
@@ -74,16 +72,20 @@ const ItemDetail = ({ item }) => {
   }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
 
   const handleRestar = () => {
-    setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
+    if (item.category === "T-shirts" && talleSeleccionado) {
+      setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
+    }
   };
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      setCantidad((prevCantidad) =>
-        Math.min(prevCantidad + 1, stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado])
-      );
-    } else {
-      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockTotal - cantidadVendida));
+      if (cantidad + cantidadVendida[talleSeleccionado] <= stockTotal[talleSeleccionado]) {
+        setCantidad((prevCantidad) => prevCantidad + 1);
+      }
+    } else if (item.category !== "T-shirts") {
+      if (cantidad + cantidadVendida <= stockTotal) {
+        setCantidad((prevCantidad) => prevCantidad + 1);
+      }
     }
   };
 
@@ -167,6 +169,7 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
+            disabled={!talleSeleccionado || cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado]} // Desactivar si no hay talle o si el stock está agotado
           />
         </div>
 
