@@ -55,9 +55,9 @@ export default async function handler(req, res) {
           },
         },
         back_urls: {
-          success: "https://dcgstore.vercel.app/#/BuySuccess",
-          failure: "https://dcgstore.vercel.app/#/BuyFailed",
-          pending: "https://dcgstore.vercel.app/#/BuyPending",
+          success: "https://www.detroitclassicgallery.com/#/BuySuccess",
+          failure: "https://www.detroitclassicgallery.com/#/BuyFailed",
+          pending: "https://www.detroitclassicgallery.com/#/BuyPending",
         },
         statement_descriptor: "DCGSTORE",
         external_reference: orderId,
