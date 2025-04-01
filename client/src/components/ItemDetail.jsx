@@ -72,20 +72,16 @@ const ItemDetail = ({ item }) => {
   }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
 
   const handleRestar = () => {
-    if (item.category === "T-shirts" && talleSeleccionado) {
-      setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
-    }
+    setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      if (cantidad + cantidadVendida[talleSeleccionado] <= stockTotal[talleSeleccionado]) {
-        setCantidad((prevCantidad) => prevCantidad + 1);
-      }
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     } else if (item.category !== "T-shirts") {
-      if (cantidad + cantidadVendida <= stockTotal) {
-        setCantidad((prevCantidad) => prevCantidad + 1);
-      }
+      const stockDisponible = stockTotal - cantidadVendida;
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     }
   };
 
@@ -95,27 +91,37 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    if (cantidad <= 0) {
-      alert("Por favor, selecciona una cantidad válida.");
-      return;
+    // Obtener la cantidad del producto ya en el carrito
+    let cantidadEnCarritoProducto = 0;
+    if (item.category === "T-shirts") {
+      // Si el producto tiene talles, filtrar por el talle seleccionado
+      const productoEnCarrito = carrito.find(
+        (producto) => producto.id === item.id && producto.talle === talleSeleccionado
+      );
+      cantidadEnCarritoProducto = productoEnCarrito ? productoEnCarrito.cantidad : 0;
+    } else {
+      // Para productos sin talle, sumar todas las cantidades con el mismo id
+      cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
+        return producto.id === item.id ? total + producto.cantidad : total;
+      }, 0);
     }
 
-    if (item.category === "T-shirts") {
-      if (cantidad + cantidadVendida[talleSeleccionado] > stockTotal[talleSeleccionado]) {
-        alert("No hay suficiente stock disponible para este talle.");
-        return;
-      }
-    } else {
-      if (cantidad + cantidadVendida > stockTotal) {
-        alert("No hay suficiente stock disponible.");
-        return;
-      }
+    // Calcular stock disponible restando lo ya vendido y lo que está en el carrito
+    const stockDisponible =
+      item.category === "T-shirts"
+        ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
+        : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
+
+    if (cantidad > stockDisponible) {
+      alert("No hay suficiente stock disponible.");
+      return;
     }
 
     agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
     setCantidad(1);
     setTalleSeleccionado("");
   };
+
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;
@@ -130,6 +136,8 @@ const ItemDetail = ({ item }) => {
 
   const handleTalleSeleccionado = (talle) => {
     setTalleSeleccionado(talle);
+    // Reiniciamos la cantidad a 1 al cambiar de talle
+    setCantidad(1);
   };
 
   return (
@@ -169,7 +177,7 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
-            disabled={!talleSeleccionado || cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado]} // Desactivar si no hay talle o si el stock está agotado
+            disabled={!talleSeleccionado || (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])}
           />
         </div>
 
@@ -196,10 +204,12 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE A:</span>
+                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE B:</span>
+                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
@@ -208,10 +218,12 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE A:</span>
+                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE B:</span>
+                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
