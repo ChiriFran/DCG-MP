@@ -2,7 +2,15 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
   // Agrega las cabeceras CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = ["https://www.detroitclassicgallery.com"];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "https://www.detroitclassicgallery.com");
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
