@@ -80,7 +80,8 @@
 @media screen and (max-width: 700px) {
 
   .homeVideoContainer video {
-    margin-bottom: -50%;
+    margin-bottom: -60%;
+    margin-top: -30%;
     padding-left: 0;
   }
 }
