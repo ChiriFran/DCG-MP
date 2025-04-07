@@ -11,7 +11,7 @@ const ItemListDestacados = ({ productos }) => {
     const updateItemsPerView = () => {
       const width = window.innerWidth;
       if (width <= 700) {
-        setItemsPerView(1);
+        setItemsPerView(2); // ← CAMBIADO DE 1 A 2
       } else if (width <= 1024) {
         setItemsPerView(2);
       } else {

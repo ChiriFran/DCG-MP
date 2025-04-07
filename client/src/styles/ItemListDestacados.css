@@ -83,11 +83,11 @@
 @media screen and (max-width: 700px) {
 
   .productosDestacadosContainer {
-    width: 95%;
+    width: 100%;
   }
 
   .productosDestacadosWrapper {
-    width: 90%;
+    width: 95%;
   }
 
   .sliderItem {
