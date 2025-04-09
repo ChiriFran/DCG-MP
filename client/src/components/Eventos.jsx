@@ -53,17 +53,19 @@ const Eventos = () => {
           </div>
         )}
       </div>
-      <h2 className="pastEventosTitle">Past events</h2>
-      <div className="pastEventosContainer">
-        {pastEvents.map((evento) => (
-          <div key={evento.id} className="pastEventoCard">
-            <div className="pastImgEventos">
-              <a href={evento.buyLink} target="_blank" rel="noopener noreferrer">
-                <img src={evento.image} alt="" />
-              </a>
+      <div className="eventosContainer">
+        <h2 className="pastEventosTitle">Past events</h2>
+        <div className="pastEventosContainer">
+          {pastEvents.map((evento) => (
+            <div key={evento.id} className="pastEventoCard">
+              <div className="pastImgEventos">
+                <a href={evento.buyLink} target="_blank" rel="noopener noreferrer">
+                  <img src={evento.image} alt="" />
+                </a>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </>
   );
