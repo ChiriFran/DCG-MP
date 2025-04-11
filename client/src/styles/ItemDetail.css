@@ -25,6 +25,7 @@
 }
 
 .itemDetailImg {
+  aspect-ratio: 1 / 1;
   width: 100%;
   margin-top: 5rem;
   margin-bottom: 1rem;
@@ -222,12 +223,103 @@
   cursor: not-allowed;
 }
 
-.mensajeAdvertencia{
+.mensajeAdvertencia {
   color: rgb(136, 135, 135);
   margin: 1rem 0;
   font-size: 0.9rem;
   letter-spacing: 1px;
 }
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.itemDetail,
+.itemDetailImg,
+.itemDetailTitle,
+.itemDetailPrice,
+.paymentButtons,
+.sizeSelectorContainer,
+.itemDetailDescription,
+.itemDetailCategory,
+.mensajeAdvertencia {
+  animation: fadeIn 0.8s ease forwards;
+  opacity: 0;
+}
+
+/* Retrasos para efecto secuencial */
+.itemDetailImg {
+  animation-delay: 0.1s;
+}
+
+.itemDetailTitle {
+  animation-delay: 0.2s;
+}
+
+.itemDetailPrice {
+  animation-delay: 0.3s;
+}
+
+.sizeSelectorContainer {
+  animation-delay: 0.4s;
+}
+
+.paymentButtons {
+  animation-delay: 0.5s;
+}
+
+.itemDetailDescription {
+  animation-delay: 0.6s;
+}
+
+.itemDetailCategory {
+  animation-delay: 0.7s;
+}
+
+.mensajeAdvertencia {
+  animation-delay: 0.8s;
+}
+
+/* Transiciones suaves */
+.size-button,
+.eliminarDelCarrito {
+  transition: all 0.3s ease;
+}
+
+/* Efecto hover para imagen */
+.itemDetailImg:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+/* Botones suaves al seleccionar */
+.size-button.selected {
+  transition: all 0.3s ease;
+}
+
+/* Hover en eliminar del carrito */
+.eliminarDelCarrito:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Suavizado general */
+.itemDetailContainer,
+.sizeChartContainerDesktop,
+.sizeGridContainerDesktop,
+.itemDetailImgContainer {
+  transition: all 0.3s ease-in-out;
+}
+
 
 @media screen and (max-width: 700px) {
 
