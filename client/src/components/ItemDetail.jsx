@@ -242,11 +242,7 @@ const ItemDetail = ({ item }) => {
           <span
             onClick={() => cambiarImagen(item.imageDetail)}
             style={{
-              width: "12px",
-              height: "12px",
-              borderRadius: "50%",
               backgroundColor: imagenActual === item.imageDetail ? "#363636" : "#acadac",
-              margin: "0 5px",
               cursor: imagenCargando ? "not-allowed" : "pointer",
               opacity: imagenCargando ? 0.5 : 1,
             }}
@@ -255,11 +251,7 @@ const ItemDetail = ({ item }) => {
             <span
               onClick={() => cambiarImagen(item.imageBack)}
               style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "50%",
                 backgroundColor: imagenActual === item.imageBack ? "#363636" : "#acadac",
-                margin: "0 5px",
                 cursor: imagenCargando ? "not-allowed" : "pointer",
                 opacity: imagenCargando ? 0.5 : 1,
               }}
