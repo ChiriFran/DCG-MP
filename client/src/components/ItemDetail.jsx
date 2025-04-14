@@ -108,35 +108,73 @@ const ItemDetail = ({ item }) => {
     setCantidad(1);
     setTalleSeleccionado("");
   };
-
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
+      // Calcular el stock disponible restante para el talle seleccionado
       const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+
+      // Obtener la cantidad en el carrito para este talle
       const cantidadEnCarritoProducto = carrito.filter((producto) => producto.id === item.id && producto.talle === talleSeleccionado)
         .reduce((total, producto) => total + producto.cantidad, 0);
+
+      // Calcular la cantidad total (cantidad en carrito + cantidad seleccionada)
       const cantidadTotal = cantidadEnCarritoProducto + cantidad;
 
-      // Verificamos que la cantidad no exceda el stock disponible
-      if (cantidadTotal < stockDisponible) {
+      // Verificar que la cantidad total no exceda el stock disponible
+      if (cantidadTotal <= stockDisponible) {
+        // Si no excede, sumar la cantidad
         setCantidad((prevCantidad) => prevCantidad + 1);
+
+        // Agregar el producto al carrito si es válido
+        const nuevoCarrito = [...carrito];
+        const index = nuevoCarrito.findIndex((producto) => producto.id === item.id && producto.talle === talleSeleccionado);
+
+        if (index >= 0) {
+          // Si el producto ya está en el carrito, actualizar la cantidad
+          nuevoCarrito[index].cantidad += 1;
+        } else {
+          // Si el producto no está en el carrito, agregarlo
+          nuevoCarrito.push({ ...item, cantidad: 1, talle: talleSeleccionado });
+        }
+        setCarrito(nuevoCarrito);
       } else {
         alert("No hay suficiente stock disponible.");
       }
     } else if (item.category !== "T-shirts") {
+      // Para productos no T-shirts, verificamos el stock total
       const stockDisponible = stockTotal - cantidadVendida;
+
+      // Obtener la cantidad en el carrito de este producto
       const cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
         return producto.id === item.id ? total + producto.cantidad : total;
       }, 0);
+
+      // Calcular la cantidad total
       const cantidadTotal = cantidadEnCarritoProducto + cantidad;
 
-      // Verificamos que la cantidad no exceda el stock disponible
-      if (cantidadTotal < stockDisponible) {
+      // Verificar que la cantidad total no exceda el stock disponible
+      if (cantidadTotal <= stockDisponible) {
+        // Si no excede, sumar la cantidad
         setCantidad((prevCantidad) => prevCantidad + 1);
+
+        // Agregar el producto al carrito si es válido
+        const nuevoCarrito = [...carrito];
+        const index = nuevoCarrito.findIndex((producto) => producto.id === item.id);
+
+        if (index >= 0) {
+          // Si el producto ya está en el carrito, actualizar la cantidad
+          nuevoCarrito[index].cantidad += 1;
+        } else {
+          // Si el producto no está en el carrito, agregarlo
+          nuevoCarrito.push({ ...item, cantidad: 1 });
+        }
+        setCarrito(nuevoCarrito);
       } else {
         alert("No hay suficiente stock disponible.");
       }
     }
   };
+
 
 
   const handleRestar = () => {
