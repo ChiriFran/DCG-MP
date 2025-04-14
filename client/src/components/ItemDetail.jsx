@@ -85,19 +85,28 @@ const ItemDetail = ({ item }) => {
     let stockDisponible = 0;
 
     if (item.category === "T-shirts" && talleSeleccionado) {
-      const enCarrito = carrito.reduce((total, p) => {
-        return p.id === item.id && p.talle === talleSeleccionado ? total + p.cantidad : total;
-      }, 0);
-      stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - enCarrito;
-    } else if (item.category !== "T-shirts") {
-      const enCarrito = carrito.reduce((total, p) => {
-        return p.id === item.id ? total + p.cantidad : total;
-      }, 0);
-      stockDisponible = stockTotal - cantidadVendida - enCarrito;
-    }
+      const enCarrito = carrito.reduce((total, p) =>
+        p.id === item.id && p.talle === talleSeleccionado ? total + p.cantidad : total,
+        0);
 
-    setCantidad((prev) => Math.min(prev + 1, stockDisponible));
+      stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - enCarrito;
+
+      if (cantidad < stockDisponible) {
+        setCantidad((prev) => prev + 1);
+      }
+    } else if (item.category !== "T-shirts") {
+      const enCarrito = carrito.reduce((total, p) =>
+        p.id === item.id ? total + p.cantidad : total,
+        0);
+
+      stockDisponible = stockTotal - cantidadVendida - enCarrito;
+
+      if (cantidad < stockDisponible) {
+        setCantidad((prev) => prev + 1);
+      }
+    }
   };
+
 
   const handleAgregarAlCarrito = () => {
     if (item.category === "T-shirts" && !talleSeleccionado) {
@@ -188,6 +197,7 @@ const ItemDetail = ({ item }) => {
                 : cantidadVendida >= stockTotal
             }
           />
+
         </div>
 
         <p className="cantidadEnCarrito">
