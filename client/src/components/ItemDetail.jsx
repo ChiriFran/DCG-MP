@@ -12,12 +12,11 @@ const ItemDetail = ({ item }) => {
   const [stockTotal, setStockTotal] = useState(item.category === "T-shirts" ? {} : 0);
   const [cantidadVendida, setCantidadVendida] = useState(item.category === "T-shirts" ? {} : 0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
-  const [imagenActual, setImagenActual] = useState(item.imageDetail);
-  const [imagenCargando, setImagenCargando] = useState(false);
 
   useEffect(() => {
     const consultarStock = async () => {
       try {
+        // Obtener el stock total desde la colección "productos"
         const productoRef = doc(db, "productos", item.id);
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
@@ -34,6 +33,7 @@ const ItemDetail = ({ item }) => {
           setStockTotal(productoData?.stock || 0);
         }
 
+        // Obtener la cantidad vendida desde la colección "stock"
         const stockRef = doc(db, "stock", item.title);
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
@@ -73,114 +73,47 @@ const ItemDetail = ({ item }) => {
     }
   }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
 
+  const handleRestar = () => {
+    setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
+  };
+
+  const handleSumar = () => {
+    if (item.category === "T-shirts" && talleSeleccionado) {
+      setCantidad((prevCantidad) =>
+        Math.min(prevCantidad + 1, stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado])
+      );
+    } else {
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockTotal - cantidadVendida));
+    }
+  };
+
   const handleAgregarAlCarrito = () => {
     if (item.category === "T-shirts" && !talleSeleccionado) {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
 
-    // Verificar la cantidad en el carrito para el producto seleccionado
-    let cantidadEnCarritoProducto = 0;
-    if (item.category === "T-shirts") {
-      const productoEnCarrito = carrito.find(
-        (producto) => producto.id === item.id && producto.talle === talleSeleccionado
-      );
-      cantidadEnCarritoProducto = productoEnCarrito ? productoEnCarrito.cantidad : 0;
-    } else {
-      cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
-        return producto.id === item.id ? total + producto.cantidad : total;
-      }, 0);
+    if (cantidad <= 0) {
+      alert("Por favor, selecciona una cantidad válida.");
+      return;
     }
 
-    // Verificar el stock disponible
-    const stockDisponible =
-      item.category === "T-shirts"
-        ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
-        : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
-
-    // Validar que no se exceda el stock
-    if (cantidad > stockDisponible) {
-      alert("No hay suficiente stock disponible.");
-      return;
+    if (item.category === "T-shirts") {
+      if (cantidad + cantidadVendida[talleSeleccionado] > stockTotal[talleSeleccionado]) {
+        alert("No hay suficiente stock disponible para este talle.");
+        return;
+      }
+    } else {
+      if (cantidad + cantidadVendida > stockTotal) {
+        alert("No hay suficiente stock disponible.");
+        return;
+      }
     }
 
     agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
     setCantidad(1);
     setTalleSeleccionado("");
   };
-  const handleSumar = () => {
-    if (item.category === "T-shirts" && talleSeleccionado) {
-      // Calcular el stock disponible restante para el talle seleccionado
-      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
-
-      // Obtener la cantidad en el carrito para este talle
-      const cantidadEnCarritoProducto = carrito.filter((producto) => producto.id === item.id && producto.talle === talleSeleccionado)
-        .reduce((total, producto) => total + producto.cantidad, 0);
-
-      // Calcular la cantidad total (cantidad en carrito + cantidad seleccionada)
-      const cantidadTotal = cantidadEnCarritoProducto + cantidad;
-
-      // Verificar que la cantidad total no exceda el stock disponible
-      if (cantidadTotal <= stockDisponible) {
-        // Si no excede, sumar la cantidad
-        setCantidad((prevCantidad) => prevCantidad + 1);
-
-        // Agregar el producto al carrito si es válido
-        const nuevoCarrito = [...carrito];
-        const index = nuevoCarrito.findIndex((producto) => producto.id === item.id && producto.talle === talleSeleccionado);
-
-        if (index >= 0) {
-          // Si el producto ya está en el carrito, actualizar la cantidad
-          nuevoCarrito[index].cantidad += 1;
-        } else {
-          // Si el producto no está en el carrito, agregarlo
-          nuevoCarrito.push({ ...item, cantidad: 1, talle: talleSeleccionado });
-        }
-        setCarrito(nuevoCarrito);
-      } else {
-        alert("No hay suficiente stock disponible.");
-      }
-    } else if (item.category !== "T-shirts") {
-      // Para productos no T-shirts, verificamos el stock total
-      const stockDisponible = stockTotal - cantidadVendida;
-
-      // Obtener la cantidad en el carrito de este producto
-      const cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
-        return producto.id === item.id ? total + producto.cantidad : total;
-      }, 0);
-
-      // Calcular la cantidad total
-      const cantidadTotal = cantidadEnCarritoProducto + cantidad;
-
-      // Verificar que la cantidad total no exceda el stock disponible
-      if (cantidadTotal <= stockDisponible) {
-        // Si no excede, sumar la cantidad
-        setCantidad((prevCantidad) => prevCantidad + 1);
-
-        // Agregar el producto al carrito si es válido
-        const nuevoCarrito = [...carrito];
-        const index = nuevoCarrito.findIndex((producto) => producto.id === item.id);
-
-        if (index >= 0) {
-          // Si el producto ya está en el carrito, actualizar la cantidad
-          nuevoCarrito[index].cantidad += 1;
-        } else {
-          // Si el producto no está en el carrito, agregarlo
-          nuevoCarrito.push({ ...item, cantidad: 1 });
-        }
-        setCarrito(nuevoCarrito);
-      } else {
-        alert("No hay suficiente stock disponible.");
-      }
-    }
-  };
-
-
-
-  const handleRestar = () => {
-    setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
-  };
-
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;
@@ -195,14 +128,6 @@ const ItemDetail = ({ item }) => {
 
   const handleTalleSeleccionado = (talle) => {
     setTalleSeleccionado(talle);
-    setCantidad(1);
-  };
-
-  const cambiarImagen = (nuevaImagen) => {
-    if (!imagenCargando && imagenActual !== nuevaImagen) {
-      setImagenCargando(true);
-      setImagenActual(nuevaImagen);
-    }
   };
 
   return (
@@ -232,7 +157,9 @@ const ItemDetail = ({ item }) => {
           </div>
         </div>
 
-        {mensajeAdvertencia && <p className="mensajeAdvertencia">{mensajeAdvertencia}</p>}
+        {mensajeAdvertencia && (
+          <p className="mensajeAdvertencia">{mensajeAdvertencia}</p>
+        )}
 
         <div className="botonesComprarEliminar">
           <ItemCount
@@ -240,7 +167,6 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
-            disabled={!talleSeleccionado || (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])}
           />
         </div>
 
@@ -267,12 +193,10 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L...</p>
+                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
-                <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M...</p>
+                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
@@ -281,12 +205,10 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L...</p>
+                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
-                <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M...</p>
+                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
