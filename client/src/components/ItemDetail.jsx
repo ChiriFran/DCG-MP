@@ -216,32 +216,7 @@ const ItemDetail = ({ item }) => {
       </div>
 
       <div className="itemDetailImgContainer">
-        <img
-          className="itemDetailImg"
-          src={imagenActual}
-          alt={item.title}
-          onLoad={() => setImagenCargando(false)}
-        />
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          <span
-            onClick={() => cambiarImagen(item.imageDetail)}
-            style={{
-              backgroundColor: imagenActual === item.imageDetail ? "#363636" : "#acadac",
-              cursor: imagenCargando ? "not-allowed" : "pointer",
-              opacity: imagenCargando ? 0.5 : 1,
-            }}
-          />
-          {item.imageBack && (
-            <span
-              onClick={() => cambiarImagen(item.imageBack)}
-              style={{
-                backgroundColor: imagenActual === item.imageBack ? "#363636" : "#acadac",
-                cursor: imagenCargando ? "not-allowed" : "pointer",
-                opacity: imagenCargando ? 0.5 : 1,
-              }}
-            />
-          )}
-        </div>
+        <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
       </div>
     </div>
   );
