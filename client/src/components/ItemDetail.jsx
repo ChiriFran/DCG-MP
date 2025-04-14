@@ -79,13 +79,22 @@ const ItemDetail = ({ item }) => {
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto[talleSeleccionado];
+      const cantidadCarrito = carrito.reduce((total, producto) => {
+        return producto.id === item.id && producto.talle === talleSeleccionado
+          ? total + producto.cantidad
+          : total;
+      }, 0);
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadCarrito;
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     } else if (item.category !== "T-shirts") {
-      const stockDisponible = stockTotal - cantidadVendida - cantidadEnCarritoProducto;
+      const cantidadCarrito = carrito.reduce((total, producto) => {
+        return producto.id === item.id ? total + producto.cantidad : total;
+      }, 0);
+      const stockDisponible = stockTotal - cantidadVendida - cantidadCarrito;
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     }
   };
+
 
   const handleAgregarAlCarrito = () => {
     if (item.category === "T-shirts" && !talleSeleccionado) {
@@ -110,10 +119,16 @@ const ItemDetail = ({ item }) => {
         ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
         : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
 
-    if (cantidad > stockDisponible) {
-      alert("No hay suficiente stock disponible.");
+    if (stockDisponible <= 0) {
+      alert("No hay stock disponible para este talle.");
       return;
     }
+
+    if (cantidad + cantidadEnCarrito > stockDisponible) {
+      alert("No puedes agregar más unidades de este talle. Límite alcanzado.");
+      return;
+    }
+
 
     agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
     setCantidad(1);
@@ -127,9 +142,16 @@ const ItemDetail = ({ item }) => {
     setCantidad(1);
   };
 
-  const cantidadEnCarrito = carrito.reduce((total, producto) => {
-    return producto.id === item.id ? total + producto.cantidad : total;
-  }, 0);
+  const cantidadEnCarrito = item.category === "T-shirts"
+    ? carrito.reduce((total, producto) => {
+      return producto.id === item.id && producto.talle === talleSeleccionado
+        ? total + producto.cantidad
+        : total;
+    }, 0)
+    : carrito.reduce((total, producto) => {
+      return producto.id === item.id ? total + producto.cantidad : total;
+    }, 0);
+
 
   const handleTalleSeleccionado = (talle) => {
     setTalleSeleccionado(talle);
@@ -178,8 +200,12 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
-            disabled={!talleSeleccionado || (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])}
+            disabled={
+              (item.category === "T-shirts" && (!talleSeleccionado || stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarrito <= 0)) ||
+              (item.category !== "T-shirts" && stockTotal - cantidadVendida - cantidadEnCarrito <= 0)
+            }
           />
+
         </div>
 
         <p className="cantidadEnCarrito">
