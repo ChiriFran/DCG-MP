@@ -79,10 +79,10 @@ const ItemDetail = ({ item }) => {
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto[talleSeleccionado];
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     } else if (item.category !== "T-shirts") {
-      const stockDisponible = stockTotal - cantidadVendida;
+      const stockDisponible = stockTotal - cantidadVendida - cantidadEnCarritoProducto;
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     }
   };
