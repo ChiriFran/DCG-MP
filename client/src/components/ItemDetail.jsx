@@ -12,6 +12,8 @@ const ItemDetail = ({ item }) => {
   const [stockTotal, setStockTotal] = useState(item.category === "T-shirts" ? {} : 0);
   const [cantidadVendida, setCantidadVendida] = useState(item.category === "T-shirts" ? {} : 0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
+  const [imagenActual, setImagenActual] = useState(item.imageDetail);
+  const [imagenCargando, setImagenCargando] = useState(false);
 
   useEffect(() => {
     const consultarStock = async () => {
@@ -72,20 +74,16 @@ const ItemDetail = ({ item }) => {
   }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
 
   const handleRestar = () => {
-    if (item.category === "T-shirts" && talleSeleccionado) {
-      setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
-    }
+    setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      if (cantidad + cantidadVendida[talleSeleccionado] <= stockTotal[talleSeleccionado]) {
-        setCantidad((prevCantidad) => prevCantidad + 1);
-      }
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     } else if (item.category !== "T-shirts") {
-      if (cantidad + cantidadVendida <= stockTotal) {
-        setCantidad((prevCantidad) => prevCantidad + 1);
-      }
+      const stockDisponible = stockTotal - cantidadVendida;
+      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     }
   };
 
@@ -95,21 +93,26 @@ const ItemDetail = ({ item }) => {
       return;
     }
 
-    if (cantidad <= 0) {
-      alert("Por favor, selecciona una cantidad válida.");
-      return;
+    let cantidadEnCarritoProducto = 0;
+    if (item.category === "T-shirts") {
+      const productoEnCarrito = carrito.find(
+        (producto) => producto.id === item.id && producto.talle === talleSeleccionado
+      );
+      cantidadEnCarritoProducto = productoEnCarrito ? productoEnCarrito.cantidad : 0;
+    } else {
+      cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
+        return producto.id === item.id ? total + producto.cantidad : total;
+      }, 0);
     }
 
-    if (item.category === "T-shirts") {
-      if (cantidad + cantidadVendida[talleSeleccionado] > stockTotal[talleSeleccionado]) {
-        alert("No hay suficiente stock disponible para este talle.");
-        return;
-      }
-    } else {
-      if (cantidad + cantidadVendida > stockTotal) {
-        alert("No hay suficiente stock disponible.");
-        return;
-      }
+    const stockDisponible =
+      item.category === "T-shirts"
+        ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
+        : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
+
+    if (cantidad > stockDisponible) {
+      alert("No hay suficiente stock disponible.");
+      return;
     }
 
     agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
@@ -130,6 +133,14 @@ const ItemDetail = ({ item }) => {
 
   const handleTalleSeleccionado = (talle) => {
     setTalleSeleccionado(talle);
+    setCantidad(1);
+  };
+
+  const cambiarImagen = (nuevaImagen) => {
+    if (!imagenCargando && imagenActual !== nuevaImagen) {
+      setImagenCargando(true);
+      setImagenActual(nuevaImagen);
+    }
   };
 
   return (
@@ -159,9 +170,7 @@ const ItemDetail = ({ item }) => {
           </div>
         </div>
 
-        {mensajeAdvertencia && (
-          <p className="mensajeAdvertencia">{mensajeAdvertencia}</p>
-        )}
+        {mensajeAdvertencia && <p className="mensajeAdvertencia">{mensajeAdvertencia}</p>}
 
         <div className="botonesComprarEliminar">
           <ItemCount
@@ -169,7 +178,7 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
-            disabled={!talleSeleccionado || cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado]} // Desactivar si no hay talle o si el stock está agotado
+            disabled={!talleSeleccionado || (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])}
           />
         </div>
 
@@ -196,10 +205,12 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE A:</span>
+                <p>Marco is 1.80m and wears a Size L...</p>
               </li>
               <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE B:</span>
+                <p>Nina is 1.71m and wears a Size M...</p>
               </li>
             </ul>
           </div>
@@ -208,10 +219,12 @@ const ItemDetail = ({ item }) => {
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
-                <span>SIZE A:</span><p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE A:</span>
+                <p>Marco is 1.80m and wears a Size L...</p>
               </li>
               <li>
-                <span>SIZE B:</span><p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <span>SIZE B:</span>
+                <p>Nina is 1.71m and wears a Size M...</p>
               </li>
             </ul>
           </div>
@@ -219,7 +232,32 @@ const ItemDetail = ({ item }) => {
       </div>
 
       <div className="itemDetailImgContainer">
-        <img className="itemDetailImg" src={item.imageDetail} alt={item.title} />
+        <img
+          className="itemDetailImg"
+          src={imagenActual}
+          alt={item.title}
+          onLoad={() => setImagenCargando(false)}
+        />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
+          <span
+            onClick={() => cambiarImagen(item.imageDetail)}
+            style={{
+              backgroundColor: imagenActual === item.imageDetail ? "#363636" : "#acadac",
+              cursor: imagenCargando ? "not-allowed" : "pointer",
+              opacity: imagenCargando ? 0.5 : 1,
+            }}
+          />
+          {item.imageBack && (
+            <span
+              onClick={() => cambiarImagen(item.imageBack)}
+              style={{
+                backgroundColor: imagenActual === item.imageBack ? "#363636" : "#acadac",
+                cursor: imagenCargando ? "not-allowed" : "pointer",
+                opacity: imagenCargando ? 0.5 : 1,
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
