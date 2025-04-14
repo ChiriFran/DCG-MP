@@ -95,45 +95,43 @@ const ItemDetail = ({ item }) => {
     }
   };
 
-
   const handleAgregarAlCarrito = () => {
-    if (item.category === "T-shirts" && !talleSeleccionado) {
-      alert("Por favor, selecciona un talle antes de agregar al carrito.");
-      return;
-    }
-
-    let cantidadEnCarritoProducto = 0;
     if (item.category === "T-shirts") {
-      const productoEnCarrito = carrito.find(
-        (producto) => producto.id === item.id && producto.talle === talleSeleccionado
-      );
-      cantidadEnCarritoProducto = productoEnCarrito ? productoEnCarrito.cantidad : 0;
+      if (!talleSeleccionado) {
+        alert("Por favor, selecciona un talle antes de agregar al carrito.");
+        return;
+      }
+
+      const cantidadActualCarrito = carrito.reduce((total, producto) => {
+        return producto.id === item.id && producto.talle === talleSeleccionado
+          ? total + producto.cantidad
+          : total;
+      }, 0);
+
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+
+      if (cantidadActualCarrito + cantidad > stockDisponible) {
+        alert("No hay suficiente stock disponible para este talle.");
+        return;
+      }
     } else {
-      cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
+      const cantidadActualCarrito = carrito.reduce((total, producto) => {
         return producto.id === item.id ? total + producto.cantidad : total;
       }, 0);
+
+      const stockDisponible = stockTotal - cantidadVendida;
+
+      if (cantidadActualCarrito + cantidad > stockDisponible) {
+        alert("No hay suficiente stock disponible.");
+        return;
+      }
     }
-
-    const stockDisponible =
-      item.category === "T-shirts"
-        ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
-        : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
-
-    if (stockDisponible <= 0) {
-      alert("No hay stock disponible para este talle.");
-      return;
-    }
-
-    if (cantidad + cantidadEnCarrito > stockDisponible) {
-      alert("No puedes agregar más unidades de este talle. Límite alcanzado.");
-      return;
-    }
-
 
     agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
     setCantidad(1);
     setTalleSeleccionado("");
   };
+
 
   const handleEliminarDelCarrito = () => {
     const cantidadEnCarrito = carrito.find((producto) => producto.id === item.id)?.cantidad || 0;
