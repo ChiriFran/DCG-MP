@@ -111,14 +111,33 @@ const ItemDetail = ({ item }) => {
 
   const handleSumar = () => {
     if (item.category === "T-shirts" && talleSeleccionado) {
-      const stockDisponible =
-        stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarrito;
-      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
+      const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
+      const cantidadEnCarritoProducto = carrito.filter((producto) => producto.id === item.id && producto.talle === talleSeleccionado)
+        .reduce((total, producto) => total + producto.cantidad, 0);
+      const cantidadTotal = cantidadEnCarritoProducto + cantidad;
+
+      // Verificamos que la cantidad no exceda el stock disponible
+      if (cantidadTotal < stockDisponible) {
+        setCantidad((prevCantidad) => prevCantidad + 1);
+      } else {
+        alert("No hay suficiente stock disponible.");
+      }
     } else if (item.category !== "T-shirts") {
-      const stockDisponible = stockTotal - cantidadVendida - cantidadEnCarrito;
-      setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
+      const stockDisponible = stockTotal - cantidadVendida;
+      const cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
+        return producto.id === item.id ? total + producto.cantidad : total;
+      }, 0);
+      const cantidadTotal = cantidadEnCarritoProducto + cantidad;
+
+      // Verificamos que la cantidad no exceda el stock disponible
+      if (cantidadTotal < stockDisponible) {
+        setCantidad((prevCantidad) => prevCantidad + 1);
+      } else {
+        alert("No hay suficiente stock disponible.");
+      }
     }
   };
+
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
