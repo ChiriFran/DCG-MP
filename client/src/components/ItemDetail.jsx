@@ -201,16 +201,17 @@ const ItemDetail = ({ item }) => {
             <li>Includes our unique Mutual Rytm rubber tag, a Bandcamp download code and stickers</li>
           </ul>
 
+
           <div className="sizeChartContainer">
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
                 <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L...</p>
+                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
                 <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M...</p>
+                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
@@ -220,11 +221,11 @@ const ItemDetail = ({ item }) => {
             <ul>
               <li>
                 <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L...</p>
+                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
               <li>
                 <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M...</p>
+                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
               </li>
             </ul>
           </div>
@@ -264,3 +265,5 @@ const ItemDetail = ({ item }) => {
 };
 
 export default ItemDetail;
+
+
