@@ -94,15 +94,15 @@ const ItemDetail = ({ item }) => {
     }
 
     let cantidadEnCarritoProducto = 0;
+
     if (item.category === "T-shirts") {
-      const productoEnCarrito = carrito.find(
-        (producto) => producto.id === item.id && producto.talle === talleSeleccionado
-      );
-      cantidadEnCarritoProducto = productoEnCarrito ? productoEnCarrito.cantidad : 0;
+      cantidadEnCarritoProducto = carrito
+        .filter((producto) => producto.id === item.id && producto.talleSeleccionado === talleSeleccionado)
+        .reduce((total, producto) => total + producto.cantidad, 0);
     } else {
-      cantidadEnCarritoProducto = carrito.reduce((total, producto) => {
-        return producto.id === item.id ? total + producto.cantidad : total;
-      }, 0);
+      cantidadEnCarritoProducto = carrito
+        .filter((producto) => producto.id === item.id)
+        .reduce((total, producto) => total + producto.cantidad, 0);
     }
 
     const stockDisponible =
