@@ -34,6 +34,9 @@
   flex-shrink: 0;
   box-sizing: border-box;
   padding: 0 10px;
+  display: flex;
+  flex-flow: column;
+  align-content: center;
 }
 
 .sliderItem[data-items-per-view="1"] {
