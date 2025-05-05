@@ -36,7 +36,7 @@
   padding: 0 10px;
   display: flex;
   flex-flow: column;
-  align-content: center;
+  align-items: center;
 }
 
 .sliderItem[data-items-per-view="1"] {
