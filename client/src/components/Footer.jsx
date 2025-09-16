@@ -15,7 +15,7 @@ function Footer() {
           <img src={visaIcon} alt="visa" title="visa" />
         </div>
         <div className="footer">
-          <p className="footerDate">All rights reserved  © 2024 - DCG </p>
+          <p className="footerDate">All rights reserved  © 2025 - DCG </p>
         </div>
       </section>
     </>
