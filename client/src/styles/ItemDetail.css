@@ -249,10 +249,18 @@
 .itemDetailPrice,
 .paymentButtons,
 .sizeSelectorContainer,
+.itemCountContainer,
+.cantidadEnCarrito,
 .itemDetailDescription,
 .itemDetailCategory,
 .mensajeAdvertencia {
-  animation: fadeIn 0.8s ease forwards;
+  animation: fadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+.sizeTitle,
+.itemDetailDescriptionList ul li {
+  animation: fadeIn 0.5s ease forwards;
   opacity: 0;
 }
 
@@ -273,6 +281,14 @@
   animation-delay: 0.4s;
 }
 
+.itemCountContainer{
+  animation-delay: 0.5s;
+}
+
+.cantidadEnCarrito{
+  animation-delay: 0.5s;
+}
+
 .paymentButtons {
   animation-delay: 0.5s;
 }
@@ -286,6 +302,14 @@
 }
 
 .mensajeAdvertencia {
+  animation-delay: 0.7s;
+}
+
+.sizeTitle {
+  animation-delay: 0.9s;
+}
+
+.itemDetailDescriptionList ul li {
   animation-delay: 0.8s;
 }
 
@@ -309,7 +333,6 @@
 /* Hover en eliminar del carrito */
 .eliminarDelCarrito:hover {
   transform: scale(1.05);
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Suavizado general */

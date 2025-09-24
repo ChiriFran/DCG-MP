@@ -47,7 +47,7 @@ const Eventos = () => {
           <div className="eventoCard">
             <div className="imgEventosContainer">
               <a href={upcomingEvent.buyLink} target="_blank" rel="noopener noreferrer">
-                <img src={upcomingEvent.image} alt="" />
+                <img src={upcomingEvent.image} alt="Proximo Evento" />
               </a>
             </div>
           </div>
@@ -60,7 +60,7 @@ const Eventos = () => {
             <div key={evento.id} className="pastEventoCard">
               <div className="pastImgEventos">
                 <a href={evento.buyLink} target="_blank" rel="noopener noreferrer">
-                  <img src={evento.image} alt="" />
+                  <img src={evento.image} alt="Ultimos eventos" />
                 </a>
               </div>
             </div>

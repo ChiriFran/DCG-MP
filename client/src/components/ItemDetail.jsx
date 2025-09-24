@@ -5,12 +5,17 @@ import { CartContext } from "../context/CartContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
+// 🔹 Lista de categorías que manejan talles
+const categoriasConTalle = ["T-shirts", "Pants", "Jackets"];
+
 const ItemDetail = ({ item }) => {
   const { carrito, agregarAlCarrito, eliminarDelCarrito } = useContext(CartContext);
+  const manejaTalle = categoriasConTalle.includes(item.category);
+
   const [cantidad, setCantidad] = useState(1);
   const [talleSeleccionado, setTalleSeleccionado] = useState("");
-  const [stockTotal, setStockTotal] = useState(item.category === "T-shirts" ? {} : 0);
-  const [cantidadVendida, setCantidadVendida] = useState(item.category === "T-shirts" ? {} : 0);
+  const [stockTotal, setStockTotal] = useState(manejaTalle ? {} : 0);
+  const [cantidadVendida, setCantidadVendida] = useState(manejaTalle ? {} : 0);
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
   const [imagenActual, setImagenActual] = useState(item.imageDetail);
   const [imagenCargando, setImagenCargando] = useState(false);
@@ -22,7 +27,7 @@ const ItemDetail = ({ item }) => {
         const productoSnapshot = await getDoc(productoRef);
         const productoData = productoSnapshot.data();
 
-        if (item.category === "T-shirts") {
+        if (manejaTalle) {
           setStockTotal({
             S: productoData?.stockS || 0,
             M: productoData?.stockM || 0,
@@ -38,7 +43,7 @@ const ItemDetail = ({ item }) => {
         const stockSnapshot = await getDoc(stockRef);
         const stockData = stockSnapshot.data();
 
-        if (item.category === "T-shirts") {
+        if (manejaTalle) {
           setCantidadVendida({
             S: stockData?.S || 0,
             M: stockData?.M || 0,
@@ -55,10 +60,10 @@ const ItemDetail = ({ item }) => {
     };
 
     consultarStock();
-  }, [item.id, item.title, item.category]);
+  }, [item.id, item.title, item.category, manejaTalle]);
 
   useEffect(() => {
-    if (item.category === "T-shirts") {
+    if (manejaTalle) {
       if (talleSeleccionado && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado]) {
         setMensajeAdvertencia("No hay stock disponible para este talle.");
       } else {
@@ -71,31 +76,31 @@ const ItemDetail = ({ item }) => {
         setMensajeAdvertencia("");
       }
     }
-  }, [cantidadVendida, stockTotal, talleSeleccionado, item.category]);
+  }, [cantidadVendida, stockTotal, talleSeleccionado, manejaTalle]);
 
   const handleRestar = () => {
     setCantidad((prevCantidad) => Math.max(prevCantidad - 1, 1));
   };
 
   const handleSumar = () => {
-    if (item.category === "T-shirts" && talleSeleccionado) {
+    if (manejaTalle && talleSeleccionado) {
       const stockDisponible = stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado];
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
-    } else if (item.category !== "T-shirts") {
+    } else if (!manejaTalle) {
       const stockDisponible = stockTotal - cantidadVendida;
       setCantidad((prevCantidad) => Math.min(prevCantidad + 1, stockDisponible));
     }
   };
 
   const handleAgregarAlCarrito = () => {
-    if (item.category === "T-shirts" && !talleSeleccionado) {
+    if (manejaTalle && !talleSeleccionado) {
       alert("Por favor, selecciona un talle antes de agregar al carrito.");
       return;
     }
 
     let cantidadEnCarritoProducto = 0;
 
-    if (item.category === "T-shirts") {
+    if (manejaTalle) {
       cantidadEnCarritoProducto = carrito
         .filter((producto) => producto.id === item.id && producto.talleSeleccionado === talleSeleccionado)
         .reduce((total, producto) => total + producto.cantidad, 0);
@@ -105,17 +110,16 @@ const ItemDetail = ({ item }) => {
         .reduce((total, producto) => total + producto.cantidad, 0);
     }
 
-    const stockDisponible =
-      item.category === "T-shirts"
-        ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
-        : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
+    const stockDisponible = manejaTalle
+      ? stockTotal[talleSeleccionado] - cantidadVendida[talleSeleccionado] - cantidadEnCarritoProducto
+      : stockTotal - cantidadVendida - cantidadEnCarritoProducto;
 
     if (cantidad > stockDisponible) {
       alert("No hay suficiente stock disponible.");
       return;
     }
 
-    agregarAlCarrito(item, cantidad, item.category === "T-shirts" ? talleSeleccionado : null);
+    agregarAlCarrito(item, cantidad, manejaTalle ? talleSeleccionado : null);
     setCantidad(1);
     setTalleSeleccionado("");
   };
@@ -152,7 +156,7 @@ const ItemDetail = ({ item }) => {
         <div className="sizeSelectorContainer">
           <h3>Size</h3>
           <div id="size-selector">
-            {item.category === "T-shirts" ? (
+            {manejaTalle ? (
               ["S", "M", "L", "XL", "XXL"].map((talle) => (
                 <button
                   key={talle}
@@ -178,7 +182,10 @@ const ItemDetail = ({ item }) => {
             handleSumar={handleSumar}
             handleRestar={handleRestar}
             handleAgregar={handleAgregarAlCarrito}
-            disabled={!talleSeleccionado || (item.category === "T-shirts" && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])}
+            disabled={
+              (manejaTalle && !talleSeleccionado) ||
+              (manejaTalle && cantidadVendida[talleSeleccionado] >= stockTotal[talleSeleccionado])
+            }
           />
         </div>
 
@@ -193,25 +200,26 @@ const ItemDetail = ({ item }) => {
 
         <div className="itemDetailDescriptionList">
           <ul>
-            <li>Unisex Hoodie</li>
-            <li>Relaxed Fit</li>
             <li>70% premium cotton / 30% polyester</li>
             <li>Logo puff print on the back</li>
-            <li>Faux leather logo patch on the sleeve</li>
-            <li>Includes our unique Mutual Rytm rubber tag, a Bandcamp download code and stickers</li>
           </ul>
-
 
           <div className="sizeChartContainer">
             <p className="sizeTitle">Size Chart</p>
             <ul>
               <li>
                 <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <p>
+                  Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
+                  regular size. For an oversized look, go one size up!
+                </p>
               </li>
               <li>
                 <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <p>
+                  Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
+                  regular size. For an oversized look, go one size up!
+                </p>
               </li>
             </ul>
           </div>
@@ -221,11 +229,17 @@ const ItemDetail = ({ item }) => {
             <ul>
               <li>
                 <span>SIZE A:</span>
-                <p>Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <p>
+                  Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
+                  regular size. For an oversized look, go one size up!
+                </p>
               </li>
               <li>
                 <span>SIZE B:</span>
-                <p>Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your regular size. For an oversized look, go one size up!</p>
+                <p>
+                  Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
+                  regular size. For an oversized look, go one size up!
+                </p>
               </li>
             </ul>
           </div>
@@ -243,7 +257,7 @@ const ItemDetail = ({ item }) => {
           <span
             onClick={() => cambiarImagen(item.imageDetail)}
             style={{
-              backgroundColor: imagenActual === item.imageDetail ? "#363636" : "#acadac",
+              backgroundColor: imagenActual === item.imageDetail ? "#d3d0d0ff" : "#2f2f2fff",
               cursor: imagenCargando ? "not-allowed" : "pointer",
               opacity: imagenCargando ? 0.5 : 1,
             }}
@@ -252,7 +266,7 @@ const ItemDetail = ({ item }) => {
             <span
               onClick={() => cambiarImagen(item.imageBack)}
               style={{
-                backgroundColor: imagenActual === item.imageBack ? "#363636" : "#acadac",
+                backgroundColor: imagenActual === item.imageBack ? "#d3d0d0ff" : "#2f2f2fff",
                 cursor: imagenCargando ? "not-allowed" : "pointer",
                 opacity: imagenCargando ? 0.5 : 1,
               }}
@@ -265,5 +279,3 @@ const ItemDetail = ({ item }) => {
 };
 
 export default ItemDetail;
-
-
