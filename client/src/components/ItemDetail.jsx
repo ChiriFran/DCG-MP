@@ -205,7 +205,7 @@ const ItemDetail = ({ item }) => {
           </ul>
 
           <div className="sizeChartContainer">
-            <p className="sizeTitle">Size Chart</p>
+            <p className="sizeTitle">T-shirt size chart</p>
             <ul>
               <li>
                 <span>SIZE A:</span>
@@ -225,7 +225,7 @@ const ItemDetail = ({ item }) => {
           </div>
 
           <div className="sizeChartContainerDesktop">
-            <p className="sizeTitle">Size Chart</p>
+            <p className="sizeTitle">T-shirt size chart</p>
             <ul>
               <li>
                 <span>SIZE A:</span>
