@@ -197,52 +197,56 @@ const ItemDetail = ({ item }) => {
         </p>
 
         <p className="itemDetailDescription">{item.description}</p>
-
         <div className="itemDetailDescriptionList">
           <ul>
             <li>70% premium cotton / 30% polyester</li>
             <li>Logo puff print on the back</li>
           </ul>
 
-          <div className="sizeChartContainer">
-            <p className="sizeTitle">T-shirt size chart</p>
-            <ul>
-              <li>
-                <span>SIZE A:</span>
-                <p>
-                  Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
-                  regular size. For an oversized look, go one size up!
-                </p>
-              </li>
-              <li>
-                <span>SIZE B:</span>
-                <p>
-                  Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
-                  regular size. For an oversized look, go one size up!
-                </p>
-              </li>
-            </ul>
-          </div>
+          {/* 🔹 Mostrar solo si el producto maneja talles */}
+          {manejaTalle && (
+            <>
+              <div className="sizeChartContainer">
+                <p className="sizeTitle">T-shirt size chart</p>
+                <ul>
+                  <li>
+                    <span>SIZE A:</span>
+                    <p>
+                      Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
+                      regular size. For an oversized look, go one size up!
+                    </p>
+                  </li>
+                  <li>
+                    <span>SIZE B:</span>
+                    <p>
+                      Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
+                      regular size. For an oversized look, go one size up!
+                    </p>
+                  </li>
+                </ul>
+              </div>
 
-          <div className="sizeChartContainerDesktop">
-            <p className="sizeTitle">T-shirt size chart</p>
-            <ul>
-              <li>
-                <span>SIZE A:</span>
-                <p>
-                  Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
-                  regular size. For an oversized look, go one size up!
-                </p>
-              </li>
-              <li>
-                <span>SIZE B:</span>
-                <p>
-                  Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
-                  regular size. For an oversized look, go one size up!
-                </p>
-              </li>
-            </ul>
-          </div>
+              <div className="sizeChartContainerDesktop">
+                <p className="sizeTitle">T-shirt size chart</p>
+                <ul>
+                  <li>
+                    <span>SIZE A:</span>
+                    <p>
+                      Marco is 1.80m and wears a Size L. For a comfortable, relaxed fit, choose your
+                      regular size. For an oversized look, go one size up!
+                    </p>
+                  </li>
+                  <li>
+                    <span>SIZE B:</span>
+                    <p>
+                      Nina is 1.71m and wears a Size M. For a comfortable, relaxed fit, choose your
+                      regular size. For an oversized look, go one size up!
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
