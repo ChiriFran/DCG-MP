@@ -183,9 +183,6 @@ const Carrito = () => {
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
-                {/* Campos de envío (igual que antes) */}
-                {/* ... mantén todos los campos del formulario tal cual ... */}
-
                 <div className="formEnvioGroup">
                   <label>Full Name</label>
                   <input
