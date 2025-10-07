@@ -1,26 +1,63 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import homeVideoDesktop from "../../media/video/DCG-hero-desktop.mp4";
 import homeVideoMobile from "../../media/video/DCG-hero-mobile.mp4";
+import homePoster from "../../media/video/heroFallback.png"; // Imagen fija de respaldo
 import "../styles/HomeVideo.css";
 
 function HomeVideo() {
   const videoRef = useRef(null);
+  const [showFallback, setShowFallback] = useState(false);
+
+  // Detectar si el navegador es el WebView de Instagram (o similar)
+  const isInstagramBrowser = () => {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    return ua.toLowerCase().includes("instagram");
+  };
 
   useEffect(() => {
     const video = videoRef.current;
+    if (!video) return;
 
-    const handleLoadedMetadata = () => {
-      video.play().catch((error) => {
-        console.log("Failed to autoplay:", error);
-      });
+    const useMobile = window.innerWidth <= 700;
+    video.src = useMobile ? homeVideoMobile : homeVideoDesktop;
+
+    const tryPlay = async () => {
+      try {
+        await video.play();
+      } catch (err) {
+        console.warn("Autoplay bloqueado o no permitido, usando fallback:", err);
+        setShowFallback(true);
+      }
     };
 
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    // En navegadores embebidos como Instagram, forzamos fallback directamente
+    if (isInstagramBrowser()) {
+      setShowFallback(true);
+      return;
+    }
+
+    video.addEventListener("loadedmetadata", tryPlay);
+    video.addEventListener("error", () => setShowFallback(true));
 
     return () => {
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("loadedmetadata", tryPlay);
+      video.removeEventListener("error", () => setShowFallback(true));
     };
   }, []);
+
+  if (showFallback) {
+    return (
+      <div className="homeVideoContainer">
+        <div className="homeVideoContainerTexture">
+          <img
+            src={homePoster}
+            alt="Inicio"
+            className="homeVideoFallback"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="homeVideoContainer">
@@ -29,13 +66,10 @@ function HomeVideo() {
           ref={videoRef}
           autoPlay
           loop
-          playsInline
           muted
-        >
-          <source src={homeVideoMobile} type="video/mp4" media="(max-width: 700px)" />
-          <source src={homeVideoDesktop} type="video/mp4" media="(min-width: 701px)" />
-          Su navegador no soporta la etiqueta de vídeo.
-        </video>
+          playsInline
+          poster={homePoster}
+        />
       </div>
     </div>
   );
