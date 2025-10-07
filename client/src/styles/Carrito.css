@@ -14,7 +14,7 @@
 .carritoCard {
   display: flex;
   flex-direction: column;
-  width: 60%;
+  width: 70%;
   background-color: #33333300;
   padding: 3rem;
   border-radius: 8px;
