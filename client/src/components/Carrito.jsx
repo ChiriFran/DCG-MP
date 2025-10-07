@@ -10,7 +10,7 @@ import { db } from "../firebase/config";
 
 const Carrito = () => {
   const { carrito, precioTotal, vaciarCarrito } = useContext(CartContext);
-  const [isProcessing, setIsProcessing] = useState(""); // Estado para el mensaje de procesamiento
+  const [isProcessing, setIsProcessing] = useState("");
   const [preferenceId, setPreferenceId] = useState(null);
   const [shippingData, setShippingData] = useState({
     name: "",
@@ -27,15 +27,14 @@ const Carrito = () => {
     adressType: "",
     comments: "",
   });
-  const [shippingOption, setShippingOption] = useState(""); // Nueva opción de envío
+  const [shippingOption, setShippingOption] = useState("");
+  const [message, setMessage] = useState("");
 
   const shippingCosts = {
-    CABA: 5000,             //PRECIO DE ENVIO PRUEBA 
-    GBA: 7500,              //PRECIO DE ENVIO PRUEBA
-    "Resto del país": 15000, //PRECIO DE ENVIO PRUEBA
+    CABA: 5000,
+    GBA: 7500,
+    "Resto del país": 15000,
   };
-  const [message, setMessage] = useState(""); // Estado para mostrar los mensajes
-
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -46,42 +45,35 @@ const Carrito = () => {
     setShippingOption(e.target.value);
   };
 
-  // Inicializa Mercado Pago con clave pública desde las variables de entorno
   const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY_PROD;
   initMercadoPago(mpPublicKey);
 
-  // Crea la preferencia en el backend
   const createPreference = async () => {
     try {
       const items = carrito.map((prod) => ({
-        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - Unidades: ${prod.cantidad}`, // Agrega la cantidad al título
+        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - Unidades: ${prod.cantidad}`,
         unit_price: prod.price,
         quantity: prod.cantidad,
-        category_id: prod.talleSeleccionado, // Mantén el talle en category_id si lo necesitas
-        description: `Talle: ${prod.talleSeleccionado}`, // Descripción también con el talle
+        category_id: prod.talleSeleccionado,
+        description: `Talle: ${prod.talleSeleccionado}`,
       }));
 
-      console.log("Items enviados a Mercado Pago:", JSON.stringify(items, null, 2));
-
       const apiUrl = import.meta.env.VITE_API_URL;
-
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
-        shipping: shippingData, // Agregamos los datos de envío
-        shippingCost: shippingCosts[shippingOption] || 0, // Se agrega el costo de envío
+        shipping: shippingData,
+        shippingCost: shippingCosts[shippingOption] || 0,
       });
-
-      console.log("Respuesta de Mercado Pago:", response.data);
 
       const { id } = response.data;
       return id;
     } catch (error) {
       console.error("Error al crear la preferencia en Mercado Pago:", error);
-      alert("Hubo un problema al generar la preferencia. Por favor, inténtalo de nuevo.");
+      alert("Hubo un problema al generar la preferencia. Inténtalo nuevamente.");
+      return null;
     }
   };
 
-  // Guarda la orden en Firebase
   const saveOrderToFirebase = async () => {
     const pedido = {
       cliente: shippingData,
@@ -95,14 +87,11 @@ const Carrito = () => {
     try {
       const pedidoDb = collection(db, "pedidos");
       const doc = await addDoc(pedidoDb, pedido);
-
-      console.log("Guardando el orderId:", doc.id);
       localStorage.setItem("orderId", doc.id);
-
-      return doc.id; // Regresar el ID del pedido guardado
+      return doc.id;
     } catch (error) {
-      console.error("Error saving the order in Firebase:", error);
-      alert("There was a problem saving the order. Please try again.");
+      console.error("Error guardando el pedido:", error);
+      alert("Hubo un problema al guardar el pedido. Inténtalo nuevamente.");
       return false;
     }
   };
@@ -110,65 +99,49 @@ const Carrito = () => {
   const handleBuy = async (e) => {
     e.preventDefault();
 
-    if (!shippingData.adressType) {
-      setMessage("Por favor, indica el tipo de domicilio.");
-      return;
+    if (!shippingData.adressType) return setMessage("Por favor, indica el tipo de domicilio.");
+    if (!shippingOption) return setMessage("Por favor, confirma el costo de envío.");
+    if (shippingData.adressType === "departamento" && (!shippingData.floor || !shippingData.apartment)) {
+      return setMessage("Completa el número de piso y departamento.");
     }
 
-    if (!shippingOption) {
-      setMessage("Por favor, confirma el costo de envio.");
-      return;
-    }
-
-    if (shippingData.adressType === "departamento") {
-      if (!shippingData.floor || !shippingData.apartment) {
-        setMessage("Completa el número de piso y departamento.");
-        return;
-      }
-    }
-
-    // Validación de código postal según ubicación
     const zipCode = shippingData.zipCode.trim();
-    const zipCodeNumber = parseInt(zipCode, 10);
-
     let region = "Resto del país";
-
-    if (/^(10|11|12|13|14|15)\d{2}$/.test(zipCode)) {
-      region = "CABA";
-    } else if (/^(16|17|18|19|2[0-9]|3[0-9])\d{2}$/.test(zipCode)) {
-      region = "GBA";
-    }
+    if (/^(10|11|12|13|14|15)\d{2}$/.test(zipCode)) region = "CABA";
+    else if (/^(16|17|18|19|2[0-9]|3[0-9])\d{2}$/.test(zipCode)) region = "GBA";
 
     if (region !== shippingOption) {
-      setMessage(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
-      return;
+      return setMessage(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
     }
 
     if (isProcessing) return;
-
     setIsProcessing("Processing...");
 
-    const id = await createPreference();
-    if (id) {
-      setPreferenceId(id);
-      setIsProcessing("Redirecting to Mercado Pago...");
+    // Abrimos la ventana inmediatamente para que Safari no la bloquee
+    const newWindow = window.open("", "_blank");
 
-      const orderId = await saveOrderToFirebase();
-      if (orderId) {
-        setTimeout(() => {
-          const checkoutUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
-          window.open(checkoutUrl, "_blank");
-          vaciarCarrito();
-          setIsProcessing("");
-        }, 200);
-      } else {
-        setMessage("Error guardando el pedido.");
-        setIsProcessing("");
-      }
-    } else {
+    const id = await createPreference();
+    if (!id) {
+      newWindow.close();
       setMessage("Error creando la preferencia en Mercado Pago.");
       setIsProcessing("");
+      return;
     }
+
+    setPreferenceId(id);
+
+    const orderId = await saveOrderToFirebase();
+    if (!orderId) {
+      newWindow.close();
+      setMessage("Error guardando el pedido.");
+      setIsProcessing("");
+      return;
+    }
+
+    // Redirigimos la ventana que ya abrimos
+    newWindow.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
+    vaciarCarrito();
+    setIsProcessing("");
   };
 
   return (
@@ -179,6 +152,7 @@ const Carrito = () => {
             ? "Shopping Cart"
             : "Oops, you don't have any items in your cart! Here below are some of our products"}
         </h1>
+
         {carrito.length > 0 ? (
           <>
             <div className="carritoHeader">
@@ -187,6 +161,7 @@ const Carrito = () => {
               <span className="headerItem">Quantity</span>
               <span className="headerItem">Total Price</span>
             </div>
+
             {carrito.map((prod) => (
               <div className="carritoItem" key={prod.id}>
                 <div className="productDetails">
@@ -208,6 +183,9 @@ const Carrito = () => {
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
+                {/* Campos de envío (igual que antes) */}
+                {/* ... mantén todos los campos del formulario tal cual ... */}
+
                 <div className="formEnvioGroup">
                   <label>Full Name</label>
                   <input
@@ -381,7 +359,7 @@ const Carrito = () => {
                   <label className="mediosDeEnvioTitle">Shipping cost</label>
                   <div className="mediosDeEnvio">
                     <label>
-                      CABA<br />$4000
+                      CABA<br />$5000
                       <input
                         type="radio"
                         name="shippingOption"
@@ -390,7 +368,7 @@ const Carrito = () => {
                       />
                     </label>
                     <label>
-                      GBA<br />$8000
+                      GBA<br />$7500
                       <input
                         type="radio"
                         name="shippingOption"
@@ -424,30 +402,34 @@ const Carrito = () => {
                 <div className="redireccionMarkContainer">
                   <p>Al finalizar el pago seras redirigido rapidamente. / At the end of the payment you will be redirected quickly.</p>
                 </div>
-                {message && <div className="message">{message}</div>} {/* Mostrar el mensaje en pantalla */}
+
+                {message && <div className="message">{message}</div>}
+
                 <button
                   type="submit"
                   className="mercadoPagoBtn"
                   style={{
                     cursor: isProcessing ? "not-allowed" : "pointer",
                   }}
-                  disabled={isProcessing} // Desactiva el botón mientras se procesa la compra
+                  disabled={!!isProcessing}
                 >
                   {isProcessing || "Buy"}
                 </button>
               </form>
+
               <button onClick={vaciarCarrito} className="vaciarCarrito">
                 Empty Cart
               </button>
             </div>
+
             <Link to="/Faq" className="carritoFaq">
               FAQ / Shipping
             </Link>
           </>
-        ) : null}
+        ) : (
+          <ItemListContainerDestacados />
+        )}
       </div>
-
-      {carrito.length === 0 && <ItemListContainerDestacados />}
     </div>
   );
 };
