@@ -9,7 +9,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const Carrito = () => {
-  const { carrito, precioTotal, vaciarCarrito } = useContext(CartContext);
+  const { carrito, precioTotal, vaciarCarrito, eliminarUnidad } = useContext(CartContext);
   const [isProcessing, setIsProcessing] = useState("");
   const [preferenceId, setPreferenceId] = useState(null);
   const [shippingData, setShippingData] = useState({
@@ -160,10 +160,11 @@ const Carrito = () => {
               <span className="headerItem">Unit Price</span>
               <span className="headerItem">Quantity</span>
               <span className="headerItem">Total Price</span>
+              <span className="headerItem"></span>
             </div>
 
             {carrito.map((prod) => (
-              <div className="carritoItem" key={prod.id}>
+              <div className="carritoItem" key={`${prod.id}-${prod.talleSeleccionado || "no-talle"}`}>
                 <div className="productDetails">
                   <img src={prod.image} alt={prod.title} className="productImage" />
                   <h2 className="titulo">{prod.title}</h2>
@@ -174,6 +175,13 @@ const Carrito = () => {
                   {prod.cantidad}
                 </h3>
                 <h3 className="precioTotal">${prod.price * prod.cantidad}</h3>
+                <button
+                  className="btnEliminar"
+                  onClick={() => eliminarUnidad(prod.id, prod.talleSeleccionado)}
+                  title="Eliminar una unidad"
+                >
+                  ❌
+                </button>
               </div>
             ))}
 
@@ -183,6 +191,8 @@ const Carrito = () => {
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
+                {/* ... (el resto del formulario queda igual) ... */}
+
                 <div className="formEnvioGroup">
                   <label>Full Name</label>
                   <input

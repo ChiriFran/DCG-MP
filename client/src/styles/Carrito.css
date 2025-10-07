@@ -38,7 +38,7 @@
 .carritoHeader,
 .carritoItem {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   align-items: center;
   margin-bottom: 1rem;
   padding: 1rem 0;
@@ -264,7 +264,7 @@
 
 }
 
-.mediosDeEnvioContainer{
+.mediosDeEnvioContainer {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -274,7 +274,7 @@
   margin-top: 0.2rem;
 }
 
-.mediosDeEnvio{
+.mediosDeEnvio {
   display: flex;
   flex-flow: row;
   align-items: center;
@@ -282,12 +282,12 @@
   width: 100%;
 }
 
-.mediosDeEnvioTitle{
+.mediosDeEnvioTitle {
   width: 100%;
   padding: 0 6px;
 }
 
-.mediosDeEnvio label{
+.mediosDeEnvio label {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -297,10 +297,12 @@
 
 
 .mediosDeEnvio input[type="radio"] {
-  appearance: none; /* Oculta el radio predeterminado */
+  appearance: none;
+  /* Oculta el radio predeterminado */
   -webkit-appearance: none;
   -moz-appearance: none;
-  width: 30px; /* Tamaño del cuadrado */
+  width: 30px;
+  /* Tamaño del cuadrado */
   height: 30px;
   background-color: rgba(174, 174, 174, 0.046);
   border: 1px solid #ffffff31;
@@ -320,17 +322,20 @@ input[type="radio"]:checked {
 input[type="radio"]::before {
   content: "";
   position: absolute;
-  width: 10px; /* Tamaño del "check" */
+  width: 10px;
+  /* Tamaño del "check" */
   height: 10px;
   background: rgba(0, 255, 0, 0);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  display: none; /* Oculto por defecto */
+  display: none;
+  /* Oculto por defecto */
 }
 
 input[type="radio"]:checked::before {
-  display: block; /* Muestra el check al seleccionar */
+  display: block;
+  /* Muestra el check al seleccionar */
 }
 
 
@@ -351,7 +356,7 @@ input[type="radio"]:checked::before {
   line-height: 2;
 }
 
-.message{
+.message {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -363,6 +368,20 @@ input[type="radio"]:checked::before {
   border: 1px solid rgb(75, 75, 75);
   transition: .4s;
 }
+
+.btnEliminar {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btnEliminar:hover {
+  transform: scale(1.2);
+}
+
 
 @media screen and (max-width: 700px) {
 
@@ -394,6 +413,11 @@ input[type="radio"]:checked::before {
   .carritoCantidad {
     order: 1;
     margin: 0.5rem 0;
+  }
+
+  .btnEliminar{
+    display: flex;
+    order: 3;
   }
 
   .mobileCantidad {
@@ -473,15 +497,15 @@ input[type="radio"]:checked::before {
     width: 100%;
   }
 
-  .radio-group{
+  .radio-group {
     flex-flow: column;
   }
 
-  .mediosDeEnvioTitle{
+  .mediosDeEnvioTitle {
     margin-bottom: 2rem;
   }
 
-  .message{
+  .message {
     font-size: 1rem;
   }
 }

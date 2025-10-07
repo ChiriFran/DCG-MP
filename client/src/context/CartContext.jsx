@@ -21,7 +21,7 @@ export const CartProvider = ({ children }) => {
         // Si el producto ya está en el carrito, aumentamos la cantidad
         return prevCarrito.map((prod, i) =>
           i === index
-            ? { ...prod, cantidad: prod.cantidad + cantidad } // Se añade la nueva cantidad
+            ? { ...prod, cantidad: prod.cantidad + cantidad }
             : prod
         );
       } else {
@@ -30,7 +30,6 @@ export const CartProvider = ({ children }) => {
       }
     });
   };
-
 
   const eliminarDelCarrito = (itemId, cantidadAEliminar) => {
     setCarrito((prevCarrito) => {
@@ -50,6 +49,24 @@ export const CartProvider = ({ children }) => {
 
       return updatedCart;
     });
+  };
+
+  // 🧩 Nueva función para eliminar UNA unidad
+  const eliminarUnidad = (id, talleSeleccionado) => {
+    setCarrito((prevCarrito) =>
+      prevCarrito
+        .map((prod) => {
+          if (prod.id === id && prod.talleSeleccionado === talleSeleccionado) {
+            if (prod.cantidad > 1) {
+              return { ...prod, cantidad: prod.cantidad - 1 };
+            } else {
+              return null; // eliminar completamente si tenía solo 1
+            }
+          }
+          return prod;
+        })
+        .filter(Boolean)
+    );
   };
 
   const precioTotal = () => {
@@ -84,6 +101,7 @@ export const CartProvider = ({ children }) => {
         carrito,
         agregarAlCarrito,
         eliminarDelCarrito,
+        eliminarUnidad,
         precioTotal,
         cantidadTotal,
         obtenerCantidadPorProducto,
