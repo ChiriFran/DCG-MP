@@ -50,6 +50,11 @@ export default async function handler(req, res) {
     const email = paymentData.payer?.email || "desconocido";
     const precio = paymentData.transaction_amount || 0;
 
+    // 🔹 Calcular el precio total incluyendo envío
+    const precioProductos = paymentData.transaction_amount || 0;
+    const costoEnvio = paymentData.shipments?.cost || 0;
+    const precioTotal = precioProductos + costoEnvio;
+
     // Extraer productos: nombre, talle y cantidad
     const productosComprados =
       paymentData.additional_info?.items?.map((item) => {
@@ -81,6 +86,9 @@ export default async function handler(req, res) {
       comprador,
       email,
       precio,
+      precioProductos, // 🔹 nuevo campo informativo
+      costoEnvio,      // 🔹 nuevo campo informativo
+      precioTotal,     // 🔹 nuevo campo informativo (productos + envío)
       productos: productosComprados,
       envio: { direccion, numero, codigoPostal, ciudad, provincia, pais },
     });
