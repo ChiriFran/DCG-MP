@@ -191,10 +191,8 @@ const Carrito = () => {
 
             <div className="finalizarCompraContainer">
               <form onSubmit={handleBuy} className="formEnvio">
-                {/* ... (el resto del formulario queda igual) ... */}
-
                 <div className="formEnvioGroup">
-                  <label>Full Name</label>
+                  <label>Nombre y apellidos</label>
                   <input
                     type="text"
                     name="name"
@@ -205,7 +203,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Province</label>
+                  <label>Provincia</label>
                   <input
                     type="text"
                     name="province"
@@ -227,7 +225,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>City</label>
+                  <label>Ciudad</label>
                   <input
                     type="text"
                     name="city"
@@ -238,7 +236,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Address street</label>
+                  <label>Dirección calle</label>
                   <input
                     type="text"
                     name="address"
@@ -249,7 +247,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Adress Number</label>
+                  <label>Dirección numero</label>
                   <input
                     type="text"
                     name="streetNumber"
@@ -260,7 +258,7 @@ const Carrito = () => {
                   />
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Zip Code</label>
+                  <label>Código postal</label>
                   <input
                     type="text"
                     name="zipCode"
@@ -272,7 +270,7 @@ const Carrito = () => {
                 </div>
                 <div className="half-container">
                   <div className="formEnvioGroup half">
-                    <label>Phone area</label>
+                    <label>Zona telefónica</label>
                     <input
                       type="text"
                       name="phoneArea"
@@ -283,7 +281,7 @@ const Carrito = () => {
                     />
                   </div>
                   <div className="formEnvioGroup half">
-                    <label>Phone</label>
+                    <label>Teléfono numero</label>
                     <input
                       type="text"
                       name="phone"
@@ -295,7 +293,7 @@ const Carrito = () => {
                   </div>
                 </div>
                 <div className="formEnvioGroup">
-                  <label>Housing options</label>
+                  <label>Opciones de despacho</label>
                   <div className="radio-group">
                     <label className={`custom-radio ${shippingData.adressType === "casa" ? "selected" : ""}`}>
                       <input
@@ -327,7 +325,7 @@ const Carrito = () => {
 
                 <div className="half-container">
                   <div className="formEnvioGroup half">
-                    <label>House Floor</label>
+                    <label>Departamento piso</label>
                     <input
                       type="text"
                       name="floor"
@@ -344,7 +342,7 @@ const Carrito = () => {
                   </div>
 
                   <div className="formEnvioGroup half">
-                    <label>Apartment</label>
+                    <label>Departamento numero</label>
                     <input
                       type="text"
                       name="apartment"
@@ -363,7 +361,7 @@ const Carrito = () => {
                 </div>
 
                 <div className="formEnvioGroup mediosDeEnvioContainer">
-                  <label className="mediosDeEnvioTitle">Shipping cost</label>
+                  <label className="mediosDeEnvioTitle">Gastos de envío</label>
                   <div className="mediosDeEnvio">
                     <label>
                       CABA<br />$5000
@@ -398,7 +396,7 @@ const Carrito = () => {
                   </div>
                 </div>
                 <div className="formEnvio">
-                  <label>Comments (Optional)</label>
+                  <label>Comentarios (Opcional)</label>
                   <textarea
                     name="comments"
                     value={shippingData.comments}
@@ -420,13 +418,9 @@ const Carrito = () => {
                   }}
                   disabled={!!isProcessing}
                 >
-                  {isProcessing || "Buy"}
+                  {isProcessing || "Comprar"}
                 </button>
               </form>
-
-              <button onClick={vaciarCarrito} className="vaciarCarrito">
-                Empty Cart
-              </button>
             </div>
 
             <Link to="/Faq" className="carritoFaq">

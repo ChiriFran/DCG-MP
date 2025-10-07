@@ -169,25 +169,6 @@
   cursor: pointer;
 }
 
-.vaciarCarrito {
-  border: none;
-  background-color: #f1f2f600;
-  color: rgba(255, 255, 255, 0.872);
-  padding: 1rem 0;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: underline;
-  transition: .6s;
-}
-
-.vaciarCarrito:hover {
-  color: rgba(255, 255, 255, 0.414);
-  transition: .3s;
-}
-
 .mercadoPagoBtn.processing {
   cursor: wait;
   opacity: 0.6;
@@ -415,7 +396,7 @@ input[type="radio"]:checked::before {
     margin: 0.5rem 0;
   }
 
-  .btnEliminar{
+  .btnEliminar {
     display: flex;
     order: 3;
   }
@@ -478,12 +459,6 @@ input[type="radio"]:checked::before {
   .formEnvioGroup {
     width: 100%;
   }
-
-  .vaciarCarrito {
-    font-size: 0.8rem;
-    margin-top: 2rem;
-  }
-
 
   .formEnvioGroup input {
     margin-bottom: 1rem;
