@@ -105,14 +105,7 @@ const Carrito = () => {
       return setMessage("Completa el número de piso y departamento.");
     }
 
-    const zipCode = shippingData.zipCode.trim();
-    let region = "Resto del país";
-    if (/^(10|11|12|13|14|15)\d{2}$/.test(zipCode)) region = "CABA";
-    else if (/^(16|17|18|19|2[0-9]|3[0-9])\d{2}$/.test(zipCode)) region = "GBA";
-
-    if (region !== shippingOption) {
-      return setMessage(`El código postal ${zipCode} pertenece a ${region}, pero seleccionaste ${shippingOption}.`);
-    }
+    // 🔹 Eliminamos toda la validación del código postal y región
 
     if (isProcessing) return;
     setIsProcessing("Processing...");

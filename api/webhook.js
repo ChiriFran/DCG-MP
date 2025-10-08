@@ -46,14 +46,38 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    const comprador = paymentData.payer?.name || "desconocido";
-    const email = paymentData.payer?.email || "desconocido";
+    const comprador = paymentData.payer?.name || "Desconocido";
+    const email = paymentData.payer?.email || "No especificado";
     const precio = paymentData.transaction_amount || 0;
 
     // 🔹 Calcular el precio total incluyendo envío
     const precioProductos = paymentData.transaction_amount || 0;
     const costoEnvio = paymentData.shipments?.cost || 0;
     const precioTotal = precioProductos + costoEnvio;
+
+    // 🔹 Datos del teléfono (con fallback seguro)
+    const phoneData = paymentData.payer?.phone || {};
+    const phone = {
+      area_code: phoneData.area_code || "No especificado",
+      number: phoneData.number || "No especificado",
+      completo:
+        phoneData.area_code && phoneData.number
+          ? `+${phoneData.area_code} ${phoneData.number}`
+          : "No especificado",
+    };
+
+    // 🔹 Datos completos del address (con fallback)
+    const addressData = paymentData.payer?.address || {};
+    const address = {
+      street_name: addressData.street_name || "No especificado",
+      street_number: addressData.street_number || "No especificado",
+      zip_code: addressData.zip_code || "No especificado",
+      floor: addressData.floor || "No especificado",
+      apartment: addressData.apartment || "No especificado",
+      city: addressData.city || "No especificado",
+      state_name: addressData.state_name || "No especificado",
+      country: addressData.country || "No especificado",
+    };
 
     // Extraer productos: nombre, talle y cantidad
     const productosComprados =
@@ -70,32 +94,36 @@ export default async function handler(req, res) {
 
     console.log("Productos comprados:", productosComprados);
 
-    // Datos de envío
+    // 🔹 Datos de envío adicionales desde shipments
     const shippingData = paymentData.additional_info?.shipments || {};
-    const direccion = shippingData.receiver_address?.street_name || "No especificada";
-    const numero = shippingData.receiver_address?.street_number || "No especificado";
-    const codigoPostal = shippingData.receiver_address?.zip_code || "No especificado";
-    const ciudad = shippingData.receiver_address?.city?.name || "No especificada";
-    const provincia = shippingData.receiver_address?.state?.name || "No especificada";
-    const pais = shippingData.receiver_address?.country?.name || "No especificado";
+    const direccionEnvio = {
+      street_name: shippingData.receiver_address?.street_name || "No especificado",
+      street_number: shippingData.receiver_address?.street_number || "No especificado",
+      zip_code: shippingData.receiver_address?.zip_code || "No especificado",
+      city: shippingData.receiver_address?.city?.name || "No especificado",
+      province: shippingData.receiver_address?.state?.name || "No especificado",
+      country: shippingData.receiver_address?.country?.name || "No especificado",
+    };
 
-    // Guardar pedido
+    // 🔹 Guardar pedido con toda la información
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
+      telefono: phone, // 🔹 teléfono completo y dividido
+      address,         // 🔹 datos de dirección del payer
+      envio: direccionEnvio, // 🔹 datos de envío del pedido
       precio,
-      precioProductos, // 🔹 nuevo campo informativo
-      costoEnvio,      // 🔹 nuevo campo informativo
-      precioTotal,     // 🔹 nuevo campo informativo (productos + envío)
+      precioProductos,
+      costoEnvio,
+      precioTotal,
       productos: productosComprados,
-      envio: { direccion, numero, codigoPostal, ciudad, provincia, pais },
     });
 
     console.log(`Pedido ${paymentId} guardado en ${coleccion}.`);
 
-    // Actualizar stock con batch
+    // 🔹 Actualizar stock solo si fue exitoso
     if (estadoPedido === "pago completado") {
       const batch = db.batch();
 
@@ -125,7 +153,6 @@ export default async function handler(req, res) {
         }
       }
 
-      // Ejecutar batch
       await batch.commit();
       console.log("Stock actualizado con batch.");
     }
