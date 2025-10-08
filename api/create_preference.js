@@ -38,6 +38,13 @@ export default async function handler(req, res) {
         payer: {
           name: shipping.name,
           email: shipping.email,
+          // ✅ DNI opcional
+          ...(shipping.dni && {
+            identification: {
+              type: "DNI",
+              number: shipping.dni,
+            },
+          }),
           phone: {
             area_code: shipping.phoneArea,
             number: shipping.phone,
@@ -55,7 +62,7 @@ export default async function handler(req, res) {
         },
         shipments: {
           mode: "not_specified",
-          cost: Number(shippingCost) || 0, // 🔹 Ahora usa el costo de envío dinamico
+          cost: Number(shippingCost) || 0, // 🔹 Ahora usa el costo de envío dinámico
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),

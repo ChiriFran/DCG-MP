@@ -30,6 +30,7 @@ export default async function handler(req, res) {
 
     const paymentData = response.data;
 
+    // Determinar estado y colección según el estado del pago
     let estadoPedido;
     let coleccion;
 
@@ -46,17 +47,21 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    const comprador = paymentData.payer?.name || "Desconocido";
-    const email = paymentData.payer?.email || "No especificado";
+    // 🔹 Datos del payer y DNI opcional
+    const payerData = paymentData.payer || {};
+    const dni = payerData.identification?.number || "No especificado";
+
+    const comprador = payerData.name || "Desconocido";
+    const email = payerData.email || "No especificado";
     const precio = paymentData.transaction_amount || 0;
 
-    // 🔹 Calcular el precio total incluyendo envío
+    // 🔹 Calcular precio total incluyendo envío
     const precioProductos = paymentData.transaction_amount || 0;
     const costoEnvio = paymentData.shipments?.cost || 0;
     const precioTotal = precioProductos + costoEnvio;
 
-    // 🔹 Datos del teléfono (con fallback seguro)
-    const phoneData = paymentData.payer?.phone || {};
+    // 🔹 Datos del teléfono
+    const phoneData = payerData.phone || {};
     const phone = {
       area_code: phoneData.area_code || "No especificado",
       number: phoneData.number || "No especificado",
@@ -66,8 +71,8 @@ export default async function handler(req, res) {
           : "No especificado",
     };
 
-    // 🔹 Datos completos del address (con fallback)
-    const addressData = paymentData.payer?.address || {};
+    // 🔹 Datos completos del address
+    const addressData = payerData.address || {};
     const address = {
       street_name: addressData.street_name || "No especificado",
       street_number: addressData.street_number || "No especificado",
@@ -79,7 +84,7 @@ export default async function handler(req, res) {
       country: addressData.country || "No especificado",
     };
 
-    // Extraer productos: nombre, talle y cantidad
+    // 🔹 Extraer productos comprados: nombre, talle y cantidad
     const productosComprados =
       paymentData.additional_info?.items?.map((item) => {
         const match = item.title.match(/^(.*?) - Talle: (.*?) - Unidades: (\d+)$/);
@@ -105,15 +110,16 @@ export default async function handler(req, res) {
       country: shippingData.receiver_address?.country?.name || "No especificado",
     };
 
-    // 🔹 Guardar pedido con toda la información
+    // 🔹 Guardar pedido con toda la información, incluyendo DNI
     await db.collection(coleccion).doc(`${paymentId}`).set({
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
       email,
-      telefono: phone, // 🔹 teléfono completo y dividido
-      address,         // 🔹 datos de dirección del payer
-      envio: direccionEnvio, // 🔹 datos de envío del pedido
+      dni,            // ✅ Guardamos el DNI opcional
+      telefono: phone,
+      address,
+      envio: direccionEnvio,
       precio,
       precioProductos,
       costoEnvio,

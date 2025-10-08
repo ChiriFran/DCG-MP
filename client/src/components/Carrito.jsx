@@ -12,8 +12,11 @@ const Carrito = () => {
   const { carrito, precioTotal, vaciarCarrito, eliminarUnidad } = useContext(CartContext);
   const [isProcessing, setIsProcessing] = useState("");
   const [preferenceId, setPreferenceId] = useState(null);
+
+  // 🔹 Agregamos dni
   const [shippingData, setShippingData] = useState({
     name: "",
+    dni: "",
     address: "",
     streetNumber: "",
     apartment: "",
@@ -27,6 +30,7 @@ const Carrito = () => {
     adressType: "",
     comments: "",
   });
+
   const [shippingOption, setShippingOption] = useState("");
   const [message, setMessage] = useState("");
 
@@ -59,6 +63,8 @@ const Carrito = () => {
       }));
 
       const apiUrl = import.meta.env.VITE_API_URL;
+
+      // 🔹 Incluimos el DNI dentro de shippingData
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
         shipping: shippingData,
@@ -75,6 +81,7 @@ const Carrito = () => {
   };
 
   const saveOrderToFirebase = async () => {
+    // 🔹 Incluye dni completo dentro del cliente
     const pedido = {
       cliente: shippingData,
       productos: carrito,
@@ -105,12 +112,9 @@ const Carrito = () => {
       return setMessage("Completa el número de piso y departamento.");
     }
 
-    // 🔹 Eliminamos toda la validación del código postal y región
-
     if (isProcessing) return;
     setIsProcessing("Processing...");
 
-    // Abrimos la ventana inmediatamente para que Safari no la bloquee
     const newWindow = window.open("", "_blank");
 
     const id = await createPreference();
@@ -131,7 +135,6 @@ const Carrito = () => {
       return;
     }
 
-    // Redirigimos la ventana que ya abrimos
     newWindow.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
     vaciarCarrito();
     setIsProcessing("");
@@ -195,6 +198,26 @@ const Carrito = () => {
                     required
                   />
                 </div>
+
+                {/* 🔹 Campo nuevo: DNI */}
+                <div className="formEnvioGroup">
+                  <label>DNI</label>
+                  <input
+                    type="text"
+                    name="dni"
+                    value={shippingData.dni}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Acepta solo números (sin guiones ni puntos)
+                      if (/^\d*$/.test(value)) {
+                        setShippingData((prev) => ({ ...prev, dni: value }));
+                      }
+                    }}
+                    placeholder="Ej: 40123456"
+                    required
+                  />
+                </div>
+
                 <div className="formEnvioGroup">
                   <label>Provincia</label>
                   <input
@@ -325,7 +348,6 @@ const Carrito = () => {
                       value={shippingData.floor}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // ✅ Acepta letras, números y espacios
                         if (/^[A-Za-z0-9\s]*$/.test(value)) {
                           setShippingData((prev) => ({ ...prev, floor: value }));
                         }
@@ -342,7 +364,6 @@ const Carrito = () => {
                       value={shippingData.apartment}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // ✅ Acepta letras, números y espacios
                         if (/^[A-Za-z0-9\s]*$/.test(value)) {
                           setShippingData((prev) => ({ ...prev, apartment: value }));
                         }
@@ -387,6 +408,7 @@ const Carrito = () => {
                     <p>Al seleccionar envío, se aplicará el costo. / When selecting shipping, the cost will be applied.</p>
                   </div>
                 </div>
+
                 <div className="formEnvio">
                   <label>Comentarios (Opcional)</label>
                   <textarea
@@ -396,6 +418,7 @@ const Carrito = () => {
                     placeholder="Special instructions for vendors, shipping, and additional."
                   />
                 </div>
+
                 <div className="redireccionMarkContainer">
                   <p>Al finalizar el pago seras redirigido rapidamente. / At the end of the payment you will be redirected quickly.</p>
                 </div>
