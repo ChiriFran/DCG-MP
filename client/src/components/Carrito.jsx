@@ -325,32 +325,31 @@ const Carrito = () => {
                       value={shippingData.floor}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (/^\d*$/.test(value)) { // Acepta solo números
+                        // ✅ Acepta letras, números y espacios
+                        if (/^[A-Za-z0-9\s]*$/.test(value)) {
                           setShippingData((prev) => ({ ...prev, floor: value }));
                         }
                       }}
-                      placeholder="4"
-                      className={shippingData.floor && /^\d+$/.test(shippingData.floor) ? "valid" : "invalid"}
+                      placeholder="4B"
                     />
                   </div>
 
                   <div className="formEnvioGroup half">
-                    <label>Departamento numero</label>
+                    <label>Departamento número</label>
                     <input
                       type="text"
                       name="apartment"
                       value={shippingData.apartment}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (/^[A-Za-z]*$/.test(value)) { // Acepta solo letras
+                        // ✅ Acepta letras, números y espacios
+                        if (/^[A-Za-z0-9\s]*$/.test(value)) {
                           setShippingData((prev) => ({ ...prev, apartment: value }));
                         }
                       }}
-                      placeholder="B"
-                      className={shippingData.apartment && /^[A-Za-z]+$/.test(shippingData.apartment) ? "valid" : "invalid"}
+                      placeholder="B2"
                     />
                   </div>
-
                 </div>
 
                 <div className="formEnvioGroup mediosDeEnvioContainer">
