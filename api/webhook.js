@@ -82,26 +82,39 @@ export default async function handler(req, res) {
     };
 
     // 🧳 Productos comprados
-    const productosComprados =
-      paymentData.additional_info?.items?.map((item) => {
-        const match = item.title.match(/^(.*?) - Talle: (.*?) - Unidades: (\d+)$/);
-        if (!match)
-          return {
-            title: item.title || "Producto sin nombre",
-            cantidad: item.quantity || 1,
+    let productosComprados = [];
+
+    // ✅ 1. Prioridad: leer desde metadata (preferencia)
+    if (paymentData.metadata?.productos?.length) {
+      productosComprados = paymentData.metadata.productos.map((p) => ({
+        title: p.nombre || "Producto sin nombre",
+        cantidad: p.cantidad || 1,
+        talle: p.talle || "Dato no disponible",
+        precio: p.precio || 0,
+      }));
+    } else {
+      // 🔄 2. Fallback: extraer desde additional_info si no hay metadata
+      productosComprados =
+        paymentData.additional_info?.items?.map((item) => {
+          const match = item.title.match(/^(.*?) - Talle: (.*?) - Unidades: (\d+)$/);
+          if (!match)
+            return {
+              title: item.title || "Producto sin nombre",
+              cantidad: item.quantity || 1,
+              talle: "Dato no disponible",
+            };
+          const nombre = match[1].trim();
+          const talle = match[2] === "null" ? "Dato no disponible" : match[2].trim();
+          const cantidad = parseInt(match[3], 10);
+          return { title: nombre, talle, cantidad };
+        }) || [
+          {
+            title: "Sin productos",
+            cantidad: 0,
             talle: "Dato no disponible",
-          };
-        const nombre = match[1].trim();
-        const talle = match[2] === "null" ? "Dato no disponible" : match[2].trim();
-        const cantidad = parseInt(match[3], 10);
-        return { title: nombre, talle, cantidad };
-      }) || [
-        {
-          title: "Sin productos",
-          cantidad: 0,
-          talle: "Dato no disponible",
-        },
-      ];
+          },
+        ];
+    }
 
     // 📦 Guardar pedido en Firebase
     await db.collection(coleccion).doc(`${paymentId}`).set({

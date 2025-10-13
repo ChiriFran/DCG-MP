@@ -32,13 +32,11 @@ export default async function handler(req, res) {
           quantity: Number(quantity),
           unit_price: Number(unit_price),
           currency_id: "ARS",
-          category_id: talleSeleccionado, // Se incluye el talle como category_id
-          description: talleSeleccionado,
+          description: `Talle: ${talleSeleccionado || "No especificado"}`, // 👈 agregado correctamente
         })),
         payer: {
           name: shipping.name,
           email: shipping.email,
-          // ✅ DNI opcional
           ...(shipping.dni && {
             identification: {
               type: "DNI",
@@ -62,7 +60,7 @@ export default async function handler(req, res) {
         },
         shipments: {
           mode: "not_specified",
-          cost: Number(shippingCost) || 0, // 🔹 Ahora usa el costo de envío dinámico
+          cost: Number(shippingCost) || 0,
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
@@ -77,6 +75,17 @@ export default async function handler(req, res) {
         statement_descriptor: "DCGSTORE",
         external_reference: orderId,
         auto_return: "approved",
+
+        // 👇 Se agrega metadata con talle
+        metadata: {
+          orderId,
+          productos: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
+            nombre: title,
+            talle: talleSeleccionado || "No especificado",
+            cantidad: quantity,
+            precio: unit_price,
+          })),
+        },
       };
 
       const preference = new Preference(client);
