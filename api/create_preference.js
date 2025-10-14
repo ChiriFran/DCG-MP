@@ -23,14 +23,27 @@ export default async function handler(req, res) {
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
       const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
-      const body = {
-        items: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
-          title,
-          quantity: Number(quantity),
-          unit_price: Number(unit_price),
+      // 🔹 Clonar items originales y agregar costo de envío como ítem adicional
+      const mpItems = items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
+        title,
+        quantity: Number(quantity),
+        unit_price: Number(unit_price),
+        currency_id: "ARS",
+        description: `Talle: ${talleSeleccionado || "No especificado"}`,
+      }));
+
+      if (shippingCost && Number(shippingCost) > 0) {
+        mpItems.push({
+          title: `Costo de envío - ${shipping.address}`,
+          quantity: 1,
+          unit_price: Number(shippingCost),
           currency_id: "ARS",
-          description: `Talle: ${talleSeleccionado || "No especificado"}`,
-        })),
+          description: `Envío a ${shipping.address}`,
+        });
+      }
+
+      const body = {
+        items: mpItems,
         payer: {
           name: shipping.name,
           email: shipping.email,
@@ -54,7 +67,7 @@ export default async function handler(req, res) {
         },
         shipments: {
           mode: "not_specified",
-          cost: Number(shippingCost) || 0,
+          cost: 0, // 🔹 Lo manejamos como ítem, no aquí
           receiver_address: {
             street_name: shipping.address,
             street_number: Number(shipping.streetNumber),
@@ -67,16 +80,17 @@ export default async function handler(req, res) {
           pending: "https://www.detroitclassicgallery.com/#/BuyPending",
         },
         statement_descriptor: "DCGSTORE",
-        external_reference: orderId, // 👈 vínculo clave
+        external_reference: orderId,
         auto_return: "approved",
         metadata: {
-          orderId, // 👈 respaldo adicional
+          orderId,
           productos: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
             nombre: title,
             talle: talleSeleccionado || "No especificado",
             cantidad: quantity,
             precio: unit_price,
           })),
+          shippingCost: Number(shippingCost) || 0,
         },
       };
 

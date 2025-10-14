@@ -54,6 +54,7 @@ const Carrito = () => {
 
   const createPreference = async () => {
     try {
+      // 🔹 Items del carrito
       const items = carrito.map((prod) => ({
         title: `${prod.title} - Talle: ${prod.talleSeleccionado} - Unidades: ${prod.cantidad}`,
         unit_price: prod.price,
@@ -62,13 +63,23 @@ const Carrito = () => {
         description: `Talle: ${prod.talleSeleccionado}`,
       }));
 
+      // 🔹 Costo de envío como ítem adicional
+      const shippingCost = shippingCosts[shippingOption] || 0;
+      if (shippingCost > 0) {
+        items.push({
+          title: `Costo de envío - ${shippingOption}`,
+          unit_price: shippingCost,
+          quantity: 1,
+          description: `Envío a ${shippingOption}`,
+        });
+      }
+
       const apiUrl = import.meta.env.VITE_API_URL;
 
-      // 🔹 Incluimos el DNI dentro de shippingData
+      // 🔹 Crear preferencia en tu backend
       const response = await axios.post(`${apiUrl}/create_preference`, {
         items,
-        shipping: shippingData,
-        shippingCost: shippingCosts[shippingOption] || 0,
+        shipping: shippingData, // Info del cliente
       });
 
       const { id } = response.data;
@@ -79,6 +90,7 @@ const Carrito = () => {
       return null;
     }
   };
+
 
   const saveOrderToFirebase = async () => {
     // 🔹 Incluye dni completo dentro del cliente
