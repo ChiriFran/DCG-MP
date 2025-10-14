@@ -115,11 +115,8 @@ const Carrito = () => {
     if (isProcessing) return;
     setIsProcessing("Processing...");
 
-    const newWindow = window.open("", "_blank");
-
     const id = await createPreference();
     if (!id) {
-      newWindow.close();
       setMessage("Error creando la preferencia en Mercado Pago.");
       setIsProcessing("");
       return;
@@ -129,13 +126,23 @@ const Carrito = () => {
 
     const orderId = await saveOrderToFirebase();
     if (!orderId) {
-      newWindow.close();
       setMessage("Error guardando el pedido.");
       setIsProcessing("");
       return;
     }
 
-    newWindow.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
+    // 🔹 URLs de checkout
+    const appUrl = `mercadopago://checkout?pref_id=${id}`;
+    const webUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
+
+    // 🔹 Intentar abrir la app primero
+    window.location.href = appUrl;
+
+    // 🔹 Fallback automático a la web si la app no responde
+    setTimeout(() => {
+      window.location.href = webUrl;
+    }, 2000);
+
     vaciarCarrito();
     setIsProcessing("");
   };
