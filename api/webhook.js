@@ -14,6 +14,7 @@ export default async function handler(req, res) {
 
     const paymentId = data.id;
 
+    // 🔹 Obtener datos del pago desde Mercado Pago
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       { headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}` } }
@@ -23,6 +24,7 @@ export default async function handler(req, res) {
     const status = paymentData.status;
     const orderId = paymentData.external_reference || paymentData.metadata?.orderId || null;
 
+    // 🔹 Determinar estado y colección
     let estadoPedido, coleccion;
     if (status === "approved") {
       estadoPedido = "pago completado";
@@ -37,51 +39,61 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Webhook recibido, sin cambios" });
     }
 
-    // 🧾 Datos del comprador
+    // 🔹 Tomar datos del pedido original si existe
+    let clienteOriginal = {};
+    let envioOriginal = {};
+    if (orderId) {
+      const pedidoDoc = await db.collection("pedidos").doc(orderId).get();
+      if (pedidoDoc.exists) {
+        const pedidoData = pedidoDoc.data();
+        clienteOriginal = pedidoData.cliente || {};
+        envioOriginal = {
+          street_name: clienteOriginal.address || "Dato no disponible",
+          street_number: clienteOriginal.streetNumber || "Dato no disponible",
+          floor: clienteOriginal.floor || "",
+          apartment: clienteOriginal.apartment || "",
+          zip_code: clienteOriginal.zipCode || "Dato no disponible",
+          city: clienteOriginal.city || "Dato no disponible",
+          province: clienteOriginal.province || "Dato no disponible",
+          country: "AR",
+        };
+      }
+    }
+
+    // 🧾 Datos del comprador desde MP (fallback)
     const payer = paymentData.payer || {};
-    const comprador = `${payer.first_name || ""} ${payer.last_name || ""}`.trim() || "Dato no disponible";
-    const email = payer.email || "Dato no disponible";
-    const dni = payer.identification?.number || "Dato no disponible";
+    const comprador = `${payer.first_name || clienteOriginal.name || ""} ${payer.last_name || ""}`.trim() || "Dato no disponible";
+    const email = payer.email || clienteOriginal.email || "Dato no disponible";
+    const dni = payer.identification?.number || clienteOriginal.dni || "Dato no disponible";
 
     // 📞 Teléfono
-    const phone =
-      payer.phone?.number ||
-      paymentData.additional_info?.payer?.phone?.number ||
-      null;
-    const areaCode =
-      payer.phone?.area_code ||
-      paymentData.additional_info?.payer?.phone?.area_code ||
-      null;
-    const telefono = phone
-      ? {
-        area_code: areaCode || "Dato no disponible",
-        number: phone || "Dato no disponible",
-        completo: `${areaCode ? "+" + areaCode + " " : ""}${phone}`,
-      }
-      : {
-        area_code: "Dato no disponible",
-        number: "Dato no disponible",
-        completo: "Dato no disponible",
-      };
+    const telefono = {
+      area_code: clienteOriginal.phoneArea || payer.phone?.area_code || "Dato no disponible",
+      number: clienteOriginal.phone || payer.phone?.number || "Dato no disponible",
+      completo: clienteOriginal.phoneArea && clienteOriginal.phone
+        ? `+${clienteOriginal.phoneArea} ${clienteOriginal.phone}`
+        : "Dato no disponible",
+    };
 
-    // 💰 Precios
-    const precioProductos = paymentData.transaction_amount || 0;
-    const costoEnvio = paymentData.shipments?.cost || 0;
+    // 💰 Extraer costo de envío desde los items
+    let costoEnvio = 0;
+    if (paymentData.items?.length) {
+      const shippingItem = paymentData.items.find((item) =>
+        item.title.toLowerCase().includes("costo de envío")
+      );
+      costoEnvio = shippingItem ? Number(shippingItem.unit_price) : 0;
+    }
+
+    // 🔹 Precios
+    const precioProductos =
+      paymentData.transaction_amount ||
+      (paymentData.items?.reduce((sum, item) => sum + (item.unit_price || 0) * (item.quantity || 1), 0) -
+        costoEnvio);
+
     const precioTotal =
       paymentData.transaction_details?.total_paid_amount ||
       precioProductos + costoEnvio ||
       0;
-
-    // 🚚 Dirección de envío
-    const envioData = paymentData.shipments?.receiver_address || {};
-    const envio = {
-      street_name: envioData.street_name || "Dato no disponible",
-      street_number: envioData.street_number || "Dato no disponible",
-      zip_code: envioData.zip_code || "Dato no disponible",
-      city: envioData.city?.name || "Dato no disponible",
-      province: envioData.state?.name || "Dato no disponible",
-      country: envioData.country?.name || "Dato no disponible",
-    };
 
     // 🧳 Productos comprados
     let productosComprados = [];
@@ -94,30 +106,33 @@ export default async function handler(req, res) {
       }));
     } else {
       productosComprados =
-        paymentData.additional_info?.items?.map((item) => ({
-          title: item.title || "Producto sin nombre",
-          cantidad: item.quantity || 1,
-          talle: "Dato no disponible",
-        })) || [];
+        paymentData.additional_info?.items?.filter(item => !item.title.toLowerCase().includes("costo de envío"))
+          .map((item) => ({
+            title: item.title || "Producto sin nombre",
+            cantidad: item.quantity || 1,
+            talle: "Dato no disponible",
+            precio: item.unit_price || 0,
+          })) || [];
     }
 
-    // 📦 Guardar en la colección correspondiente
-    await db.collection(coleccion).doc(`${paymentId}`).set({
-      orderId, // 👈 vínculo directo con la orden original
-      estado: estadoPedido,
-      fecha: new Date().toISOString(),
-      comprador,
-      email,
-      dni,
-      telefono,
-      envio,
-      precioProductos,
-      costoEnvio,
-      precioTotal,
-      productos: productosComprados,
-    });
-
-    console.log(`✅ Pedido ${paymentId} guardado en ${coleccion}.`);
+    // 📦 Guardar en pedidosExitosos incluyendo datos originales de cliente y envío
+    if (estadoPedido === "pago completado") {
+      await db.collection("pedidosExitosos").doc(`${paymentId}`).set({
+        orderId,
+        estado: estadoPedido,
+        fecha: new Date().toISOString(),
+        comprador,
+        email,
+        dni,
+        telefono,
+        envio: envioOriginal,
+        precioProductos,
+        costoEnvio,
+        precioTotal,
+        productos: productosComprados,
+      });
+      console.log(`✅ Pedido ${paymentId} guardado en pedidosExitosos con datos de envío.`);
+    }
 
     // 🔁 Actualizar el pedido original si existe
     if (orderId) {
