@@ -8,7 +8,9 @@ export default async function handler(req, res) {
 
   try {
     const { action, data } = req.body;
-    if (!data?.id) return res.status(400).json({ error: "ID de pago no proporcionado" });
+    if (!data || !data.id) {
+      return res.status(400).json({ error: "ID de pago no proporcionado" });
+    }
 
     const paymentId = data.id;
 
@@ -23,14 +25,23 @@ export default async function handler(req, res) {
     const orderId = paymentData.external_reference || paymentData.metadata?.orderId || null;
 
     // 🔹 Determinar estado y colección
-    let estadoPedido;
-    if (status === "approved") estadoPedido = "pago completado";
-    else if (status === "rejected") estadoPedido = "pago rechazado";
-    else if (status === "pending" || action === "payment.created") estadoPedido = "pago pendiente";
-    else return res.status(200).json({ message: "Webhook recibido, sin cambios" });
+    let estadoPedido, coleccion;
+    if (status === "approved") {
+      estadoPedido = "pago completado";
+      coleccion = "pedidosExitosos";
+    } else if (status === "rejected") {
+      estadoPedido = "pago rechazado";
+      coleccion = "pedidosRechazados";
+    } else if (status === "pending" || action === "payment.created") {
+      estadoPedido = "pago pendiente";
+      coleccion = "pedidosPendientes";
+    } else {
+      return res.status(200).json({ message: "Webhook recibido, sin cambios" });
+    }
 
-    // 🔹 Datos originales de cliente y envío
-    let clienteOriginal = {}, envioOriginal = {};
+    // 🔹 Tomar datos del pedido original si existe
+    let clienteOriginal = {};
+    let envioOriginal = {};
     if (orderId) {
       const pedidoDoc = await db.collection("pedidos").doc(orderId).get();
       if (pedidoDoc.exists) {
@@ -49,11 +60,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // 🔹 Datos del comprador desde MP (fallback)
+    // 🧾 Datos del comprador desde MP (fallback)
     const payer = paymentData.payer || {};
     const comprador = `${payer.first_name || clienteOriginal.name || ""} ${payer.last_name || ""}`.trim() || "Dato no disponible";
     const email = payer.email || clienteOriginal.email || "Dato no disponible";
     const dni = payer.identification?.number || clienteOriginal.dni || "Dato no disponible";
+
+    // 📞 Teléfono
     const telefono = {
       area_code: clienteOriginal.phoneArea || payer.phone?.area_code || "Dato no disponible",
       number: clienteOriginal.phone || payer.phone?.number || "Dato no disponible",
@@ -62,10 +75,12 @@ export default async function handler(req, res) {
         : "Dato no disponible",
     };
 
-    // 🔹 Extraer costo de envío desde items
+    // 💰 Extraer costo de envío desde los items
     let costoEnvio = 0;
     if (paymentData.items?.length) {
-      const shippingItem = paymentData.items.find(item => item.title.toLowerCase().includes("costo de envío"));
+      const shippingItem = paymentData.items.find((item) =>
+        item.title.toLowerCase().includes("costo de envío")
+      );
       costoEnvio = shippingItem ? Number(shippingItem.unit_price) : 0;
     }
 
@@ -73,23 +88,28 @@ export default async function handler(req, res) {
     const precioProductos =
       paymentData.transaction_amount ||
       (paymentData.items?.reduce((sum, item) => sum + (item.unit_price || 0) * (item.quantity || 1), 0) - costoEnvio);
-    const precioTotal =
-      paymentData.transaction_details?.total_paid_amount || precioProductos + costoEnvio || 0;
 
-    // 🔹 Productos comprados
+    const precioTotal =
+      paymentData.transaction_details?.total_paid_amount ||
+      precioProductos + costoEnvio ||
+      0;
+
+    // 🔹 Productos comprados (manteniendo el formato original de la preferencia)
     let productosComprados = [];
-    if (paymentData.metadata?.productos?.length) {
-      productosComprados = paymentData.metadata.productos.map(p => ({
-        title: p.nombre || "Producto sin nombre",
-        cantidad: p.cantidad || 1,
-        talle: p.talle || "Dato no disponible",
-        precio: p.precio || 0,
-      }));
+    if (paymentData.items?.length) {
+      productosComprados = paymentData.items
+        .filter(item => !item.title.toLowerCase().includes("costo de envío")) // excluye envío
+        .map(item => ({
+          title: item.title || "Producto sin nombre",
+          cantidad: item.quantity || 1,
+          talle: item.category_id || "No especificado", // category_id guardaba el talle
+          precio: item.unit_price || 0,
+        }));
     }
 
-    // 🔹 Guardar en pedidosExitosos si pago completado
+    // 📦 Guardar en pedidosExitosos incluyendo datos originales de cliente y envío
     if (estadoPedido === "pago completado") {
-      await db.collection("pedidosExitosos").doc(paymentId).set({
+      await db.collection("pedidosExitosos").doc(`${paymentId}`).set({
         orderId,
         estado: estadoPedido,
         fecha: new Date().toISOString(),
@@ -103,9 +123,10 @@ export default async function handler(req, res) {
         precioTotal,
         productos: productosComprados,
       });
+      console.log(`✅ Pedido ${paymentId} guardado en pedidosExitosos con datos de envío.`);
     }
 
-    // 🔹 Actualizar pedido original si existe
+    // 🔁 Actualizar el pedido original si existe
     if (orderId) {
       try {
         await db.collection("pedidos").doc(orderId).update({
@@ -113,12 +134,13 @@ export default async function handler(req, res) {
           paymentId,
           actualizadoEn: new Date().toISOString(),
         });
+        console.log(`📦 Pedido original ${orderId} actualizado.`);
       } catch (err) {
         console.warn(`⚠️ No se pudo actualizar el pedido original (${orderId}):`, err.message);
       }
     }
 
-    // 🔹 Actualizar stock si pago completado
+    // 🧩 Actualizar stock si pago completado
     if (estadoPedido === "pago completado") {
       const batch = db.batch();
       for (const item of productosComprados) {
@@ -134,6 +156,7 @@ export default async function handler(req, res) {
         }
       }
       await batch.commit();
+      console.log("🧩 Stock actualizado correctamente.");
     }
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
