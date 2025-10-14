@@ -127,38 +127,65 @@ const Carrito = () => {
     if (isProcessing) return;
     setIsProcessing("Processing...");
 
-    const id = await createPreference();
-    if (!id) {
-      setMessage("Error creando la preferencia en Mercado Pago.");
+    try {
+      // 1️⃣ Guardar primero el pedido en Firebase
+      const pedido = {
+        cliente: shippingData,
+        productos: carrito,
+        total: precioTotal() + (shippingCosts[shippingOption] || 0),
+        status: "pending",
+        createdAt: new Date(),
+        shippingOption,
+      };
+
+      const pedidoDb = collection(db, "pedidos");
+      const doc = await addDoc(pedidoDb, pedido);
+      const orderId = doc.id;
+      localStorage.setItem("orderId", orderId);
+
+      // 2️⃣ Crear preferencia con orderId ya existente
+      const items = carrito.map((prod) => ({
+        title: `${prod.title} - Talle: ${prod.talleSeleccionado} - Unidades: ${prod.cantidad}`,
+        unit_price: prod.price,
+        quantity: prod.cantidad,
+        category_id: prod.talleSeleccionado,
+        description: `Talle: ${prod.talleSeleccionado}`,
+      }));
+
+      const shippingCost = shippingCosts[shippingOption] || 0;
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      const response = await axios.post(`${apiUrl}/create_preference`, {
+        items,
+        shipping: shippingData,
+        shippingCost,
+        orderId,
+      });
+
+      const { id } = response.data;
+      if (!id) throw new Error("No se generó la preferencia correctamente.");
+
+      setPreferenceId(id);
+
+      // 3️⃣ Intentar abrir la app de Mercado Pago
+      const appUrl = `mercadopago://checkout?pref_id=${id}`;
+      const webUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
+
+      window.location.href = appUrl;
+
+      setTimeout(() => {
+        window.location.href = webUrl;
+      }, 2000);
+
+      vaciarCarrito();
+    } catch (error) {
+      console.error("Error en el flujo de compra:", error);
+      setMessage("Ocurrió un error al procesar la compra.");
+    } finally {
       setIsProcessing("");
-      return;
     }
-
-    setPreferenceId(id);
-
-    const orderId = await saveOrderToFirebase();
-    if (!orderId) {
-      setMessage("Error guardando el pedido.");
-      setIsProcessing("");
-      return;
-    }
-
-    // 🔹 URLs de checkout
-    const appUrl = `mercadopago://checkout?pref_id=${id}`;
-    const webUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}&orderId=${orderId}`;
-
-    // 🔹 Intentar abrir la app primero
-    window.location.href = appUrl;
-
-    // 🔹 Fallback automático a la web si la app no responde
-    setTimeout(() => {
-      window.location.href = webUrl;
-    }, 2000);
-
-    vaciarCarrito();
-    setIsProcessing("");
   };
-
+  
   return (
     <div className="carritoContainer">
       <div className="carritoCard">
