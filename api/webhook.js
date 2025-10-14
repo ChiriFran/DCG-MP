@@ -13,6 +13,7 @@ export default async function handler(req, res) {
     }
 
     const paymentId = data.id;
+
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       { headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}` } }
@@ -20,6 +21,7 @@ export default async function handler(req, res) {
 
     const paymentData = response.data;
     const status = paymentData.status;
+    const orderId = paymentData.external_reference || paymentData.metadata?.orderId || null;
 
     let estadoPedido, coleccion;
     if (status === "approved") {
@@ -41,7 +43,7 @@ export default async function handler(req, res) {
     const email = payer.email || "Dato no disponible";
     const dni = payer.identification?.number || "Dato no disponible";
 
-    // 📞 Teléfono (busca en varias fuentes)
+    // 📞 Teléfono
     const phone =
       payer.phone?.number ||
       paymentData.additional_info?.payer?.phone?.number ||
@@ -62,7 +64,7 @@ export default async function handler(req, res) {
         completo: "Dato no disponible",
       };
 
-    // 💰 Precios reales desde la API
+    // 💰 Precios
     const precioProductos = paymentData.transaction_amount || 0;
     const costoEnvio = paymentData.shipments?.cost || 0;
     const precioTotal =
@@ -70,7 +72,7 @@ export default async function handler(req, res) {
       precioProductos + costoEnvio ||
       0;
 
-    // 🚚 Dirección de envío real
+    // 🚚 Dirección de envío
     const envioData = paymentData.shipments?.receiver_address || {};
     const envio = {
       street_name: envioData.street_name || "Dato no disponible",
@@ -83,8 +85,6 @@ export default async function handler(req, res) {
 
     // 🧳 Productos comprados
     let productosComprados = [];
-
-    // ✅ 1. Prioridad: leer desde metadata (preferencia)
     if (paymentData.metadata?.productos?.length) {
       productosComprados = paymentData.metadata.productos.map((p) => ({
         title: p.nombre || "Producto sin nombre",
@@ -93,31 +93,17 @@ export default async function handler(req, res) {
         precio: p.precio || 0,
       }));
     } else {
-      // 🔄 2. Fallback: extraer desde additional_info si no hay metadata
       productosComprados =
-        paymentData.additional_info?.items?.map((item) => {
-          const match = item.title.match(/^(.*?) - Talle: (.*?) - Unidades: (\d+)$/);
-          if (!match)
-            return {
-              title: item.title || "Producto sin nombre",
-              cantidad: item.quantity || 1,
-              talle: "Dato no disponible",
-            };
-          const nombre = match[1].trim();
-          const talle = match[2] === "null" ? "Dato no disponible" : match[2].trim();
-          const cantidad = parseInt(match[3], 10);
-          return { title: nombre, talle, cantidad };
-        }) || [
-          {
-            title: "Sin productos",
-            cantidad: 0,
-            talle: "Dato no disponible",
-          },
-        ];
+        paymentData.additional_info?.items?.map((item) => ({
+          title: item.title || "Producto sin nombre",
+          cantidad: item.quantity || 1,
+          talle: "Dato no disponible",
+        })) || [];
     }
 
-    // 📦 Guardar pedido en Firebase
+    // 📦 Guardar en la colección correspondiente
     await db.collection(coleccion).doc(`${paymentId}`).set({
+      orderId, // 👈 vínculo directo con la orden original
       estado: estadoPedido,
       fecha: new Date().toISOString(),
       comprador,
@@ -133,7 +119,21 @@ export default async function handler(req, res) {
 
     console.log(`✅ Pedido ${paymentId} guardado en ${coleccion}.`);
 
-    // 🔄 Actualizar stock solo si el pago fue aprobado
+    // 🔁 Actualizar el pedido original si existe
+    if (orderId) {
+      try {
+        await db.collection("pedidos").doc(orderId).update({
+          estado: estadoPedido,
+          paymentId,
+          actualizadoEn: new Date().toISOString(),
+        });
+        console.log(`📦 Pedido original ${orderId} actualizado.`);
+      } catch (err) {
+        console.warn(`⚠️ No se pudo actualizar el pedido original (${orderId}):`, err.message);
+      }
+    }
+
+    // 🧩 Actualizar stock si pago completado
     if (estadoPedido === "pago completado") {
       const batch = db.batch();
       for (const item of productosComprados) {
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
         }
       }
       await batch.commit();
-      console.log("🧩 Stock actualizado.");
+      console.log("🧩 Stock actualizado correctamente.");
     }
 
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });

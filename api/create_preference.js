@@ -1,9 +1,7 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export default async function handler(req, res) {
-  // Agrega las cabeceras CORS
   const allowedOrigins = ["https://www.detroitclassicgallery.com"];
-
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -25,23 +23,19 @@ export default async function handler(req, res) {
       const mpAccessToken = process.env.MP_ACCESS_TOKEN_PROD;
       const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
 
-      // Crear el cuerpo de la preferencia
       const body = {
         items: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
           title,
           quantity: Number(quantity),
           unit_price: Number(unit_price),
           currency_id: "ARS",
-          description: `Talle: ${talleSeleccionado || "No especificado"}`, // 👈 agregado correctamente
+          description: `Talle: ${talleSeleccionado || "No especificado"}`,
         })),
         payer: {
           name: shipping.name,
           email: shipping.email,
           ...(shipping.dni && {
-            identification: {
-              type: "DNI",
-              number: shipping.dni,
-            },
+            identification: { type: "DNI", number: shipping.dni },
           }),
           phone: {
             area_code: shipping.phoneArea,
@@ -73,12 +67,10 @@ export default async function handler(req, res) {
           pending: "https://www.detroitclassicgallery.com/#/BuyPending",
         },
         statement_descriptor: "DCGSTORE",
-        external_reference: orderId,
+        external_reference: orderId, // 👈 vínculo clave
         auto_return: "approved",
-
-        // 👇 Se agrega metadata con talle
         metadata: {
-          orderId,
+          orderId, // 👈 respaldo adicional
           productos: items.map(({ title, quantity, unit_price, talleSeleccionado }) => ({
             nombre: title,
             talle: talleSeleccionado || "No especificado",
@@ -91,7 +83,7 @@ export default async function handler(req, res) {
       const preference = new Preference(client);
       const result = await preference.create({ body });
 
-      console.log(result);
+      console.log("✅ Preferencia creada:", result.id);
       res.status(200).json({ id: result.id });
     } catch (error) {
       console.error("Error al crear la preferencia:", error);
