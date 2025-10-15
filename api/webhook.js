@@ -94,17 +94,15 @@ export default async function handler(req, res) {
       precioProductos + costoEnvio ||
       0;
 
-    // 🔹 Productos comprados (manteniendo el formato original de la preferencia)
+    // 🔹 Productos comprados (desde metadata)
     let productosComprados = [];
-    if (paymentData.items?.length) {
-      productosComprados = paymentData.items
-        .filter(item => !item.title.toLowerCase().includes("costo de envío")) // excluye envío
-        .map(item => ({
-          title: item.title || "Producto sin nombre",
-          cantidad: item.quantity || 1,
-          talle: item.category_id || "No especificado", // category_id guardaba el talle
-          precio: item.unit_price || 0,
-        }));
+    if (paymentData.metadata?.productos?.length) {
+      productosComprados = paymentData.metadata.productos.map((p) => ({
+        title: `${p.title} - Talle: ${p.talleSeleccionado || "No especificado"} - Unidades: ${p.cantidad}`,
+        cantidad: p.cantidad,
+        talle: p.talleSeleccionado || "No especificado",
+        precio: p.price || 0,
+      }));
     }
 
     // 📦 Guardar en pedidosExitosos incluyendo datos originales de cliente y envío
