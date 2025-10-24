@@ -11,7 +11,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendEmail({ to, subject, html }) {
     try {
         const response = await resend.emails.send({
-            from: "no-reply@resend.dev",
+            from: "Detroit Classic Gallery <onboarding@resend.dev>", // remitente provisional
             to,
             subject,
             html,
@@ -19,7 +19,7 @@ export async function sendEmail({ to, subject, html }) {
         console.log("📧 Email enviado a", to);
         return response;
     } catch (err) {
-        console.error("❌ Error enviando email:", err);
+        console.error("❌ Error enviando email:", err.response?.data || err);
         throw err;
     }
 }
