@@ -41,7 +41,7 @@ const BuyFailed = () => {
   };
 
   const handleWhatsApp = () => {
-    const phoneNumber = "5491130504515"; // 👈 reemplazá con tu número de WhatsApp (formato internacional sin +)
+    const phoneNumber = "549117009993"; // 👈 reemplazá con tu número de WhatsApp (formato internacional sin +)
     const message = `Hola, mi compra falló y este es mi ID de pedido: ${orderId}`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
@@ -51,10 +51,6 @@ const BuyFailed = () => {
     <div className="failedContainer">
       <h1>Compra fallida</h1>
       <p>Lo sentimos, hubo un problema con tu compra.</p>
-      <button onClick={handleWhatsApp} className="whatsapp-btn">
-        Contactar por WhatsApp
-      </button>
-
       {orderId && (
         <div className="failed-info">
           <p><strong>ID del pedido:</strong> {orderId}</p>

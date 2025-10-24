@@ -18,6 +18,10 @@ import MusicList from "./components/MusicList.jsx";
 import CartPopup from "./components/CartPopup.jsx";
 import ContactFooter from "./components/ContactFooter.jsx";
 import Footer from "./components/Footer.jsx";
+
+import AdminDashboard from "./components/AdminDashboard.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
+
 import { CartProvider } from "./context/CartContext.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 import { HashRouter, Routes, Route } from "react-router-dom";
@@ -46,6 +50,16 @@ function App() {
               <Route path="/BuyFailed" element={<BuyFailed />} />
               <Route path="/BuyPending" element={<BuyPending />} />
               <Route path="*" element={<p>Not Found</p>} />
+
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+
             </Routes>
           </ScrollToTop>
           <CartPopup />

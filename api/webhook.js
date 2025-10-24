@@ -1,4 +1,5 @@
 import { db } from "./firebaseAdmin.js";
+import { sendEmail } from "./send-email.js";
 import axios from "axios";
 
 export default async function handler(req, res) {
@@ -105,24 +106,22 @@ export default async function handler(req, res) {
       }));
     }
 
-    // 📦 Guardar en pedidosExitosos incluyendo datos originales de cliente y envío
-    if (estadoPedido === "pago completado") {
-      await db.collection("pedidosExitosos").doc(`${paymentId}`).set({
-        orderId,
-        estado: estadoPedido,
-        fecha: new Date().toISOString(),
-        comprador,
-        email,
-        dni,
-        telefono,
-        envio: envioOriginal,
-        precioProductos,
-        costoEnvio,
-        precioTotal,
-        productos: productosComprados,
-      });
-      console.log(`✅ Pedido ${paymentId} guardado en pedidosExitosos con datos de envío.`);
-    }
+    // 📦 Guardar en la colección correspondiente
+    await db.collection(coleccion).doc(`${paymentId}`).set({
+      orderId,
+      estado: estadoPedido,
+      fecha: new Date().toISOString(),
+      comprador,
+      email,
+      dni,
+      telefono,
+      envio: envioOriginal,
+      precioProductos,
+      costoEnvio,
+      precioTotal,
+      productos: productosComprados,
+    });
+    console.log(`📄 Pedido ${paymentId} guardado en ${coleccion}.`);
 
     // 🔁 Actualizar el pedido original si existe
     if (orderId) {
@@ -138,7 +137,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 🧩 Actualizar stock si pago completado
+    // 🧩 Actualizar stock solo si pago completado
     if (estadoPedido === "pago completado") {
       const batch = db.batch();
       for (const item of productosComprados) {
@@ -153,10 +152,29 @@ export default async function handler(req, res) {
           batch.update(stockRef, updateData);
         }
       }
+
+      // Enviar correo de confirmación si se completó el pago
+      if (email && email !== "Dato no disponible") {
+        const productosHTML = productosComprados
+          .map((p) => `<li>${p.title} - Cantidad: ${p.cantidad} - Precio: $${p.precio}</li>`)
+          .join("");
+        const html = `
+          <h2>¡Gracias por tu compra, ${comprador}!</h2>
+          <p>Tu pedido ha sido procesado correctamente.</p>
+          <ul>${productosHTML}</ul>
+          <p>Total productos: $${precioProductos}</p>
+          <p><strong>Total a pagar: $${precioTotal}</strong></p>
+        `;
+        await sendEmail({
+          to: email,
+          subject: `Compra exitosa - Pedido ${orderId || paymentId}`,
+          html,
+        });
+      }
+
       await batch.commit();
       console.log("🧩 Stock actualizado correctamente.");
     }
-
     return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
   } catch (error) {
     console.error("❌ Error procesando webhook:", error);
