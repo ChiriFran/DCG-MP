@@ -43,19 +43,20 @@ function Newsletter() {
 
       // 🔹 Enviar correo de bienvenida usando el endpoint del backend
       try {
-        await fetch("/api/send-email", {
+        await fetch("https://www.detroitclassicgallery.com/api/send-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             to: email,
             subject: "Welcome to Detroit Classic Gallery! 🎉",
             html: `
-              <h2>Hola 👋</h2>
-              <p>Gracias por suscribirse a nuestro newsletter!</p>
-              <p>Recibirás promociones y actualizaciones exclusivas de Detroit Classic Gallery.</p>
-            `,
+      <h2>Hola 👋</h2>
+      <p>Gracias por suscribirse a nuestro newsletter!</p>
+      <p>Recibirás promociones y actualizaciones exclusivas de Detroit Classic Gallery.</p>
+    `,
           }),
         });
+
       } catch (err) {
         console.error("Error sending welcome email:", err);
       }
