@@ -8,7 +8,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { to, subject, html } = req.body;
+        let { to, subject, html } = req.body;
+
+        // 🔹 Modo prueba: enviar todos los emails a tu correo registrado
+        to = "info.dcgstore@gmail.com";
 
         const response = await resend.emails.send({
             from: "Detroit Classic Gallery <onboarding@resend.dev>", // remitente de prueba
