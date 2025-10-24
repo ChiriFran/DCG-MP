@@ -43,7 +43,7 @@ function Newsletter() {
 
       // 🔹 Enviar correo de bienvenida usando el endpoint del backend
       try {
-        await fetch("/api/send-email", {
+        await fetch("https://www.detroitclassicgallery.com/api/send-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
