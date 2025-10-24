@@ -14,9 +14,7 @@ const PopUpNewsletter = ({ isOpen, onClose }) => {
   useEffect(() => {
     const showPopUp = localStorage.getItem("doNotShowPopUp") !== "true";
     if (isOpen && showPopUp) {
-      setTimeout(() => {
-        setIsVisible(true);
-      }, 10);
+      setTimeout(() => setIsVisible(true), 10);
     }
   }, [isOpen]);
 
@@ -24,42 +22,58 @@ const PopUpNewsletter = ({ isOpen, onClose }) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$/;
-
+    // Validar formato de correo
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|yahoo|outlook)\.com$/;
     if (!emailPattern.test(email)) {
-      setErrorMessage(
-        "Please enter a valid email ending in @gmail.com, @hotmail.com, or @yahoo.com."
-      );
+      setErrorMessage("Please enter a valid email ending in @gmail.com, @hotmail.com, or @yahoo.com.");
       setIsSubmitting(false);
       return;
     }
 
     try {
+      // 🔹 Verificar si ya existe
       const emailQuery = query(collection(db, "newsletter"), where("email", "==", email));
       const querySnapshot = await getDocs(emailQuery);
-
       if (!querySnapshot.empty) {
         setErrorMessage("This email is already registered in our newsletter.");
         setIsSubmitting(false);
         return;
       }
 
+      // 🔹 Guardar en Firestore
       await addDoc(collection(db, "newsletter"), {
         email: email,
         timestamp: new Date(),
       });
 
-      setEmail("");
-      setSuccessMessage("You are already subscribed to our Newsletter!");
+      // 🔹 Enviar correo de bienvenida
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: "Welcome to Detroit Classic Gallery! 🎉",
+          html: `
+            <h2>¡Hola!</h2>
+            <p>Gracias por suscribirte a nuestro newsletter 💌</p>
+            <p>Recibirás promociones, lanzamientos y descuentos exclusivos de <strong>Detroit Classic Gallery</strong>.</p>
+            <p>Nos alegra tenerte en nuestra comunidad 💫</p>
+          `,
+        }),
+      });
 
+      // 🔹 Mensaje de éxito visual
+      setEmail("");
+      setSuccessMessage("🎉 You are subscribed! Welcome to Detroit Classic Gallery!");
       setTimeout(() => {
         setSuccessMessage("");
         handleClose();
-      }, 3000);
+      }, 4000);
     } catch (error) {
-      console.error("Error adding document: ", error);
-      alert("There was an error when subscribing. Please try again.");
+      console.error("❌ Error subscribing or sending email:", error);
+      setErrorMessage("There was an error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,38 +81,25 @@ const PopUpNewsletter = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     setIsVisible(false);
-    if (doNotShow) {
-      localStorage.setItem("doNotShowPopUp", "true");
-    }
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    if (doNotShow) localStorage.setItem("doNotShowPopUp", "true");
+    setTimeout(() => onClose(), 300);
   };
 
-  const handleCheckboxChange = () => {
-    setDoNotShow(!doNotShow);
-  };
+  const handleCheckboxChange = () => setDoNotShow(!doNotShow);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`popupOverlay ${isVisible ? "fadeIn" : "fadeOut"}`}
-      onClick={handleClose}
-    >
+    <div className={`popupOverlay ${isVisible ? "fadeIn" : "fadeOut"}`} onClick={handleClose}>
       <dialog
         className={`popupNewsletter ${isVisible ? "open" : ""}`}
         open
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="modalCloseButton" onClick={handleClose}>
-          X
-        </button>
+        <button className="modalCloseButton" onClick={handleClose}>X</button>
         <div className="modalNewsletterContainer">
           <h3 className="modalNewsletterTitle">Become part of our community</h3>
-          <p className="modalNewsletterText">
-            Receive exclusive promotions and discounts.
-          </p>
+          <p className="modalNewsletterText">Receive exclusive promotions and discounts.</p>
           <form className="modalNewsletterForm" onSubmit={handleSubmit}>
             <div className="modalFormGroup">
               <input
