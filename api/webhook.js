@@ -3,82 +3,112 @@ import { sendEmail } from "./send-email.js";
 import axios from "axios";
 
 export default async function handler(req, res) {
+  console.log("🔔 Webhook iniciado...");
+
+  // 👉 ACEPTA SOLO POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
   try {
-    const { action, data } = req.body;
+    // 🔥 FIX 1 — Parsear body en Vercel si viene como texto
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+
+    console.log("📨 Body recibido:", JSON.stringify(body, null, 2));
+
+    const { action, data } = body;
 
     if (!data || !data.id) {
+      console.log("❌ Webhook sin ID de pago");
       return res.status(400).json({ error: "ID de pago no proporcionado" });
     }
 
     const paymentId = data.id;
 
-    // 🔹 Obtener info real del pago
-    const response = await axios.get(
-      `https://api.mercadopago.com/v1/payments/${paymentId}`,
-      { headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}` } }
-    );
+    // 🔥 FIX 2 — Validar token de Mercado Pago
+    if (!process.env.MP_ACCESS_TOKEN_PROD) {
+      console.error("❌ ERROR: MP_ACCESS_TOKEN_PROD no está definido en Vercel.");
+      return res.status(500).json({ error: "Falta MP_ACCESS_TOKEN_PROD" });
+    }
 
-    const paymentData = response.data;
+    // 🔥 FIX 3 — Obtener info del pago con manejo de errores Axios
+    let paymentData;
+    try {
+      const response = await axios.get(
+        `https://api.mercadopago.com/v1/payments/${paymentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN_PROD}`,
+          },
+        }
+      );
+
+      paymentData = response.data;
+    } catch (err) {
+      console.error("❌ Error consultando Mercado Pago:", err.response?.data || err);
+      return res.status(500).json({ error: "Error consultando Mercado Pago" });
+    }
+
     const status = paymentData.status;
     const orderId =
       paymentData.external_reference ||
       paymentData.metadata?.orderId ||
       null;
 
-    console.log("🔔 Webhook recibido:", { paymentId, status, orderId });
+    console.log("📌 Datos del pago:", { paymentId, status, orderId });
 
-    // ░░░ ESTADOS :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ CLASIFICACIÓN DE ESTADOS ░░░
     let estadoPedido = "";
     let coleccion = "";
 
-    if (status === "approved") {
-      estadoPedido = "pago completado";
-      coleccion = "pedidosExitosos";
-    } else if (status === "rejected") {
-      estadoPedido = "pago rechazado";
-      coleccion = "pedidosRechazados";
-    } else if (status === "pending" || action === "payment.created") {
-      estadoPedido = "pago pendiente";
-      coleccion = "pedidosPendientes";
-    } else {
-      console.log("➡️ Estado no relevante, ignorado:", status);
-      return res.status(200).json({ message: "Estado sin cambios" });
+    switch (status) {
+      case "approved":
+        estadoPedido = "pago completado";
+        coleccion = "pedidosExitosos";
+        break;
+      case "rejected":
+        estadoPedido = "pago rechazado";
+        coleccion = "pedidosRechazados";
+        break;
+      case "pending":
+      default:
+        estadoPedido = "pago pendiente";
+        coleccion = "pedidosPendientes";
     }
 
-    // ░░░ DATOS ORIGINALES :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ DATOS ORIGINALES DEL PEDIDO ░░░
     let clienteOriginal = {};
     let envioOriginal = {};
 
     if (orderId) {
-      const pedidoDoc = await db.collection("pedidos").doc(orderId).get();
+      try {
+        const pedidoDoc = await db.collection("pedidos").doc(orderId).get();
 
-      if (pedidoDoc.exists) {
-        const pedido = pedidoDoc.data();
-        clienteOriginal = pedido.cliente || {};
+        if (pedidoDoc.exists) {
+          clienteOriginal = pedidoDoc.data().cliente || {};
 
-        envioOriginal = {
-          street_name: clienteOriginal.address || "Dato no disponible",
-          street_number: clienteOriginal.streetNumber || "Dato no disponible",
-          floor: clienteOriginal.floor || "",
-          apartment: clienteOriginal.apartment || "",
-          zip_code: clienteOriginal.zipCode || "Dato no disponible",
-          city: clienteOriginal.city || "Dato no disponible",
-          province: clienteOriginal.province || "Dato no disponible",
-          country: "AR",
-        };
+          envioOriginal = {
+            street_name: clienteOriginal.address || "Dato no disponible",
+            street_number: clienteOriginal.streetNumber || "Dato no disponible",
+            floor: clienteOriginal.floor || "",
+            apartment: clienteOriginal.apartment || "",
+            zip_code: clienteOriginal.zipCode || "Dato no disponible",
+            city: clienteOriginal.city || "Dato no disponible",
+            province: clienteOriginal.province || "Dato no disponible",
+            country: "AR",
+          };
+        }
+      } catch (err) {
+        console.error("❌ Error leyendo documento original:", err);
       }
     }
 
-    // ░░░ PAYER :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ PAYER ░░░
     const payer = paymentData.payer || {};
 
     const comprador =
-      `${payer.first_name || clienteOriginal.name || ""} ${payer.last_name || ""
-        }`.trim() || "Dato no disponible";
+      `${payer.first_name || clienteOriginal.name || ""} ${payer.last_name || ""}`
+        .trim() || "Dato no disponible";
 
     const email =
       payer.email || clienteOriginal.email || "Dato no disponible";
@@ -91,26 +121,22 @@ export default async function handler(req, res) {
         clienteOriginal.phoneArea ||
         payer.phone?.area_code ||
         "Dato no disponible",
-
       number:
         clienteOriginal.phone ||
         payer.phone?.number ||
         "Dato no disponible",
-
       completo:
         clienteOriginal.phoneArea && clienteOriginal.phone
           ? `+${clienteOriginal.phoneArea} ${clienteOriginal.phone}`
           : "Dato no disponible",
     };
 
-    // ░░░ ITEMS DE M.PAGO (100% confiable) :::::::::::::::::::::::::::::::::::
+    // ░░░ ITEMS ░░░
     let productosComprados = [];
 
     if (paymentData.items?.length) {
       productosComprados = paymentData.items
-        .filter(
-          (item) => !item.title.toLowerCase().includes("costo de envío")
-        )
+        .filter((item) => !item.title.toLowerCase().includes("costo de envío"))
         .map((item) => ({
           title: item.title || "Producto sin nombre",
           cantidad: item.quantity || 1,
@@ -119,7 +145,7 @@ export default async function handler(req, res) {
         }));
     }
 
-    // ░░░ PRECIOS :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ PRECIOS ░░░
     let costoEnvio = 0;
     const shippingItem = paymentData.items?.find((item) =>
       item.title.toLowerCase().includes("costo de envío")
@@ -133,7 +159,7 @@ export default async function handler(req, res) {
       precioProductos + costoEnvio ||
       0;
 
-    // ░░░ GUARDAR EL PEDIDO :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ GUARDAR ░░░
     await db.collection(coleccion).doc(`${paymentId}`).set({
       orderId,
       estado: estadoPedido,
@@ -149,21 +175,21 @@ export default async function handler(req, res) {
       productos: productosComprados,
     });
 
-    console.log(`📦 Guardado en ${coleccion}:`, paymentId);
+    console.log(`📁 Guardado en ${coleccion}:`, paymentId);
 
-    // ░░░ ACTUALIZAR PEDIDO ORIGINAL :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ ACTUALIZAR PEDIDO ORIGINAL ░░░
     if (orderId) {
       await db.collection("pedidos").doc(orderId).update({
         estado: estadoPedido,
         paymentId,
         actualizadoEn: new Date().toISOString(),
       });
+
       console.log("📄 Pedido original actualizado:", orderId);
     }
 
-    // ░░░ SI ESTÁ APROBADO :::::::::::::::::::::::::::::::::::::::::::::::::::
+    // ░░░ SI FUE APROBADO ACTUALIZAR STOCK + EMAIL ░░░
     if (estadoPedido === "pago completado") {
-      // ----- actualizar stock -----
       const batch = db.batch();
 
       for (const item of productosComprados) {
@@ -188,7 +214,6 @@ export default async function handler(req, res) {
       await batch.commit();
       console.log("🧩 Stock actualizado correctamente.");
 
-      // ----- enviar email -----
       if (email && email !== "Dato no disponible") {
         const productosHTML = productosComprados
           .map(
@@ -199,10 +224,8 @@ export default async function handler(req, res) {
 
         const html = `
           <h2>¡Gracias por tu compra, ${comprador}!</h2>
-          <p>Tu pedido se procesó correctamente.</p>
           <ul>${productosHTML}</ul>
-          <p>Total productos: $${precioProductos}</p>
-          <p><strong>Total pagado: $${precioTotal}</strong></p>
+          <p>Total: $${precioTotal}</p>
         `;
 
         await sendEmail({
@@ -215,7 +238,9 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ message: `Pedido actualizado: ${estadoPedido}` });
+    return res.status(200).json({
+      message: `Pedido actualizado: ${estadoPedido}`,
+    });
   } catch (error) {
     console.error("❌ Error procesando webhook:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
