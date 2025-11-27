@@ -2,14 +2,13 @@
    CONTENEDOR GENERAL
 ================================ */
 .admin-email-panel-container {
-    padding: 2rem;
     color: #fff;
 }
 
 .admin-email-panel-title {
     text-align: center;
     margin: 1.5rem 0;
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
 
 /* ================================
@@ -19,7 +18,7 @@
     background: #111;
     padding: 2rem;
     border-radius: 12px;
-    max-width: 600px;
+    max-width: 60%;
     margin: auto;
     border: 1px solid #333;
 }
@@ -156,4 +155,15 @@
 .admin-email-panel-sending {
     text-align: center;
     font-size: 1.2rem;
+}
+
+@media (max-width: 600px) {
+    .admin-email-panel-box {
+        max-width: 100%;
+    }
+
+    .admin-email-panel-title {
+        margin-top: 3rem;
+    }
+
 }
