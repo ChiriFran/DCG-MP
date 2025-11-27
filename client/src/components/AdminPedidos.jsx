@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { saveAs } from "file-saver";
-import "../styles/adminPedidos.css";
+import "../styles/AdminPedidos.css";
 
 export default function AdminPedidos() {
     const [pedidos, setPedidos] = useState([]);
