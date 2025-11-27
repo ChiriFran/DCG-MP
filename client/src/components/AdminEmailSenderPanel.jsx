@@ -10,18 +10,19 @@ export default function AdminEmailSenderPanel({ usuarios = [], newsletter = [] }
     const [sending, setSending] = useState(false);
     const [result, setResult] = useState(null);
 
+    // 🔵 Obtiene la lista final de emails según selección
     const getEmailList = () => {
         if (selectedList === "usuarios") return usuarios;
         if (selectedList === "newsletter") return newsletter;
         return [...usuarios, ...newsletter];
     };
 
+    // 🚀 Enviar emails
     const handleSend = async () => {
         if (!subject.trim()) {
             alert("❗ El asunto no puede estar vacío.");
             return;
         }
-
         if (!message.trim()) {
             alert("❗ El mensaje no puede estar vacío.");
             return;
@@ -33,7 +34,10 @@ export default function AdminEmailSenderPanel({ usuarios = [], newsletter = [] }
         try {
             const emails = getEmailList();
 
-            const res = await fetch("/api/send-bulk-email", {
+            // 🟣 URL correcta (funciona en localhost y producción)
+            const API_URL = "https://www.detroitclassicgallery.com/api/send-bulk-email";
+
+            const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -58,7 +62,7 @@ export default function AdminEmailSenderPanel({ usuarios = [], newsletter = [] }
 
             <div className="admin-email-panel-box">
 
-                {/* Lista destino */}
+                {/* Selección de lista */}
                 <div className="admin-email-panel-field">
                     <label>Enviar a:</label>
                     <select
@@ -91,7 +95,7 @@ export default function AdminEmailSenderPanel({ usuarios = [], newsletter = [] }
                     />
                 </div>
 
-                {/* Botón de envío */}
+                {/* Botón */}
                 <button
                     className="admin-email-panel-send-btn"
                     onClick={() => setModalOpen(true)}
