@@ -35,7 +35,7 @@ export default function AdminEmailSenderPanel({ usuarios = [], newsletter = [] }
             const emails = getEmailList();
 
             // 🟣 URL correcta (funciona en localhost y producción)
-            const API_URL = "https://www.detroitclassicgallery.com/api/send-bulk-email";
+            const API_URL = "/api/send-bulk-email";
 
             const res = await fetch(API_URL, {
                 method: "POST",
