@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
-import "../styles/adminProductos.css";
+import "../styles/AdminProductos.css";
 
 export default function AdminProductos() {
     const [productos, setProductos] = useState([]);
