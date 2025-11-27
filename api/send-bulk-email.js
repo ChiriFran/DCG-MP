@@ -2,32 +2,27 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function handler(req) {
+export default async function handler(req, res) {
     if (req.method !== "POST") {
-        return new Response(
-            JSON.stringify({ error: "Método no permitido" }),
-            { status: 405 }
-        );
+        return res.status(405).json({ error: "Método no permitido" });
     }
 
     try {
-        const { emails, subject, html } = await req.json();
+        const { emails, subject, html } = req.body;
 
         if (!emails || !Array.isArray(emails) || emails.length === 0) {
-            return new Response(
-                JSON.stringify({ error: "Lista de emails inválida" }),
-                { status: 400 }
-            );
+            return res.status(400).json({
+                error: "Lista de emails inválida"
+            });
         }
 
         let enviados = 0;
         let fallados = 0;
 
         await Promise.all(
-            emails.map(async originalTo => {
+            emails.map(async (originalTo) => {
                 try {
-                    // 🔹 HARD-CODE: todos los emails van a tu casilla de prueba -  const to = originalTo; DE PROD
-
+                    // Cambiar en producción
                     const to = "info.dcgstore@gmail.com";
 
                     await resend.emails.send({
@@ -37,35 +32,25 @@ export default async function handler(req) {
                         html,
                     });
 
-                    console.log(
-                        `📧 Enviado a: ${to} (original: ${originalTo})`
-                    );
-
                     enviados++;
                 } catch (err) {
-                    console.error(`❌ Error enviando a ${originalTo}:`, err);
+                    console.error("❌ Error enviando:", originalTo, err);
                     fallados++;
                 }
             })
         );
 
-        return new Response(
-            JSON.stringify({
-                success: true,
-                enviados,
-                fallados
-            }),
-            {
-                status: 200,
-                headers: { "Content-Type": "application/json" }
-            }
-        );
+        return res.status(200).json({
+            success: true,
+            enviados,
+            fallados,
+        });
 
-    } catch (e) {
-        console.error("❌ Error general:", e);
-        return new Response(
-            JSON.stringify({ error: "Error enviando emails" }),
-            { status: 500 }
-        );
+    } catch (err) {
+        console.error("❌ Error general en bulk email:", err);
+
+        return res.status(500).json({
+            error: "Error enviando emails"
+        });
     }
 }
