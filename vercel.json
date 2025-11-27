@@ -18,6 +18,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/send-bulk-email.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -37,6 +41,10 @@
     {
       "src": "/api/send-email",
       "dest": "/api/send-email.js"
+    },
+    {
+      "src": "/api/send-bulk-email",
+      "dest": "/api/send-bulk-email.js"
     },
     {
       "src": "/(.*)",

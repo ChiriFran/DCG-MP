@@ -1,0 +1,339 @@
+.admin-users-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+}
+
+.admin-users-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    letter-spacing: 0.5px;
+}
+
+.admin-users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 2rem;
+}
+
+/* CARD */
+.card {
+    width: 100%;
+    background: #111;
+    padding: 1.6rem;
+    box-shadow: 0px 0px 18px #00000060;
+    border: 1px solid #2e2e2e;
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+/* HEADER TOP */
+.card-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 1.4rem;
+}
+
+.top-buttons {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.top-btn {
+    background: #222;
+    border: 1px solid #3a3a3a;
+    padding: 0.45rem 0.85rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.25s ease;
+    color: #fff;
+}
+
+.top-btn:hover {
+    background: #5353ff;
+    border-color: #6a6aff;
+    transform: scale(1.05);
+}
+
+/* LISTA */
+.list {
+    max-height: 440px;
+    width: 100%;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.list::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 4px;
+}
+
+/* ITEMS */
+.list-item {
+    background: #1b1b1b;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 0.9rem;
+    transition: 0.25s ease;
+}
+
+.list-item:hover {
+    transform: scale(1.02);
+    background: #242424;
+}
+
+.email {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #e9e9e9;
+}
+
+.name,
+.timestamp {
+    font-size: 0.85rem;
+    color: #c0c0c0;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 1rem;
+    color: #aaa;
+}
+
+.send-btn {
+    background: #2b6ef4;
+}
+
+.send-btn:hover {
+    background: #1b4fd1;
+}
+
+/* MODAL */
+.email-modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.email-modal {
+    background: #181818;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 420px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    color: #fff;
+}
+
+.email-modal input,
+.email-modal textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+    background: #121212;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.email-send-cancel {
+    background: #8e8e8e;
+    padding: 0.6rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.email-send-confirm {
+    background: #2b6ef4;
+    padding: 0.6rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.email-send-success {
+    color: #3be77a;
+}
+
+.email-send-error {
+    color: #ff6b6b;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+
+    .card-header {
+        flex-flow: column;
+        justify-content: center;
+    }
+
+    .card-title {
+        margin-bottom: 1rem;
+    }
+
+    .list-item {
+        padding: 0.9rem 0;
+    }
+
+    .top-btn {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================================= */
+/* 🔵 ESTILOS EXCLUSIVOS DEL PANEL DE EMAIL MASIVO (ADMIN)   */
+/*    Todos los nombres son únicos para NO interferir        */
+/* ========================================================= */
+
+.admin-email-panel {
+    background: #1b1b1b;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-radius: 12px;
+    border: 1px solid #333;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+}
+
+.admin-email-title {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: #f0f0f0;
+}
+
+/* Label */
+.admin-email-label {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+/* Select */
+.admin-email-select {
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.admin-email-select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+/* Input */
+.admin-email-input {
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.admin-email-input:focus {
+    border-color: #666;
+    outline: none;
+}
+
+/* Textarea */
+.admin-email-textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.admin-email-textarea:focus {
+    border-color: #666;
+    outline: none;
+}
+
+/* Botón enviar */
+.admin-email-send-btn {
+    width: 100%;
+    background: #4a8cff;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.1rem;
+    margin-top: 1.2rem;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-weight: 600;
+}
+
+.admin-email-send-btn:hover {
+    background: #3a78e0;
+}
+
+.admin-email-send-btn:disabled {
+    background: #2e2e2e;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Resultado */
+.admin-email-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: #111;
+    border: 1px solid #333;
+    font-size: 1rem;
+    color: #fff;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .admin-email-panel {
+        padding: 1rem;
+    }
+
+    .admin-email-title {
+        font-size: 1.4rem;
+    }
+}
