@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";        // <-- Storage
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -16,15 +17,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Inicializa Firebase
+// Init
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app); // Firestore
-const auth = getAuth(app); // Autenticación
 
+// Services
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+// Exports
 export {
   db,
+  storage,
   auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-};  
+};

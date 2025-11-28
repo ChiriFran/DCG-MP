@@ -67,7 +67,7 @@ export default function AdminUsuarios() {
             <div className="admin-users-grid">
 
                 {/* 🟦 USUARIOS */}
-                <div className="card">
+                <div className="users-card">
                     <div className="card-header">
                         <h2 className="card-title">Usuarios</h2>
 
@@ -108,7 +108,7 @@ export default function AdminUsuarios() {
                 </div>
 
                 {/* 🟩 NEWSLETTER */}
-                <div className="card">
+                <div className="users-card">
                     <div className="card-header">
                         <h2 className="card-title">Newsletter</h2>
 
