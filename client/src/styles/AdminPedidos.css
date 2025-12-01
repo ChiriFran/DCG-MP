@@ -138,21 +138,35 @@
 
 /* Para todas las secciones generales */
 .pedido-section:not(.productos) .value {
-    white-space: normal ;
-    text-overflow: unset ;
-    overflow: visible ;
+    white-space: normal;
+    text-overflow: unset;
+    overflow: visible;
     word-break: break-word;
     max-width: 100%;
     line-height: 1;
 }
 
 .pedido-section:not(.productos) p {
-    align-items: flex-start ;
+    align-items: flex-start;
 }
 
 /* Evita que las labels largas rompan */
 .pedido-section:not(.productos) .label {
     max-width: 40%;
-    white-space: normal ;
+    white-space: normal;
     word-break: break-word;
+}
+
+.adminPedidos-controls button { 
+    padding: 0.45rem 0.9rem;
+    background: linear-gradient(135deg, #121212, #1e1e1e);
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.adminPedidos-controls button:hover {
+    background: #292929;
 }

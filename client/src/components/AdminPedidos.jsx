@@ -5,6 +5,10 @@ import { db } from "../firebase/config";
 import { saveAs } from "file-saver";
 import "../styles/AdminPedidos.css";
 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+
 export default function AdminPedidos() {
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,59 +53,81 @@ export default function AdminPedidos() {
         setSelectedCollection(e.target.value);
     };
 
-    const handleExportJSON = () => {
-        const json = JSON.stringify(pedidos, null, 2);
-        const blob = new Blob([json], { type: "application/json;charset=utf-8" });
-        saveAs(blob, `${selectedCollection}.json`);
-    };
+    const skeletonCount = 6;
 
-    const handleExportCSV = () => {
+    const [downloadFormat, setDownloadFormat] = useState("pdf");
+
+    // =============================
+    // GENERAR EXCEL
+    // =============================
+    const generateExcel = () => {
         if (!pedidos.length) return;
-        const headers = [
-            "Fecha",
-            "Comprador",
-            "Email",
-            "DNI",
-            "Teléfono",
-            "Dirección",
-            "Provincia",
-            "Ciudad",
-            "Código Postal",
-            "Detalles Depto",
-            "Costo Envío",
-            "Estado",
-            "Total",
-            "Productos",
-        ];
-        const rows = pedidos.map((p) => [
+
+        const data = pedidos.map((p) => ({
+            Fecha: new Date(p.fecha).toLocaleString("es-AR"),
+            Nombre: p.comprador,
+            Email: p.email,
+            DNI: p.dni,
+            Teléfono: p.telefono?.completo,
+            Dirección: `${p.envio?.street_name} ${p.envio?.street_number}`,
+            Ciudad: p.envio?.city,
+            Provincia: p.envio?.province,
+            CP: p.envio?.zip_code,
+            Estado: p.estado,
+            Envío: p.costoEnvio,
+            Total: p.precioTotal,
+            Productos: p.productos
+                ?.map((prod) => `${prod.title} (${prod.talle}) x${prod.cantidad}`)
+                .join(", "),
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Pedidos");
+
+        XLSX.writeFile(workbook, `${selectedCollection}.xlsx`);
+    };
+    // =============================
+    // GENERAR PDF
+    // =============================
+    const generatePDF = () => {
+        const doc = new jsPDF("p", "pt", "a4");
+
+        doc.setFontSize(18);
+        doc.text("Reporte de Pedidos", 40, 40);
+
+        const tableData = pedidos.map((p) => [
             new Date(p.fecha).toLocaleString("es-AR"),
             p.comprador,
             p.email,
-            p.dni,
-            p.telefono?.completo || "",
-            `${p.envio?.street_name || ""} ${p.envio?.street_number || ""}`,
-            p.envio?.province || "",
-            p.envio?.city || "",
-            p.envio?.zip_code || "",
-            `${p.envio?.apartment || ""} ${p.envio?.floor || ""}`.trim(),
-            p.costoEnvio,
             p.estado,
-            p.precioTotal,
-            p.productos
-                ?.map((prod) => `${prod.title} (${prod.talle}) x${prod.cantidad}`)
-                .join(" | "),
+            "$" + p.precioTotal,
         ]);
 
-        const csvContent = [headers, ...rows].map((e) => e.join(",")).join("\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
-        saveAs(blob, `${selectedCollection}.csv`);
-    };
+        autoTable(doc, {
+            startY: 70,
+            head: [["Fecha", "Nombre", "Email", "Estado", "Total"]],
+            body: tableData,
+            theme: "grid",
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [16, 185, 129] },
+        });
 
-    const skeletonCount = 6;
+        doc.save(`${selectedCollection}.pdf`);
+    };
+    // =============================
+    // BOTÓN DE DESCARGA
+    // =============================
+    const handleDownload = () => {
+        if (downloadFormat === "pdf") generatePDF();
+        if (downloadFormat === "excel") generateExcel();
+    };
 
     return (
         <div className="adminPedidos-container">
             <div className="adminPedidos-controls">
+
                 <select value={selectedCollection} onChange={handleCollectionChange}>
                     <option value="pedidosExitosos">Pedidos Exitosos</option>
                     <option value="pedidosPendientes">Pedidos Pendientes</option>
@@ -115,8 +141,18 @@ export default function AdminPedidos() {
                 </select>
 
                 <button onClick={() => fetchPedidos(selectedCollection)}>🔄 Refrescar</button>
-                <button onClick={handleExportJSON}>💾 JSON</button>
-                <button onClick={handleExportCSV}>📊 CSV</button>
+
+                {/* Selección de formato */}
+                <select
+                    value={downloadFormat}
+                    onChange={(e) => setDownloadFormat(e.target.value)}
+                >
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel (.xlsx)</option>
+                </select>
+
+                {/* Botón único */}
+                <button onClick={handleDownload}>⬇ Descargar</button>
             </div>
 
             <div className="adminPedidos-cards">
