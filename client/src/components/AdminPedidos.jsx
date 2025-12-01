@@ -14,6 +14,8 @@ export default function AdminPedidos() {
     const [loading, setLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState("desc");
     const [selectedCollection, setSelectedCollection] = useState("pedidosExitosos");
+    const [downloadFormat, setDownloadFormat] = useState("pdf");
+    const [search, setSearch] = useState("");
 
     const fetchPedidos = async (collectionName = "pedidosExitosos") => {
         setLoading(true);
@@ -55,8 +57,15 @@ export default function AdminPedidos() {
 
     const skeletonCount = 6;
 
-    const [downloadFormat, setDownloadFormat] = useState("pdf");
-
+    // =============================
+    // busqueda
+    const filteredPedidos = pedidos.filter((p) => {
+        const text = search.toLowerCase();
+        return (
+            p.comprador?.toLowerCase().includes(text) ||
+            p.email?.toLowerCase().includes(text)
+        );
+    });
     // =============================
     // GENERAR EXCEL
     // =============================
@@ -128,31 +137,62 @@ export default function AdminPedidos() {
         <div className="adminPedidos-container">
             <div className="adminPedidos-controls">
 
-                <select value={selectedCollection} onChange={handleCollectionChange}>
+                {/* 🔍 Barra de búsqueda */}
+                <input
+                    type="text"
+                    placeholder="Buscar por nombre o email..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="adminPedidos-search control-full"
+                />
+
+                {/* 🗂 Selección de colección */}
+                <select
+                    value={selectedCollection}
+                    onChange={handleCollectionChange}
+                    className="control-half"
+                >
                     <option value="pedidosExitosos">Pedidos Exitosos</option>
                     <option value="pedidosPendientes">Pedidos Pendientes</option>
                     <option value="pedidosRechazados">Pedidos Rechazados</option>
                     <option value="pedidos">Todos los Pedidos</option>
                 </select>
 
-                <select value={sortOrder} onChange={handleSortChange}>
+                {/* 📅 Orden */}
+                <select
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    className="control-half"
+                >
                     <option value="desc">Más recientes</option>
                     <option value="asc">Más antiguos</option>
                 </select>
 
-                <button onClick={() => fetchPedidos(selectedCollection)}>🔄 Refrescar</button>
-
-                {/* Selección de formato */}
+                {/* 📝 Formato de descarga */}
                 <select
                     value={downloadFormat}
                     onChange={(e) => setDownloadFormat(e.target.value)}
+                    className="control-half"
                 >
                     <option value="pdf">PDF</option>
                     <option value="excel">Excel (.xlsx)</option>
                 </select>
 
-                {/* Botón único */}
-                <button onClick={handleDownload}>⬇ Descargar</button>
+                {/* ⬇ Botón Descargar */}
+                <button
+                    onClick={handleDownload}
+                    className="control-half"
+                >
+                    ⬇ Descargar
+                </button>
+
+                {/* 🔄 Botón Refrescar */}
+                <button
+                    onClick={() => fetchPedidos(selectedCollection)}
+                    className="control-full"
+                >
+                    🔄 Refrescar
+                </button>
             </div>
 
             <div className="adminPedidos-cards">
@@ -164,7 +204,7 @@ export default function AdminPedidos() {
                         ))}
 
                 {!loading &&
-                    pedidos.map((pedido) => (
+                    filteredPedidos.map((pedido) => (
                         <div key={pedido.id} className="pedido-card">
                             <div className="pedido-header">
                                 <h3>{pedido.comprador || "Sin nombre"}</h3>

@@ -157,7 +157,7 @@
     word-break: break-word;
 }
 
-.adminPedidos-controls button { 
+.adminPedidos-controls button {
     padding: 0.45rem 0.9rem;
     background: linear-gradient(135deg, #121212, #1e1e1e);
     border: 1px solid #444;
@@ -169,4 +169,43 @@
 
 .adminPedidos-controls button:hover {
     background: #292929;
+}
+
+.adminPedidos-search {
+    padding: 0.45rem 0.7rem;
+    background: #1f1f1f;
+    color: #fff;
+    border-radius: 8px;
+    border: 1px solid #444;
+    flex: 1;
+    min-width: 200px;
+}
+
+/* ================
+   NUEVO ORDEN MOBILE
+================ */
+@media (max-width: 768px) {
+
+    .adminPedidos-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.7rem;
+    }
+
+    /* Ocupan todo el ancho */
+    .control-full {
+        grid-column: span 2;
+        width: 100%;
+    }
+
+    /* Ocupan la mitad (2 por fila) */
+    .control-half {
+        width: 100%;
+    }
+
+    /* Barra de búsqueda: full */
+    .adminPedidos-search {
+        grid-column: span 2;
+        width: 100%;
+    }
 }
