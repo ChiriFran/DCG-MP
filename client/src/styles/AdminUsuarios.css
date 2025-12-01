@@ -196,6 +196,18 @@
         justify-content: center;
     }
 
+    .admin-users-grid {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 0;
+    }
+
+    .users-card {
+        width: 100%;
+    }
+
     .card-title {
         margin-bottom: 1rem;
     }
