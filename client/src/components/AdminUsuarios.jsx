@@ -62,6 +62,9 @@ export default function AdminUsuarios() {
 
     return (
         <div className="admin-users-container">
+
+            <AdminEmailSenderPanel usuarios={usuarios} newsletter={newsletter} />
+
             <h1 className="admin-users-title">Gestión de Usuarios</h1>
 
             <div className="admin-users-grid">
@@ -152,9 +155,6 @@ export default function AdminUsuarios() {
                     )}
                 </div>
             </div>
-
-            {/* 🔵 PANEL DE ENVÍO DE EMAILS (REEMPLAZA AL MODAL ANTERIOR) */}
-            <AdminEmailSenderPanel usuarios={usuarios} newsletter={newsletter} />
         </div>
     );
 }
