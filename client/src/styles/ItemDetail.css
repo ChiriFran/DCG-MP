@@ -367,8 +367,8 @@
 
 .itemDetailPriceContainer {
   display: flex;
-  gap: 12px;
-  align-items: center;
+  gap: 6px;
+  align-items: end;
 }
 
 .itemDetailPriceOld {
@@ -382,7 +382,7 @@
 }
 
 .preSaleSpan {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 400;
   text-transform: uppercase;
 }
