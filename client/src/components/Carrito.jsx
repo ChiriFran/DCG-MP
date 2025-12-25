@@ -35,9 +35,9 @@ const Carrito = () => {
   const [message, setMessage] = useState("");
 
   const shippingCosts = {
-    CABA: 5000,
-    GBA: 7500,
-    "Resto del país": 15000,
+    CABA: 8000,
+    GBA: 12500,
+    "Resto del país": 20000,
   };
 
   const handleShippingChange = (e) => {
@@ -423,7 +423,7 @@ const Carrito = () => {
                   <label className="mediosDeEnvioTitle">Gastos de envío</label>
                   <div className="mediosDeEnvio">
                     <label>
-                      CABA<br />$5000
+                      CABA<br />$8000
                       <input
                         type="radio"
                         name="shippingOption"
@@ -432,7 +432,7 @@ const Carrito = () => {
                       />
                     </label>
                     <label>
-                      GBA<br />$7500
+                      GBA<br />$12500
                       <input
                         type="radio"
                         name="shippingOption"
@@ -441,7 +441,7 @@ const Carrito = () => {
                       />
                     </label>
                     <label>
-                      Resto del país<br />$15000
+                      Resto del país<br />$20000
                       <input
                         type="radio"
                         name="shippingOption"
