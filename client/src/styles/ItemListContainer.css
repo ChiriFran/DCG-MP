@@ -6,8 +6,61 @@
   padding: 0 10%;
 }
 
+/* ===== CONTENEDOR GENERAL ===== */
+.shopContainer {
+  margin-top: 10vh;
+  width: 100%;
+}
+
+/* ===== HERO ===== */
+.heroShop {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.heroShop img {
+  width: 100%;
+  height: 159%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  opacity: 0.9;
+}
+
+/* ===== LISTADO ===== */
+.itemListContainer {
+  padding: 0 10%;
+}
+
+.productosContainer {
+  width: 100%;
+}
+
+/* ===== MOBILE ===== */
 @media screen and (max-width: 700px) {
   .shopContainer {
     margin-top: 1rem;
+  }
+
+  .heroShop {
+    height: 180px;
+    margin-bottom: 1.2rem;
+  }
+
+  .itemListContainer {
+    padding: 0 5%;
+  }
+}
+
+
+@media screen and (max-width: 700px) {
+  .shopContainer {
+    margin-top: 1rem;
+  }
+
+  .heroShop img {
+    height: 100%;
   }
 }

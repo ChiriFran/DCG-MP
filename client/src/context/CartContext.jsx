@@ -8,7 +8,17 @@ export const CartProvider = ({ children }) => {
   const [carrito, setCarrito] = useState(carritoInicial);
 
   const agregarAlCarrito = (item, cantidad, talleSeleccionado) => {
-    const itemAgregado = { ...item, cantidad, talleSeleccionado };
+    const precioFinal =
+      item.preSalePrice != null
+        ? item.preSalePrice
+        : item.price;
+
+    const itemAgregado = {
+      ...item,
+      price: precioFinal, // 👈 precio definitivo
+      cantidad,
+      talleSeleccionado,
+    };
 
     setCarrito((prevCarrito) => {
       const index = prevCarrito.findIndex(
@@ -18,14 +28,12 @@ export const CartProvider = ({ children }) => {
       );
 
       if (index !== -1) {
-        // Si el producto ya está en el carrito, aumentamos la cantidad
         return prevCarrito.map((prod, i) =>
           i === index
             ? { ...prod, cantidad: prod.cantidad + cantidad }
             : prod
         );
       } else {
-        // Si el producto no está en el carrito, lo añadimos
         return [...prevCarrito, itemAgregado];
       }
     });

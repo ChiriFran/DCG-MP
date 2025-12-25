@@ -30,9 +30,20 @@ const ItemDestacados = ({ producto }) => {
           </h4>
         </div>
         <div className="card-footer">
-          <span className="text-title itemDestacadosPrice">
-            ${producto.price}.-
-          </span>
+          {producto.preSalePrice ? (
+            <div className="itemDestacadosPriceContainer">
+              <p className="itemDestacadosPriceOld">
+                ${producto.price}.-
+              </p>
+              <p className="itemDestacadosPriceSale">
+                ${producto.preSalePrice}.-
+              </p>
+            </div>
+          ) : (
+            <span className="itemDestacadosPrice">
+              ${producto.price}.-
+            </span>
+          )}
         </div>
       </div>
     </>

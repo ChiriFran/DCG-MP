@@ -18,7 +18,20 @@ const Item = ({ producto }) => {
       <h2 className="itemTitle">
         {producto.title}
       </h2>
-      <h3 className="itemPrice">${producto.price}.-</h3>{" "}
+      {producto.preSalePrice ? (
+        <div className="itemPriceContainer">
+          <h3 className="itemPrice itemPriceOld">
+            ${producto.price}.-
+          </h3>
+          <h3 className="itemPrice itemPriceSale">
+            ${producto.preSalePrice}.-
+          </h3>
+        </div>
+      ) : (
+        <h3 className="itemPrice">
+          ${producto.price}.-
+        </h3>
+      )}
     </div>
   );
 };

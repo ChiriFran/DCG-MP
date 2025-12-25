@@ -151,8 +151,20 @@ const ItemDetail = ({ item }) => {
     <div className="itemDetailContainer">
       <div className="itemDetail">
         <h3 className="itemDetailTitle">{item.title}</h3>
-        <p className="itemDetailPrice">${item.price}.-</p>
-
+        {item.preSalePrice ? (
+          <div className="itemDetailPriceContainer">
+            <p className="itemDetailPrice itemDetailPriceOld">
+              ${item.price}.-
+            </p>
+            <p className="itemDetailPrice itemDetailPriceSale">
+              ${item.preSalePrice}.- <span className="preSaleSpan">pre-sale</span>
+            </p>
+          </div>
+        ) : (
+          <p className="itemDetailPrice">
+            ${item.price}.-
+          </p>
+        )}
         <div className="sizeSelectorContainer">
           <h3>Size</h3>
           <div id="size-selector">
