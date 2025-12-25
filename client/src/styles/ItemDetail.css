@@ -409,6 +409,10 @@
     order: 2;
   }
 
+  .itemDetailPrice {
+    font-size: 1.3rem;
+  }
+
   .sizeChartContainer {
     display: block;
   }
