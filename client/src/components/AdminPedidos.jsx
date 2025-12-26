@@ -74,25 +74,36 @@ export default function AdminPedidos() {
 
         const data = pedidos.map((p) => ({
             Fecha: new Date(p.fecha).toLocaleString("es-AR"),
-            Nombre: p.comprador,
-            Email: p.email,
-            DNI: p.dni,
-            Teléfono: p.telefono?.completo,
-            Dirección: `${p.envio?.street_name} ${p.envio?.street_number}`,
-            Ciudad: p.envio?.city,
-            Provincia: p.envio?.province,
-            CP: p.envio?.zip_code,
-            Estado: p.estado,
-            Envío: p.costoEnvio,
-            Total: p.precioTotal,
+            Nombre: p.comprador || "",
+            Email: p.email || "",
+            DNI: p.dni || "",
+            Teléfono: p.telefono?.completo || "",
+            Dirección: `${p.envio?.street_name || ""} ${p.envio?.street_number || ""}`,
+            Ciudad: p.envio?.city || "",
+            Provincia: p.envio?.province || "",
+            CP: p.envio?.zip_code || "",
+            Estado: p.estado || "",
+            "Costo Envío": p.costoEnvio || 0,
+            Total: p.precioTotal || 0,
             Productos: p.productos
-                ?.map((prod) => `${prod.title} (${prod.talle}) x${prod.cantidad}`)
-                .join(", "),
+                ?.map(
+                    (prod) =>
+                        `${prod.title} (${prod.talle}) x${prod.cantidad} - $${prod.precio}`
+                )
+                .join(" | "),
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
 
+        // 📐 Ancho de columnas
+        worksheet["!cols"] = [
+            { wch: 20 }, { wch: 20 }, { wch: 30 }, { wch: 15 },
+            { wch: 18 }, { wch: 30 }, { wch: 18 }, { wch: 18 },
+            { wch: 12 }, { wch: 18 }, { wch: 15 }, { wch: 15 },
+            { wch: 50 }
+        ];
+
+        const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Pedidos");
 
         XLSX.writeFile(workbook, `${selectedCollection}.xlsx`);
@@ -101,30 +112,57 @@ export default function AdminPedidos() {
     // GENERAR PDF
     // =============================
     const generatePDF = () => {
-        const doc = new jsPDF("p", "pt", "a4");
+        const doc = new jsPDF("l", "pt", "a4"); // horizontal
 
-        doc.setFontSize(18);
-        doc.text("Reporte de Pedidos", 40, 40);
+        doc.setFontSize(16);
+        doc.text(`Reporte de ${selectedCollection}`, 40, 40);
 
         const tableData = pedidos.map((p) => [
             new Date(p.fecha).toLocaleString("es-AR"),
-            p.comprador,
-            p.email,
-            p.estado,
-            "$" + p.precioTotal,
+            p.comprador || "",
+            p.email || "",
+            p.estado || "",
+            `$${p.costoEnvio || 0}`,
+            `$${p.precioTotal || 0}`,
+            p.productos
+                ?.map(
+                    (prod) =>
+                        `${prod.title} (${prod.talle}) x${prod.cantidad}`
+                )
+                .join(" | "),
         ]);
 
         autoTable(doc, {
             startY: 70,
-            head: [["Fecha", "Nombre", "Email", "Estado", "Total"]],
+            head: [[
+                "Fecha",
+                "Nombre",
+                "Email",
+                "Estado",
+                "Envío",
+                "Total",
+                "Productos"
+            ]],
             body: tableData,
             theme: "grid",
-            styles: { fontSize: 9 },
-            headStyles: { fillColor: [16, 185, 129] },
+            styles: {
+                fontSize: 8,
+                cellPadding: 4,
+                valign: "top",
+            },
+            headStyles: {
+                fillColor: [16, 185, 129],
+                textColor: 255,
+            },
+            columnStyles: {
+                6: { cellWidth: 260 }, // productos
+            },
+            pageBreak: "auto",
         });
 
         doc.save(`${selectedCollection}.pdf`);
     };
+
     // =============================
     // BOTÓN DE DESCARGA
     // =============================
