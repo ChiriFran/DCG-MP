@@ -78,13 +78,21 @@ export default function AdminPedidos() {
             Email: p.email || "",
             DNI: p.dni || "",
             Teléfono: p.telefono?.completo || "",
-            Dirección: `${p.envio?.street_name || ""} ${p.envio?.street_number || ""}`,
+
+            Calle: p.envio?.street_name || "",
+            Número: p.envio?.street_number || "",
+            Tipo: p.envio?.floor ? "Departamento" : "Casa",
+            Piso: p.envio?.floor || "",
+            Departamento: p.envio?.apartment || "",
+
             Ciudad: p.envio?.city || "",
             Provincia: p.envio?.province || "",
             CP: p.envio?.zip_code || "",
+
             Estado: p.estado || "",
             "Costo Envío": p.costoEnvio || 0,
             Total: p.precioTotal || 0,
+
             Productos: p.productos
                 ?.map(
                     (prod) =>
@@ -95,12 +103,27 @@ export default function AdminPedidos() {
 
         const worksheet = XLSX.utils.json_to_sheet(data);
 
-        // 📐 Ancho de columnas
         worksheet["!cols"] = [
-            { wch: 20 }, { wch: 20 }, { wch: 30 }, { wch: 15 },
-            { wch: 18 }, { wch: 30 }, { wch: 18 }, { wch: 18 },
-            { wch: 12 }, { wch: 18 }, { wch: 15 }, { wch: 15 },
-            { wch: 50 }
+            { wch: 20 }, // fecha
+            { wch: 20 }, // nombre
+            { wch: 30 }, // email
+            { wch: 15 }, // dni
+            { wch: 18 }, // telefono
+
+            { wch: 25 }, // calle
+            { wch: 10 }, // numero
+            { wch: 15 }, // tipo
+            { wch: 8 },  // piso
+            { wch: 12 }, // depto
+
+            { wch: 18 }, // ciudad
+            { wch: 18 }, // provincia
+            { wch: 10 }, // cp
+
+            { wch: 18 }, // estado
+            { wch: 15 }, // envio
+            { wch: 15 }, // total
+            { wch: 50 }, // productos
         ];
 
         const workbook = XLSX.utils.book_new();
@@ -108,11 +131,12 @@ export default function AdminPedidos() {
 
         XLSX.writeFile(workbook, `${selectedCollection}.xlsx`);
     };
+
     // =============================
     // GENERAR PDF
     // =============================
     const generatePDF = () => {
-        const doc = new jsPDF("l", "pt", "a4"); // horizontal
+        const doc = new jsPDF("l", "pt", "a4");
 
         doc.setFontSize(16);
         doc.text(`Reporte de ${selectedCollection}`, 40, 40);
@@ -121,43 +145,65 @@ export default function AdminPedidos() {
             new Date(p.fecha).toLocaleString("es-AR"),
             p.comprador || "",
             p.email || "",
-            p.estado || "",
-            `$${p.costoEnvio || 0}`,
+            `${p.envio?.street_name || ""} ${p.envio?.street_number || ""}`,
+            p.envio?.floor
+                ? `Departamento | Piso ${p.envio.floor} ${p.envio.apartment || ""}`
+                : "Casa",
             `$${p.precioTotal || 0}`,
             p.productos
                 ?.map(
                     (prod) =>
                         `${prod.title} (${prod.talle}) x${prod.cantidad}`
                 )
-                .join(" | "),
+                .join("\n"), // 👈 salto de línea real
         ]);
 
         autoTable(doc, {
             startY: 70,
+            margin: { left: 30, right: 30 },
+            tableWidth: "auto",
+
             head: [[
                 "Fecha",
                 "Nombre",
                 "Email",
-                "Estado",
-                "Envío",
+                "Dirección",
+                "Tipo Vivienda",
                 "Total",
-                "Productos"
+                "Productos",
             ]],
+
             body: tableData,
+
             theme: "grid",
+
             styles: {
-                fontSize: 8,
-                cellPadding: 4,
+                fontSize: 9,
+                cellPadding: 6,
                 valign: "top",
+                overflow: "linebreak",   // 👈 CLAVE
+                cellWidth: "wrap",       // 👈 CLAVE
+                minCellHeight: 20,
             },
+
             headStyles: {
                 fillColor: [16, 185, 129],
                 textColor: 255,
+                halign: "center",
             },
+
             columnStyles: {
-                6: { cellWidth: 260 }, // productos
+                0: { cellWidth: 90 },
+                1: { cellWidth: 120 },
+                2: { cellWidth: 180 },
+                3: { cellWidth: 160 },
+                4: { cellWidth: 130 },
+                5: { cellWidth: 80 },
+                6: { cellWidth: 300 }, // productos grandes
             },
+
             pageBreak: "auto",
+            rowPageBreak: "avoid",
         });
 
         doc.save(`${selectedCollection}.pdf`);
