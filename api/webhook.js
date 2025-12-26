@@ -58,6 +58,7 @@ export default async function handler(req, res) {
     console.log("📌 Datos del pago:", { paymentId, status, orderId });
 
     // ░░░ CLASIFICACIÓN DE ESTADOS ░░░
+    // ░░░ CLASIFICACIÓN DE ESTADOS ░░░
     let estadoPedido = "";
     let coleccion = "";
 
@@ -76,6 +77,18 @@ export default async function handler(req, res) {
         coleccion = "pedidosPendientes";
     }
 
+    // 🔒 PROTECCIÓN CONTRA WEBHOOK DUPLICADO
+    const existingDoc = await db
+      .collection(coleccion)
+      .doc(`${paymentId}`)
+      .get();
+
+    if (existingDoc.exists) {
+      console.log("⚠️ Webhook duplicado ignorado:", paymentId);
+      return res.status(200).json({ message: "Duplicado ignorado" });
+    }
+
+    // ⬇️ recién después sigue TODO lo demás
     // ░░░ DATOS ORIGINALES DEL PEDIDO ░░░
     let clienteOriginal = {};
     let envioOriginal = {};
