@@ -149,11 +149,7 @@ export default async function handler(req, res) {
     }
 
     // ░░░ PRECIOS ░░░
-    let costoEnvio = 0;
-    const shippingItem = paymentData.items?.find((item) =>
-      item.title.toLowerCase().includes("costo de envío")
-    );
-    if (shippingItem) costoEnvio = Number(shippingItem.unit_price || 0);
+    const costoEnvio = Number(paymentData.metadata?.shippingCost || 0);
 
     const precioProductos = paymentData.transaction_amount || 0;
 
