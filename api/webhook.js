@@ -132,9 +132,11 @@ export default async function handler(req, res) {
     };
 
     // ░░░ ITEMS ░░░
+    // ░░░ ITEMS ░░░
     let productosComprados = [];
 
-    if (paymentData.metadata?.productos?.length) {
+    // 🥇 1. PRIORIDAD: metadata.productos
+    if (Array.isArray(paymentData.metadata?.productos) && paymentData.metadata.productos.length) {
       productosComprados = paymentData.metadata.productos
         .filter(
           (item) =>
@@ -143,9 +145,34 @@ export default async function handler(req, res) {
         .map((item) => ({
           title: item.title || "Producto sin nombre",
           cantidad: Number(item.quantity) || 1,
-          talle: item.category_id || "No especificado",
+          talle: item.talle || item.category_id || "No especificado",
           precio: Number(item.unit_price) || 0,
         }));
+
+      // 🥈 2. FALLBACK: parsear desde additional_info.items (title)
+    } else if (Array.isArray(paymentData.additional_info?.items)) {
+      productosComprados = paymentData.additional_info.items
+        .filter(
+          (item) =>
+            !item.title?.toLowerCase().includes("envío")
+        )
+        .map((item) => {
+          const title = item.title || "";
+
+          // 🧠 Parseo desde el title:
+          // "Remera X - Talle: M - Unidades: 2"
+          const talleMatch = title.match(/Talle:\s*([A-Za-z0-9]+)/i);
+          const cantidadMatch = title.match(/Unidades:\s*(\d+)/i);
+
+          return {
+            title: title.split(" - Talle:")[0] || "Producto sin nombre",
+            talle: talleMatch ? talleMatch[1] : "No especificado",
+            cantidad: cantidadMatch
+              ? Number(cantidadMatch[1])
+              : Number(item.quantity) || 1,
+            precio: Number(item.unit_price) || 0,
+          };
+        });
     }
 
     // ░░░ PRECIOS ░░░
