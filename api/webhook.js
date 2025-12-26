@@ -134,14 +134,17 @@ export default async function handler(req, res) {
     // ░░░ ITEMS ░░░
     let productosComprados = [];
 
-    if (paymentData.items?.length) {
-      productosComprados = paymentData.items
-        .filter((item) => !item.title.toLowerCase().includes("costo de envío"))
+    if (paymentData.metadata?.productos?.length) {
+      productosComprados = paymentData.metadata.productos
+        .filter(
+          (item) =>
+            !item.title?.toLowerCase().includes("costo de envío")
+        )
         .map((item) => ({
           title: item.title || "Producto sin nombre",
-          cantidad: item.quantity || 1,
+          cantidad: Number(item.quantity) || 1,
           talle: item.category_id || "No especificado",
-          precio: item.unit_price || 0,
+          precio: Number(item.unit_price) || 0,
         }));
     }
 
