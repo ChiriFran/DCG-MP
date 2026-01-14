@@ -77,6 +77,7 @@ export default async function handler(req, res) {
         external_reference: orderId,
         auto_return: "approved",
         statement_descriptor: "DCGSTORE",
+        notification_url: "https://www.detroitclassicgallery.com/api/webhook",
         metadata: {
           orderId,
           shipping,
