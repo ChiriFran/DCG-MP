@@ -70,17 +70,49 @@ export default async function handler(req, res) {
       coleccion = "pedidosRechazados";
     }
 
-    // Duplicados (solo para final)
+    // Duplicados inteligentes
     const existingDoc = await db
       .collection(coleccion)
       .doc(`${paymentId}`)
       .get();
 
     if (existingDoc.exists) {
-      console.log("⚠️ Webhook duplicado ignorado:", paymentId);
-      return res.status(200).json({ message: "Duplicado ignorado" });
-    }
+      console.log("⚠️ Webhook duplicado detectado:", paymentId);
 
+      if (orderId) {
+        const pedidoRef = db.collection("pedidos").doc(orderId);
+        const pedidoSnap = await pedidoRef.get();
+
+        if (pedidoSnap.exists) {
+          const estadoActual = pedidoSnap.data().estado;
+
+          if (estadoActual !== estadoPedido) {
+            console.log(
+              "🔧 Pedido con estado incorrecto, reparando:",
+              estadoActual,
+              "→",
+              estadoPedido
+            );
+
+            await pedidoRef.update({
+              estado: estadoPedido,
+              paymentId,
+              actualizadoEn: new Date().toISOString(),
+            });
+
+            return res.status(200).json({
+              message: "Duplicado pero pedido reparado",
+            });
+          }
+        }
+      }
+
+      console.log("✅ Duplicado válido, ya estaba correcto");
+      return res
+        .status(200)
+        .json({ message: "Duplicado ignorado (ya correcto)" });
+    }
+    
     // Pedido original
     let clienteOriginal = {};
     let envioOriginal = {};
