@@ -130,7 +130,7 @@ const AdminEventos = () => {
 
   return (
     <div className="adminEventos-container">
-      <h2 className="adminEventos-title">🎫 Gestión de Eventos</h2>
+      <h2 className="adminEventos-title">🎫 Administración de Eventos</h2>
 
       {/* FORM */}
       <form className="adminEventos-form" onSubmit={handleSubmit}>

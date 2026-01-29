@@ -287,7 +287,7 @@ export default function AdminProductos() {
   /* ----------------- JSX ----------------- */
   return (
     <div className="adminProductos-container">
-      <h2 className="productos-title">Administración de Productos</h2>
+      <h2 className="productos-title">📦 Administración de Productos</h2>
 
       {/* BOTÓN AGREGAR */}
       <button

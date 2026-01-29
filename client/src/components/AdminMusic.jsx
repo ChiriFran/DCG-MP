@@ -123,7 +123,7 @@ const AdminMusic = () => {
 
   return (
     <div className="adminMusic">
-      <h2 className="section-title">🎧 Música</h2>
+      <h2 className="section-title">🎧 Administración de Discos</h2>
 
       {/* CREATE */}
       <form className="adminMusic-form" onSubmit={createMusic}>
