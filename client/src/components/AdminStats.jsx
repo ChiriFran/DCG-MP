@@ -56,6 +56,19 @@ const calcularStockTotal = (p) => {
   );
 };
 
+const calcularVendidoTotal = (s) => {
+  if (typeof s.cantidad === "number") return s.cantidad;
+  return ["S", "M", "L", "XL", "XXL"].reduce(
+    (acc, t) => acc + Number(s[t] || 0),
+    0,
+  );
+};
+
+const tieneTalles = (stock) => {
+  if (!stock) return false;
+  return Object.keys(stock).length > 1;
+};
+
 /* ---------------- Componente ---------------- */
 
 export default function AdminStats() {
@@ -64,36 +77,28 @@ export default function AdminStats() {
   const [pedidos, setPedidos] = useState([]);
   const [newsletter, setNewsletter] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [stockVendido, setStockVendido] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 
-      // pedidos exitosos
       const pedidosSnap = await getDocs(collection(db, "pedidosExitosos"));
-      const pedidosData = pedidosSnap.docs.map((doc) => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          ...d,
-          fechaObj: normalizarFecha(d.fecha),
-        };
-      });
-
-      // newsletter
       const newsletterSnap = await getDocs(collection(db, "newsletter"));
-      const newsletterData = newsletterSnap.docs.map((d) => d.data());
-
-      // productos
       const productosSnap = await getDocs(collection(db, "productos"));
-      const productosData = productosSnap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
+      const stockSnap = await getDocs(collection(db, "stock"));
 
-      setPedidos(pedidosData);
-      setNewsletter(newsletterData);
-      setProductos(productosData);
+      setPedidos(
+        pedidosSnap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+          fechaObj: normalizarFecha(d.data().fecha),
+        })),
+      );
+
+      setNewsletter(newsletterSnap.docs.map((d) => d.data()));
+      setProductos(productosSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setStockVendido(stockSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
       setLoading(false);
     };
@@ -104,7 +109,7 @@ export default function AdminStats() {
   if (loading) {
     return (
       <div className="adminStats-loading">
-        <div className="loader"></div>
+        <div className="loader" />
         <p>Cargando estadísticas...</p>
       </div>
     );
@@ -117,11 +122,13 @@ export default function AdminStats() {
     0,
   );
 
-  const cantidadPedidos = pedidos.length;
-  const ticketPromedio = cantidadPedidos ? totalFacturado / cantidadPedidos : 0;
-
   const ventasPorDia = agruparPorDia(pedidos);
   const productosTop = contarProductos(pedidos);
+
+  const vendidosPorProducto = stockVendido.map((s) => ({
+    nombre: s.nombre || s.producto || s.id,
+    vendido: calcularVendidoTotal(s),
+  }));
 
   /* --------- Render --------- */
 
@@ -129,35 +136,31 @@ export default function AdminStats() {
     <div className="adminStats-container">
       <h2 className="adminStats-title">📊 Estadísticas Generales</h2>
 
-      {/* --------- Cards --------- */}
+      {/* KPIs */}
       <div className="adminStats-cards">
         <div className="stat-card">
           <span>Total facturado</span>
           <strong>${totalFacturado.toLocaleString("es-AR")}</strong>
         </div>
-
         <div className="stat-card">
           <span>Pedidos exitosos</span>
-          <strong>{cantidadPedidos}</strong>
+          <strong>{pedidos.length}</strong>
         </div>
-
         <div className="stat-card">
           <span>Ticket promedio</span>
-          <strong>${Math.round(ticketPromedio).toLocaleString("es-AR")}</strong>
+          <strong>${(totalFacturado / pedidos.length || 0).toFixed(0)}</strong>
         </div>
-
         <div className="stat-card">
           <span>Producto más vendido</span>
           <strong>{productosTop[0]?.nombre || "-"}</strong>
         </div>
-
         <div className="stat-card">
           <span>Newsletter</span>
           <strong>{newsletter.length}</strong>
         </div>
       </div>
 
-      {/* --------- Gráficos --------- */}
+      {/* FILA 1 */}
       <div className="adminStats-charts">
         <div className="chart-card">
           <h4>Ventas por día</h4>
@@ -167,12 +170,7 @@ export default function AdminStats() {
               <XAxis dataKey="dia" />
               <YAxis />
               <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#10e09b"
-                strokeWidth={3}
-              />
+              <Line dataKey="total" stroke="#10e09b" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -182,36 +180,88 @@ export default function AdminStats() {
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={productosTop.slice(0, 8)}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="nombre" tick={false} />
+              <XAxis dataKey="nombre" hide />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="ventas" fill="#2572ef" />
+              <Bar dataKey="ventas" fill="#6366f1" />
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* --------- Resumen productos --------- */}
+      {/* FILA 2 */}
+      <div className="adminStats-charts">
+        {/* Stock actual */}
         <div className="chart-card">
-          <h4>📦 Resumen de productos</h4>
+          <h4>Stock de Producto</h4>
 
-          <div className="productos-resumen">
-            {productos.slice(0, 8).map((p) => {
-              const stockTotal = calcularStockTotal(p);
-
-              return (
+          <div className="productos-scroll">
+            <div className="productos-resumen">
+              {productos.map((p) => (
                 <div key={p.id} className="producto-row">
                   <span className="prod-nombre">{p.title}</span>
                   <span className="prod-precio">
                     ${Number(p.price).toLocaleString("es-AR")}
                   </span>
                   <span
-                    className={`prod-stock ${stockTotal <= 3 ? "low" : ""}`}
+                    className={`prod-stock ${
+                      calcularStockTotal(p) <= 3 ? "low" : ""
+                    }`}
                   >
-                    {stockTotal}
+                    {calcularStockTotal(p)}
                   </span>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Stock vendido */}
+        <div className="chart-card">
+          <h4>Stock vendido</h4>
+
+          <div className="productos-scroll">
+            <div className="productos-resumen">
+              {stockVendido.map((s) => {
+                const nombre = s.nombre || s.producto || s.id;
+                const conTalles = tieneTalles(s);
+
+                return (
+                  <div
+                    key={nombre}
+                    className="producto-row vendido producto-row-extended"
+                  >
+                    {/* fila principal */}
+                    <div className="prod-main">
+                      <span className="prod-nombre">{nombre}</span>
+                      <span className="prod-stock sold">
+                        {calcularVendidoTotal(s)}
+                      </span>
+                    </div>
+
+                    {/* talles (solo si existen) */}
+                    {conTalles && (
+                      <div className="prod-talles">
+                        {Object.entries(s)
+                          .filter(
+                            ([k]) =>
+                              k !== "cantidad" &&
+                              k !== "nombre" &&
+                              k !== "producto",
+                          )
+                          .map(([talle, qty]) => (
+                            <span
+                              key={talle}
+                              className={`talle ${qty === 0 ? "sin-stock" : ""}`}
+                            >
+                              {talle}: {qty}
+                            </span>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
