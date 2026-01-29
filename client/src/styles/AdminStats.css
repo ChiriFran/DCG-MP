@@ -1,0 +1,82 @@
+:root {
+  --bg-main: rgba(0, 0, 0, 0);
+  --bg-card: #2d2d2d;
+  --bg-card-hover: #161d2f;
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --text-main: #d5d5d6;
+  --text-muted: #5d626a;
+  --accent: #6366f1; /* indigo */
+  --success: #22c55e;
+  --warning: #facc15;
+}
+
+.adminStats-container {
+  padding: 24px;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.adminStats-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ===== CARDS ===== */
+
+.adminStats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.stat-card span {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 26px;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ===== CHARTS ===== */
+
+.adminStats-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.chart-card {
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
+}
+
+.chart-card h4 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
