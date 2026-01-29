@@ -102,7 +102,12 @@ export default function AdminStats() {
   }, []);
 
   if (loading) {
-    return <div className="adminStats-loading">Cargando estadísticas...</div>;
+    return (
+      <div className="adminStats-loading">
+        <div className="loader"></div>
+        <p>Cargando estadísticas...</p>
+      </div>
+    );
   }
 
   /* --------- Métricas --------- */

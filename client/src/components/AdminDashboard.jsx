@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import AdminStats from "./AdminStats";
 import AdminPedidos from "./AdminPedidos";
 import AdminProductos from "./AdminProductos";
+import AdminEventos from "./AdminEventos";
+import AdminMusic from "./AdminMusic";
 import AdminUsuarios from "./AdminUsuarios";
 
 import "../styles/AdminDashboard.css";
@@ -38,6 +40,20 @@ const AdminDashboard = () => {
         </button>
 
         <button
+          className={`tab-btn ${activeTab === "eventos" ? "active" : ""}`}
+          onClick={() => setActiveTab("eventos")}
+        >
+          🎫 Eventos
+        </button>
+
+        <button
+          className={`tab-btn ${activeTab === "music" ? "active" : ""}`}
+          onClick={() => setActiveTab("music")}
+        >
+          🎧 Música
+        </button>
+
+        <button
           className={`tab-btn ${activeTab === "usuarios" ? "active" : ""}`}
           onClick={() => setActiveTab("usuarios")}
         >
@@ -49,6 +65,8 @@ const AdminDashboard = () => {
         {activeTab === "stats" && <AdminStats />}
         {activeTab === "pedidos" && <AdminPedidos />}
         {activeTab === "productos" && <AdminProductos />}
+        {activeTab === "eventos" && <AdminEventos />}
+        {activeTab === "music" && <AdminMusic />}
         {activeTab === "usuarios" && <AdminUsuarios />}
       </div>
     </div>

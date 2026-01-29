@@ -1,0 +1,146 @@
+.adminEventos-container {
+  padding: 24px;
+  background: #111214;
+  color: #e5e7eb;
+}
+
+.adminEventos-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ===== FORM ===== */
+
+.adminEventos-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.adminEventos-form input {
+  background: #0b0e14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #e5e7eb;
+  font-size: 13px;
+}
+
+.adminEventos-form input::placeholder {
+  color: #6b7280;
+}
+
+.adminEventos-form button {
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.adminEventos-form button:hover {
+  opacity: 0.9;
+}
+
+/* ===== GRID ===== */
+
+.adminEventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.adminEvento-card {
+  background: #111214;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminEvento-img img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.adminEvento-info {
+  padding: 10px 12px;
+}
+
+.adminEvento-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.adminEvento-info span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ===== ACTIONS ===== */
+
+.adminEvento-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.adminEvento-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.adminEvento-actions button:hover {
+  opacity: 1;
+}
+
+.adminEvento-card.active {
+  border: 1px solid #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
+/* ===== LOADING ===== */
+
+.adminEventos-loading {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px 0;
+}
+
+/* subir eventos e imagenes */
+.adminEventos-upload {
+  background: #0b0e14;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+  color: #9ca3af;
+}
+
+.adminEventos-upload:hover {
+  border-color: #6366f1;
+  color: #e5e7eb;
+}
+
+.adminEventos-preview {
+  margin-bottom: 20px;
+  max-width: 220px;
+}
+
+.adminEventos-preview img {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

@@ -2,6 +2,7 @@
   padding: 24px;
   background: #111214;
   color: #e5e7eb;
+  overflow: hidden;
 }
 
 /* ===== TÍTULO ===== */
@@ -67,7 +68,7 @@
 .chart-card {
   background: #111214;
   border-radius: 14px;
-  padding: 16px;
+  padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -154,4 +155,31 @@
 
 .recharts-tooltip-item-value {
   font-weight: 600;
+}
+
+/* LOADING */
+.adminStats-loading {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #9ca3af; /* gris suave */
+  font-size: 14px;
+}
+
+.loader {
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  border-top: 4px solid #6366f1; /* acento (indigo) */
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

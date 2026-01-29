@@ -1,0 +1,106 @@
+.adminMusic {
+  padding: 24px;
+  color: #e5e7eb;
+}
+
+/* FORM */
+.adminMusic-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 30px;
+  background: #111214;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminMusic-form input {
+  background: #0b0e14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.adminMusic-form button {
+  grid-column: 1 / -1;
+  background: #6366f1;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* LIST */
+.adminMusic-list {
+  display: grid;
+  gap: 14px;
+}
+
+/* ITEM */
+.adminMusic-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  background: #111214;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.adminMusic-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.adminMusic-info input {
+  width: 100%;
+  margin-bottom: 6px;
+  background: #0b0e14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.adminMusic-info strong {
+  font-size: 14px;
+}
+
+.adminMusic-info p {
+  margin: 2px 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.adminMusic-info small {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ACTIONS */
+.adminMusic-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adminMusic-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.adminMusic-actions button:hover {
+  transform: scale(1.15);
+}
