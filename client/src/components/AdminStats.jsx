@@ -48,18 +48,30 @@ const contarProductos = (pedidos) => {
     .sort((a, b) => b.ventas - a.ventas);
 };
 
+const calcularStockTotal = (p) => {
+  if (p.stock !== undefined) return Number(p.stock);
+  return ["S", "M", "L", "XL", "XXL"].reduce(
+    (acc, t) => acc + Number(p[`stock${t}`] || 0),
+    0,
+  );
+};
+
 /* ---------------- Componente ---------------- */
 
 export default function AdminStats() {
   const [loading, setLoading] = useState(true);
+
   const [pedidos, setPedidos] = useState([]);
+  const [newsletter, setNewsletter] = useState([]);
+  const [productos, setProductos] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 
-      const snap = await getDocs(collection(db, "pedidosExitosos"));
-      const data = snap.docs.map((doc) => {
+      // pedidos exitosos
+      const pedidosSnap = await getDocs(collection(db, "pedidosExitosos"));
+      const pedidosData = pedidosSnap.docs.map((doc) => {
         const d = doc.data();
         return {
           id: doc.id,
@@ -68,7 +80,21 @@ export default function AdminStats() {
         };
       });
 
-      setPedidos(data);
+      // newsletter
+      const newsletterSnap = await getDocs(collection(db, "newsletter"));
+      const newsletterData = newsletterSnap.docs.map((d) => d.data());
+
+      // productos
+      const productosSnap = await getDocs(collection(db, "productos"));
+      const productosData = productosSnap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      }));
+
+      setPedidos(pedidosData);
+      setNewsletter(newsletterData);
+      setProductos(productosData);
+
       setLoading(false);
     };
 
@@ -80,10 +106,12 @@ export default function AdminStats() {
   }
 
   /* --------- Métricas --------- */
+
   const totalFacturado = pedidos.reduce(
     (acc, p) => acc + Number(p.precioTotal || 0),
     0,
   );
+
   const cantidadPedidos = pedidos.length;
   const ticketPromedio = cantidadPedidos ? totalFacturado / cantidadPedidos : 0;
 
@@ -91,6 +119,7 @@ export default function AdminStats() {
   const productosTop = contarProductos(pedidos);
 
   /* --------- Render --------- */
+
   return (
     <div className="adminStats-container">
       <h2 className="adminStats-title">📊 Estadísticas Generales</h2>
@@ -116,14 +145,17 @@ export default function AdminStats() {
           <span>Producto más vendido</span>
           <strong>{productosTop[0]?.nombre || "-"}</strong>
         </div>
+
+        <div className="stat-card">
+          <span>Newsletter</span>
+          <strong>{newsletter.length}</strong>
+        </div>
       </div>
 
       {/* --------- Gráficos --------- */}
       <div className="adminStats-charts">
-        {/* Ventas por día */}
         <div className="chart-card">
           <h4>Ventas por día</h4>
-
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={ventasPorDia}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -140,10 +172,8 @@ export default function AdminStats() {
           </ResponsiveContainer>
         </div>
 
-        {/* Productos más vendidos */}
         <div className="chart-card">
           <h4>Productos más vendidos</h4>
-
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={productosTop.slice(0, 8)}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -153,6 +183,31 @@ export default function AdminStats() {
               <Bar dataKey="ventas" fill="#2572ef" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* --------- Resumen productos --------- */}
+        <div className="chart-card">
+          <h4>📦 Resumen de productos</h4>
+
+          <div className="productos-resumen">
+            {productos.slice(0, 8).map((p) => {
+              const stockTotal = calcularStockTotal(p);
+
+              return (
+                <div key={p.id} className="producto-row">
+                  <span className="prod-nombre">{p.title}</span>
+                  <span className="prod-precio">
+                    ${Number(p.price).toLocaleString("es-AR")}
+                  </span>
+                  <span
+                    className={`prod-stock ${stockTotal <= 3 ? "low" : ""}`}
+                  >
+                    {stockTotal}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
